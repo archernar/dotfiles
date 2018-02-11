@@ -50,6 +50,7 @@ call vundle#begin()               " Vundle BEGIN
 Plugin 'VundleVim/Vundle.vim'
 " Plugin 'file:///home/mestes/scm/polymode.vim'
 Plugin 'archernar/polymode.vim'
+"Plugin 'wincent/scalpel'
 Plugin 'scrooloose/nerdtree.git'
 "Plugin 'Buffergator'
 Plugin 'tpope/vim-fugitive'
@@ -79,7 +80,10 @@ nnoremap <F2> <C-W>w
 nnoremap <F3> :bnext<CR>
 nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
 nnoremap <F5> :call Colorlet(-1)<cr>
-nnoremap <F6> :MRU<cr>
+nnoremap <F6> :colorscheme darkblue<cr>hi Visual   cterm=reverse<cr>
+nnoremap <F7> :MRU<cr>
+nnoremap <F8> :UndotreeToggle<cr>
+nnoremap <F9> :set paste!<cr>
                                   " *******************************************************************
                                   " Leader Function Keys
 nnoremap <silent> <leader><F2> :wincmd _<cr>:wincmd \|<cr>
@@ -130,7 +134,9 @@ let @e = "</kbd>"
 let @t = "</li>"
 nnoremap <leader>1 "bP<esc>
 nnoremap <leader>2 "ep<esc>
-nnoremap <leader>3 "tp<esc>
+nnoremap <leader>3 $"tp<esc>0jw
+                                  " *******************************************************************
+                                  " Tester Mapping
 
 " <li><kbd>TEST</kbd> TEST TEST TESTTEST TEST</li>
 " TEST TEST TEST TESTTEST TEST
