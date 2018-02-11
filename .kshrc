@@ -4,11 +4,13 @@
 # #######################################################################
 # http://www.badassvim.com/find-edit-vimrc-file/
 # find . -name *.mpeg -exec cp '{}' /tmp/set \;
+# sudo update-alternatives --config java
+# sudo update-alternatives --config javac
+# http://ubuntuhandbook.org/index.php/2015/01/install-openjdk-8-ubuntu-14-04-12-04-lts/
 # #######################################################################
 cp ~/.vimrc /home/mestes/scm/vimrc.vim/.vimrc
 
 
-alias vi='vi -c MRU'
 alias vii='vi -o'
 alias VIM='vim -u NONE'
 alias VI='vim'
@@ -110,6 +112,7 @@ alias H258='ssh 192.168.1.258'
 alias H259='ssh 192.168.1.259'
 alias H260='ssh 192.168.1.260'
 alias lssize='ls -S -lr'
+alias lss='ls -la | grep "^d" && ls -la | grep "^-" && ls -la | grep "^l"'
 
 alias lse='ls -l /etc/time/earth'
 alias vfig='vi /usr/local/tools/fig'
@@ -120,6 +123,7 @@ alias itt='cd ~/aman/amanscripts'
 alias scm='cd ~/scm'
 alias scmi='cd ~/scm/iman'
 alias scmp='cd ~/scm/polymode.vim'
+alias scmpp='cd ~/scm/polymode.vim/plugin'
 alias scmf='cd ~/scm/fastlight'
 alias scmkm='cd ~/scm/km'
 alias scmt='cd ~/scm/tom'
@@ -203,41 +207,6 @@ print ""
 /usr/lib/jvm/default-java/bin/java -version
 iwconfig
 
-# #######################################################################
-# setup PATH
-# setup CLASSPATH
-# #######################################################################
-monty() {
-     print "$1" |  gawk '{printf("%-54s ",$0)}'
-     if [ -d "$1" ] ; then
-          PATH="$1:$PATH"
-          export PATH
-          print "OK" |  gawk '{printf("%s\n",$0)}'
-     else
-          print "BAD" |  gawk '{printf("%s\n",$0)}'
-     fi
-}
-print "+-------------------------------------------------------------------+"
-monty ./
-monty $M2 
-monty "$EC2_HOME/bin"
-monty $HOME/bin
-monty $HOME/tools
-monty $HOME/ant/bin
-monty /home/mestes/scm/km
-monty /home/mestes/scm/km/scripts
-monty $AWS_CLOUDWATCH_HOME/bin
-monty $HOME/aman
-monty $HOME/aman/scripts
-monty $HOME/awsscripts
-monty /sbin
-monty /usr/share/fslint/fslint
-monty /usr/local/tools
-monty /usr/network/bin
-monty /home/mestes/scm/utils
-monty $HOME/ec2
-print "+-------------------------------------------------------------------+"
-cp /usr/network/bin/* /usr/local/tools
 
 export ADK=$HOME/aws-java-sdk-1.11.51
 export ADKV=1.11.51
@@ -389,6 +358,12 @@ if grep -qs '/etc/share' /proc/mounts; then
     cp ~/.vimrc   /etc/share/SYS/$HOSTNAME/.vimrc
     cp ~/.kshrc   /etc/share/SYS/$HOSTNAME/.kshrc
     cp ~/.profile /etc/share/SYS/$HOSTNAME/.profile
+
+    ALAMOBACKUP=/etc/share/backup
+    rsync -av --delete ~/.vimrc          $ALAMOBACKUP
+    rsync -av --delete ~/.kshrc          $ALAMOBACKUP
+    rsync -av --delete ~/.profile        $ALAMOBACKUP
+
 else
     figlet -t -c "No Alamo File Server"
 fi
@@ -407,9 +382,9 @@ iwlist wlan0
 print "https://gitlab.com/archernar/archernar.git"
 
 
-export M2_HOME=/usr/share/maven
-export M2=$M2_HOME/bin
-export PATH=$M2:$PATH
+# export M2_HOME=/usr/share/maven
+# export M2=$M2_HOME/bin
+# export PATH=$M2:$PATH
 
 
 if grep -qs '/etc/share' /proc/mounts; then
@@ -417,3 +392,29 @@ if grep -qs '/etc/share' /proc/mounts; then
 fi
 
 
+# #######################################################################
+# setup PATH
+# setup CLASSPATH
+# monty $M2 
+# #######################################################################
+monty() {
+     print "$1" |  gawk '{printf("%-54s ",$0)}'
+     if [ -d "$1" ] ; then
+          PATH="$1:$PATH"
+          export PATH
+          print "OK" |  gawk '{printf("%s\n",$0)}'
+     else
+          print "BAD" |  gawk '{printf("%s\n",$0)}'
+     fi
+}
+print "+-------------------------------------------------------------------+"
+monty ./
+monty /home/mestes/scm/km
+monty /home/mestes/scm/km/scripts
+monty /sbin
+monty /usr/share/fslint/fslint
+monty $HOME/ec2
+
+monty /usr/local/tools
+monty $HOME/firstbin
+print "+-------------------------------------------------------------------+"
