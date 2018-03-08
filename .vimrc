@@ -49,6 +49,7 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()               " Vundle BEGIN
 Plugin 'VundleVim/Vundle.vim'
 " Plugin 'file:///home/mestes/scm/polymode.vim'
+Plugin 'kristijanhusak/vim-carbon-now-sh'
 Plugin 'archernar/polymode.vim'
 "Plugin 'wincent/scalpel'
 Plugin 'scrooloose/nerdtree.git'
@@ -84,6 +85,7 @@ nnoremap <F6> :colorscheme darkblue<cr>hi Visual   cterm=reverse<cr>
 nnoremap <F7> :MRU<cr>
 nnoremap <F8> :UndotreeToggle<cr>
 nnoremap <F9> :set paste!<cr>
+nnoremap <F12> :wa<CR>:!build<CR>
                                   " *******************************************************************
                                   " Leader Function Keys
 nnoremap <silent> <leader><F2> :wincmd _<cr>:wincmd \|<cr>
@@ -145,3 +147,126 @@ nnoremap <leader>3 $"tp<esc>0jw
 " set cpo-=<
 " set wcm=<C-Z>
 " map <F4> :emenu <C-Z>
+
+" Bind F5 to save file if modified and execute python script in a buffer.
+nnoremap <silent> <F5> :call SaveAndExecutePython()<CR>
+vnoremap <silent> <F5> :<C-u>call SaveAndExecutePython()<CR>
+nnoremap <silent> <F6> :call Tb()<CR>
+
+function! RandomString()
+    let l:szAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    let l:c = 1
+    let l:szOut = ""
+    while l:c <= 8
+         let l:rrr = str2nr(matchstr(reltimestr(reltime()), '\v\.@<=\d+')[1:]) % 24 
+         let l:szOut = l:szOut . l:szAlpha[rrr] 
+         let l:c += 1
+    endwhile 
+    return l:szOut
+endfunction
+
+function! SaveAndExecutePython()
+    " https://stackoverflow.com/questions/18948491/running-python-code-in-vim
+    " SOURCE [reusable window]: https://github.com/fatih/vim-go/blob/master/autoload/go/ui.vim
+
+                                  " *******************************************************************
+                                  " Save and reload current file
+                                  " Get file path of current file
+    silent execute "update | edit"
+    let s:current_buffer_file_path = expand("%")
+    let s:output_buffer_name = "Python"
+    let s:output_buffer_filetype = "output"
+                                  " *******************************************************************
+                                  " Reuse existing buffer window if it exists otherwise create a new one
+    if !exists("s:buf_nr") || !bufexists(s:buf_nr)
+        silent execute 'botright new ' . s:output_buffer_name
+        let s:buf_nr = bufnr('%')
+    elseif bufwinnr(s:buf_nr) == -1
+        silent execute 'botright new'
+        silent execute s:buf_nr . 'buffer'
+    elseif bufwinnr(s:buf_nr) != bufwinnr('%')
+        silent execute bufwinnr(s:buf_nr) . 'wincmd w'
+    endif
+
+    silent execute "setlocal filetype=" . s:output_buffer_filetype
+                                  " *******************************************************************
+	                          " bufhidden:  This option specifies what happens when a buffer is no longer displayed in a window
+	                          " buftype:    'nofile' means that the buffer is not associated with a file
+    setlocal bufhidden=delete
+    setlocal buftype=nofile
+    setlocal noswapfile
+    setlocal nobuflisted
+    setlocal winfixheight
+"    setlocal cursorline " make it easy to distinguish
+    setlocal nonumber
+    setlocal norelativenumber
+    setlocal showbreak=""
+
+    " clear the buffer
+    setlocal noreadonly
+    setlocal modifiable
+    %delete _
+
+    " add the console output
+    silent execute ".!python " . shellescape(s:current_buffer_file_path, 1)
+
+    " resize window to content length
+    " Note: This is annoying because if you print a lot of lines then your code buffer is
+    " forced to a height of one line every time you run this function.
+    " However without this line the buffer starts off as a default size and if you resize
+    " the buffer then it keeps that custom size after repeated runs of this function.
+    " But if you close the output buffer then it returns to using the default size when its recreated
+    "execute 'resize' . line('$')
+
+    " make the buffer non modifiable
+    setlocal readonly
+    setlocal nomodifiable
+    wincmd k
+endfunction
+
+
+
+
+function! Tb()
+    let l:cWord = shellescape(expand("<cWORD>"))
+    silent execute "update | edit"
+    let s:current_buffer_file_path = expand("%")
+    let s:output_buffer_name = RandomString()
+    let s:output_buffer_filetype = "output"
+    if !exists("s:buf_nr") || !bufexists(s:buf_nr)
+        silent execute 'botright new ' . s:output_buffer_name
+        let s:buf_nr = bufnr('%')
+    elseif bufwinnr(s:buf_nr) == -1
+        silent execute 'botright new'
+        silent execute s:buf_nr . 'buffer'
+    elseif bufwinnr(s:buf_nr) != bufwinnr('%')
+        silent execute bufwinnr(s:buf_nr) . 'wincmd w'
+    endif
+
+    silent execute "setlocal filetype=" . s:output_buffer_filetype
+    setlocal bufhidden=delete
+    setlocal buftype=nofile
+    setlocal noswapfile
+    setlocal nobuflisted
+    setlocal winfixheight
+"    setlocal cursorline " make it easy to distinguish
+    setlocal nonumber
+    setlocal norelativenumber
+    setlocal showbreak=""
+
+    " clear the buffer
+    setlocal noreadonly
+    setlocal modifiable
+    %delete _
+
+    " add the console output
+    let l:szCommand = ".!grep -n " .  l:cWord . " " . s:current_buffer_file_path
+    silent execute  l:szCommand
+    setlocal readonly
+    setlocal nomodifiable
+
+endfunction
+
+
+
+
