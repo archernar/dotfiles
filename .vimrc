@@ -121,6 +121,7 @@ set t_Co=256
                                   " *******************************************************************
                                   " Set Color Scheme
 colorscheme darkblue
+colorscheme pablo
 hi Visual   cterm=reverse
 
 " nnoremap <silent> <Leader><PageUp> :wincmd _<cr>:wincmd \|<cr>
@@ -151,7 +152,7 @@ nnoremap <leader>3 $"tp<esc>0jw
 " Bind F5 to save file if modified and execute python script in a buffer.
 nnoremap <silent> <F5> :call SaveAndExecutePython()<CR>
 vnoremap <silent> <F5> :<C-u>call SaveAndExecutePython()<CR>
-nnoremap <silent> <F6> :call Tb()<CR>
+nnoremap <silent> <F6> :call Tcmd()<CR>
 
 function! RandomString()
     let l:szAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -229,6 +230,8 @@ endfunction
 
 function! Tb()
     let l:cWord = shellescape(expand("<cWORD>"))
+    call SetRegisterI()
+    let l:cWord = @i
     silent execute "update | edit"
     let s:current_buffer_file_path = expand("%")
     let s:output_buffer_name = RandomString()
@@ -270,3 +273,64 @@ endfunction
 
 
 
+function! Tcmd()
+    call SetRegisterI()
+    let l:cWord = @i
+    silent execute "update | edit"
+    call MakeTempBuffer()
+
+    let l:szCommand = ".!" .  l:cWord
+    silent execute  l:szCommand
+
+    call LockTempBuffer()
+
+endfunction
+
+
+
+
+function! MakeTempBuffer()
+    let s:current_buffer_file_path = expand("%")
+    let s:output_buffer_name = RandomString()
+    let s:output_buffer_filetype = "output"
+    if !exists("s:buf_nr") || !bufexists(s:buf_nr)
+        silent execute 'botright new ' . s:output_buffer_name
+        let s:buf_nr = bufnr('%')
+    elseif bufwinnr(s:buf_nr) == -1
+        silent execute 'botright new'
+        silent execute s:buf_nr . 'buffer'
+    elseif bufwinnr(s:buf_nr) != bufwinnr('%')
+        silent execute bufwinnr(s:buf_nr) . 'wincmd w'
+    endif
+    silent execute "setlocal filetype=" . s:output_buffer_filetype
+    setlocal bufhidden=delete
+    setlocal buftype=nofile
+    setlocal noswapfile
+    setlocal nobuflisted
+    setlocal winfixheight
+"    setlocal cursorline " make it easy to distinguish
+    setlocal nonumber
+    setlocal norelativenumber
+    setlocal showbreak=""
+
+    " clear the buffer
+    setlocal noreadonly
+    setlocal modifiable
+    %delete _
+
+
+endfunction
+function! LockTempBuffer()
+    setlocal readonly
+    setlocal nomodifiable
+endfunction
+
+
+
+
+function! SetRegisterI()
+      let szIn = input('Value: ')
+      let @i = szIn
+      echo "\r"
+      echo ""
+endfunction
