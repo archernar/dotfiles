@@ -329,7 +329,7 @@ endfunction
 
 
 function! SetRegisterI()
-      let szIn = input('Value: ')
+      let szIn = input('$ ')
       let @i = szIn
       echo "\r"
       echo ""
