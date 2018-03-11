@@ -1,6 +1,7 @@
 "=============================================================================
 "=    W e l c o m e   t o   m y  V I M R C                                   =
 "=============================================================================
+let gfbar = "<F2> Next Window, <F3> Next Buffer, <F4> New ShellScript, <F5> Python, <F6> Command, <F7> MRU, <F8> UndoTree, <F9> PasteMode"
 set nocompatible
 set hidden
 set foldcolumn=3
@@ -69,10 +70,11 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 " *****************************************************************************************************
                                   " *******************************************************************
                                   " Command Words
+command! COLORLET :call Colorlet(-1)
 command! LIB :call OpenLibrary()
 command! Lib :call OpenLibrary()
-command! NOTES :call OpenNotes()
-command! Notes :call OpenNotes()
+command! NOTES :call OpenMyNotes()
+command! Notes :call OpenMyNotes()
 command! BE :call SetRegistersBE()
 command! Be :call SetRegistersBE()
                                   " *******************************************************************
@@ -80,8 +82,11 @@ command! Be :call SetRegistersBE()
 nnoremap <F2> <C-W>w
 nnoremap <F3> :bnext<CR>
 nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
-nnoremap <F5> :call Colorlet(-1)<cr>
-nnoremap <F6> :colorscheme darkblue<cr>hi Visual   cterm=reverse<cr>
+nnoremap <leader><F5> :call Colorlet(-1)<cr><esc>
+nnoremap <silent> <F5> :call SaveAndExecutePython()<CR>
+vnoremap <silent> <F5> :<C-u>call SaveAndExecutePython()<CR>
+nnoremap <leader><F6> :colorscheme pablo<cr>hi Visual   cterm=reverse<cr><esc>
+nnoremap <silent> <F6> :call Tcmd()<CR>
 nnoremap <F7> :MRU<cr>
 nnoremap <F8> :UndotreeToggle<cr>
 nnoremap <F9> :set paste!<cr>
@@ -112,6 +117,7 @@ nnoremap <leader>w :call Smash()<cr>
                                   " *******************************************************************
                                   " MJE Polymode Keys
 nnoremap <Home> :call PolyMode(-1)<cr>
+nnoremap <silent> <leader><Home> :close<cr>
 nnoremap <End>  :call PolyModeReset()<cr>
                                   " *******************************************************************
                                   " Powerline
@@ -149,10 +155,6 @@ nnoremap <leader>3 $"tp<esc>0jw
 " set wcm=<C-Z>
 " map <F4> :emenu <C-Z>
 
-" Bind F5 to save file if modified and execute python script in a buffer.
-nnoremap <silent> <F5> :call SaveAndExecutePython()<CR>
-vnoremap <silent> <F5> :<C-u>call SaveAndExecutePython()<CR>
-nnoremap <silent> <F6> :call Tcmd()<CR>
 
 function! RandomString()
     let l:szAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -334,3 +336,36 @@ function! SetRegisterI()
       echo "\r"
       echo ""
 endfunction
+function! Tput(sz)
+    call append(line('$'), a:sz)
+endfunction
+function! OpenMyNotes()
+    call MakeTempBuffer()
+    call Tput("My Mappings                                                                                              My Commands ")
+    call Tput("F2             Next Window          <leader> F2    Zoom Buffer                                           Lib     Open Reference Files")
+    call Tput("F3             Next Buffer          <leader> F3    Un-Zoom Buffer                                        Notes   Open Notes Ref File")
+    call Tput("F4             Script with Header   <leader> F4    Close Buffer                                          MRU     Recent Files")
+    call Tput("F5             Colorlet        ")
+    call Tput("F6             MRU               ")
+    call Tput("F7              ")
+    call Tput("<Leader>nt     NERDTreeToggle  <Leader>p      PluginUpdate      <leader>ev :split $MYVIMRC               <leader>sv :source $MYVIMRC")
+    call Tput("Folding")
+    call Tput("zi  switch folding on or off")
+    call Tput("za  toggle current fold open/closed")
+    call Tput("zc  close current fold")
+    call Tput("zR  open all folds")
+    call Tput("zM  close all folds")
+    call Tput("zv  expand folds to reveal cursor")
+    call Tput("")
+    call Tput("Tabs and Multiple Files")
+    call Tput(":tabnew [file]       - Open a new tab with given file (or empty file)")
+    call Tput("gt or :tabn[ext]     - Next tab")
+    call Tput("gT or :tabp[revious] - Previous tab")
+    call Tput(":tabm[ove] #         - Move current tab to position # (zero-indexed), no argument = end")
+    call Tput(":tabc                - Close current tab")
+    call Tput(":tabo                - Close all other tabs except current")
+    call LockTempBuffer()
+endfunction
+
+
+
