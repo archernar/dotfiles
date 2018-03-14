@@ -1,7 +1,18 @@
 "=============================================================================
 "=    W e l c o m e   t o   m y  V I M R C                                   =
 "=============================================================================
-let gfbar = "<F2> Next Window, <F3> Next Buffer, <F4> New ShellScript, <F5> Python, <F6> Command, <F7> MRU, <F8> UndoTree, <F9> PasteMode"
+" There are several name spaces for variables.i
+" 
+" (nothing)            In a function: local to a function; otherwise: global
+" |buffer-variable|    b:	  Local to the current buffer.
+" |window-variable|    w:	  Local to the current window.
+" |tabpage-variable|   t:	  Local to the current tab page.
+" |global-variable|    g:	  Global.
+" |local-variable|     l:	  Local to a function.
+" |script-variable|    s:	  Local to a |:source|'ed Vim script.
+" |function-argument|  a:	  Function argument (only inside a function).
+" |vim-variable|       v:	  Global, predefined by Vim.
+"=============================================================================
 set nocompatible
 set hidden
 set foldcolumn=3
@@ -70,6 +81,8 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 " *****************************************************************************************************
                                   " *******************************************************************
                                   " Command Words
+command! KSH :call OpenKshTop()
+command! GAWK :call SaveAndExecuteGawk()
 command! COLORLET :call Colorlet(-1)
 command! LIB :call OpenLibrary()
 command! Lib :call OpenLibrary()
@@ -91,6 +104,7 @@ nnoremap <F7> :MRU<cr>
 nnoremap <F8> :UndotreeToggle<cr>
 nnoremap <F9> :set paste!<cr>
 nnoremap <F12> :wa<CR>:!build<CR>
+nnoremap <leader><F12> :call SaveAndExecuteGawk()<CR>
                                   " *******************************************************************
                                   " Leader Function Keys
 nnoremap <silent> <leader><F2> :wincmd _<cr>:wincmd \|<cr>
@@ -117,7 +131,6 @@ nnoremap <leader>w :call Smash()<cr>
                                   " *******************************************************************
                                   " MJE Polymode Keys
 nnoremap <Home> :call PolyMode(-1)<cr>
-nnoremap <silent> <leader><Home> :close<cr>
 nnoremap <End>  :call PolyModeReset()<cr>
                                   " *******************************************************************
                                   " Powerline
@@ -339,8 +352,33 @@ endfunction
 function! Tput(sz)
     call append(line('$'), a:sz)
 endfunction
+function! OpenKshTop()
+    call MakeTempBuffer()
+    call Tput("#!/usr/bin/ksh")
+    call Tput("Tmp=\"/tmp/$$\"")
+    call Tput("TmpDir=\"/tmp/dir$$\"")
+    call Tput("trap 'rm -f \"$Tmp\" >/dev/null 2>&1' 0")
+    call Tput("trap \"exit 2\" 1 2 3 13 15")
+    call Tput("")
+endfunction
 function! OpenMyNotes()
     call MakeTempBuffer()
+    nnoremap <buffer> <End> :close<cr>
+    nnoremap <buffer> <PageUp> :close<cr>
+    nnoremap <buffer> <PageDown> :close<cr>
+    nnoremap <buffer> <Delete> :close<cr>
+    call Tput(" There are several name spaces for variables.")
+    call Tput(" ")
+    call Tput(" (nothing)            In a function: local to a function; otherwise: global")
+    call Tput(" |buffer-variable|    b:	  Local to the current buffer.")
+    call Tput(" |window-variable|    w:	  Local to the current window.")
+    call Tput(" |tabpage-variable|   t:	  Local to the current tab page.")
+    call Tput(" |global-variable|    g:	  Global.")
+    call Tput(" |local-variable|     l:	  Local to a function.")
+    call Tput(" |script-variable|    s:	  Local to a |:source|'ed Vim script.")
+    call Tput(" |function-argument|  a:	  Function argument (only inside a function).")
+    call Tput(" |vim-variable|       v:	  Global, predefined by Vim.")
+    call Tput("-")
     call Tput("My Mappings                                                                                              My Commands ")
     call Tput("F2             Next Window          <leader> F2    Zoom Buffer                                           Lib     Open Reference Files")
     call Tput("F3             Next Buffer          <leader> F3    Un-Zoom Buffer                                        Notes   Open Notes Ref File")
@@ -366,6 +404,17 @@ function! OpenMyNotes()
     call Tput(":tabo                - Close all other tabs except current")
     call LockTempBuffer()
 endfunction
+
+
+
+function! SaveAndExecuteGawk()
+    let s:current_buffer_file_path = expand("%")
+    silent execute "update | edit"
+    call MakeTempBuffer()
+    silent execute ".!gawk -f " . shellescape(s:current_buffer_file_path, 1) . " input.txt"
+    call LockTempBuffer()
+endfunction
+
 
 
 
