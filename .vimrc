@@ -307,6 +307,17 @@ endfunction
 
 
 
+function! OpenInTempBuffer(...)
+     call MakeTempBuffer()
+     execute "edit ". a:1
+     nnoremap <buffer> <Home> :close<cr>
+     nnoremap <buffer> <Insert> :close<cr>
+     nnoremap <buffer> <End> :close<cr>
+     nnoremap <buffer> <PageUp> :close<cr>
+     nnoremap <buffer> <PageDown> :close<cr>
+     nnoremap <buffer> <Delete> :close<cr>
+     call LockTempBuffer()
+endfunction
 function! MakeTempBuffer()
     let s:current_buffer_file_path = expand("%")
     let s:output_buffer_name = RandomString()
@@ -335,7 +346,7 @@ function! MakeTempBuffer()
     setlocal noreadonly
     setlocal modifiable
     %delete _
-
+    
 
 endfunction
 function! LockTempBuffer()
