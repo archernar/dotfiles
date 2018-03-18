@@ -68,7 +68,7 @@ Plugin 'kristijanhusak/vim-carbon-now-sh'
 Plugin 'archernar/polymode.vim'
 "Plugin 'wincent/scalpel'
 Plugin 'scrooloose/nerdtree.git'
-"Plugin 'Buffergator'
+Plugin 'Buffergator'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-obsession'
 Plugin 'mbbill/undotree'
@@ -84,11 +84,10 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 " *****************************************************************************************************
                                   " *******************************************************************
                                   " Command Words
+command! TERMINAL :call Terminal()
 command! KSH :call OpenKshTop()
 command! GAWK :call SaveAndExecuteGawk()
 command! COLORLET :call Colorlet(-1)
-command! LIB :call OpenLibrary()
-command! Lib :call OpenLibrary()
 command! NOTES :call OpenMyNotes()
 command! Notes :call OpenMyNotes()
 command! BE :call SetRegistersBE()
@@ -135,6 +134,7 @@ nnoremap <leader>w :call Smash()<cr>
                                   " MJE Polymode Keys
 nnoremap <Home> :call PolyMode(-1)<cr>
 nnoremap <End>  :call PolyModeReset()<cr>
+nnoremap <Insert> <Nop>
                                   " *******************************************************************
                                   " Powerline
 set  rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim/
@@ -310,13 +310,23 @@ endfunction
 function! OpenInTempBuffer(...)
      call MakeTempBuffer()
      execute "edit ". a:1
-     nnoremap <buffer> <Home> :close<cr>
-     nnoremap <buffer> <Insert> :close<cr>
-     nnoremap <buffer> <End> :close<cr>
-     nnoremap <buffer> <PageUp> :close<cr>
-     nnoremap <buffer> <PageDown> :close<cr>
-     nnoremap <buffer> <Delete> :close<cr>
+     nnoremap <silent> <buffer> <Home>   :close<cr>:call PolyModeReset()<cr>
+     nnoremap <silent> <buffer> <Insert> :close<cr>:call PolyModeReset()<cr>
+     nnoremap <silent> <buffer> <End>    :close<cr>:call PolyModeReset()<cr>
+     nnoremap <silent> <buffer> <PageUp> :close<cr>:call PolyModeReset()<cr>
+     nnoremap <silent> <buffer> <PageDown> :close<cr>:call PolyModeReset()<cr>
+     nnoremap <silent> <buffer> <Delete> :close<cr>:call PolyModeReset()<cr>
      call LockTempBuffer()
+endfunction
+function! EditInTempBuffer(...)
+     call MakeTempBuffer()
+     execute "edit ". a:1
+     nnoremap <silent> <buffer> <Home>   :close<cr>:call PolyModeReset()<cr>
+     nnoremap <silent> <buffer> <Insert> :close<cr>:call PolyModeReset()<cr>
+     nnoremap <silent> <buffer> <End>    :close<cr>:call PolyModeReset()<cr>
+     nnoremap <silent> <buffer> <PageUp> :close<cr>:call PolyModeReset()<cr>
+     nnoremap <silent> <buffer> <PageDown> :close<cr>:call PolyModeReset()<cr>
+     nnoremap <silent> <buffer> <Delete> :close<cr>:call PolyModeReset()<cr>
 endfunction
 function! MakeTempBuffer()
     let s:current_buffer_file_path = expand("%")
@@ -365,6 +375,10 @@ function! SetRegisterI()
 endfunction
 function! Tput(sz)
     call append(line('$'), a:sz)
+endfunction
+function! Terminal()
+    execute "silent !gnome-terminal --title=vimsterTerm --geometry 135x30x200x200 &"
+    redraw!
 endfunction
 function! OpenKshTop()
     call MakeTempBuffer()
