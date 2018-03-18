@@ -1,0 +1,26 @@
+
+-
+
+My Mappings                                                                                              My Commands 
+F2             Next Window          <leader> F2    Zoom Buffer                                           Lib     Open Reference Files
+F3             Next Buffer          <leader> F3    Un-Zoom Buffer                                        Notes   Open Notes Ref File
+F4             Script with Header   <leader> F4    Close Buffer                                          MRU     Recent Files
+F5             Colorlet        
+F6             MRU               
+F7              
+<Leader>nt     NERDTreeToggle  <Leader>p      PluginUpdate      <leader>ev :split $MYVIMRC               <leader>sv :source $MYVIMRC
+Folding {{{1
+zi  switch folding on or off
+za  toggle current fold open/closed
+zc  close current fold
+zR  open all folds
+zM  close all folds
+zv  expand folds to reveal cursor
+
+Tabs and Multiple Files {{{1
+:tabnew [file]       - Open a new tab with given file (or empty file)
+gt or :tabn[ext]     - Next tab
+gT or :tabp[revious] - Previous tab
+:tabm[ove] #         - Move current tab to position # (zero-indexed), no argument = end
+:tabc                - Close current tab
+:tabo                - Close all other tabs except current
