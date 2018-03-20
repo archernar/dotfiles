@@ -88,8 +88,6 @@ command! TERMINAL :call Terminal()
 command! KSH :call OpenKshTop()
 command! GAWK :call SaveAndExecuteGawk()
 command! COLORLET :call Colorlet(-1)
-command! NOTES :call OpenMyNotes()
-command! Notes :call OpenMyNotes()
 command! BE :call SetRegistersBE()
 command! Be :call SetRegistersBE()
                                   " *******************************************************************
@@ -171,6 +169,11 @@ nnoremap <leader>3 $"tp<esc>0jw
 " set wcm=<C-Z>
 " map <F4> :emenu <C-Z>
 
+function! VimKeyMap()
+     redir! > ~/.vimkeymap.txt
+     silent verbose map
+     redir END
+endfunction
 
 function! RandomString()
     let l:szAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -389,50 +392,6 @@ function! OpenKshTop()
     call Tput("trap \"exit 2\" 1 2 3 13 15")
     call Tput("")
 endfunction
-function! OpenMyNotes()
-    call MakeTempBuffer()
-    nnoremap <buffer> <End> :close<cr>
-    nnoremap <buffer> <PageUp> :close<cr>
-    nnoremap <buffer> <PageDown> :close<cr>
-    nnoremap <buffer> <Delete> :close<cr>
-    call Tput(" There are several name spaces for variables.")
-    call Tput(" ")
-    call Tput(" (nothing)            In a function: local to a function; otherwise: global")
-    call Tput(" |buffer-variable|    b:	  Local to the current buffer.")
-    call Tput(" |window-variable|    w:	  Local to the current window.")
-    call Tput(" |tabpage-variable|   t:	  Local to the current tab page.")
-    call Tput(" |global-variable|    g:	  Global.")
-    call Tput(" |local-variable|     l:	  Local to a function.")
-    call Tput(" |script-variable|    s:	  Local to a |:source|'ed Vim script.")
-    call Tput(" |function-argument|  a:	  Function argument (only inside a function).")
-    call Tput(" |vim-variable|       v:	  Global, predefined by Vim.")
-    call Tput("-")
-    call Tput("My Mappings                                                                                              My Commands ")
-    call Tput("F2             Next Window          <leader> F2    Zoom Buffer                                           Lib     Open Reference Files")
-    call Tput("F3             Next Buffer          <leader> F3    Un-Zoom Buffer                                        Notes   Open Notes Ref File")
-    call Tput("F4             Script with Header   <leader> F4    Close Buffer                                          MRU     Recent Files")
-    call Tput("F5             Colorlet        ")
-    call Tput("F6             MRU               ")
-    call Tput("F7              ")
-    call Tput("<Leader>nt     NERDTreeToggle  <Leader>p      PluginUpdate      <leader>ev :split $MYVIMRC               <leader>sv :source $MYVIMRC")
-    call Tput("Folding")
-    call Tput("zi  switch folding on or off")
-    call Tput("za  toggle current fold open/closed")
-    call Tput("zc  close current fold")
-    call Tput("zR  open all folds")
-    call Tput("zM  close all folds")
-    call Tput("zv  expand folds to reveal cursor")
-    call Tput("")
-    call Tput("Tabs and Multiple Files")
-    call Tput(":tabnew [file]       - Open a new tab with given file (or empty file)")
-    call Tput("gt or :tabn[ext]     - Next tab")
-    call Tput("gT or :tabp[revious] - Previous tab")
-    call Tput(":tabm[ove] #         - Move current tab to position # (zero-indexed), no argument = end")
-    call Tput(":tabc                - Close current tab")
-    call Tput(":tabo                - Close all other tabs except current")
-    call LockTempBuffer()
-endfunction
-
 
 
 function! SaveAndExecuteGawk()
