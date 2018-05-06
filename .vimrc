@@ -13,7 +13,7 @@
 " |function-argument|  a:	  Function argument (only inside a function).
 " |vim-variable|       v:	  Global, predefined by Vim.
 "=============================================================================
-let g:help0 = "<F2> Next Window, <F3> Next Buffer, <F4> New ShellScript, <F5> Python, <F6> Command, <F7> MRU, <F8> UndoTree, <F9> PasteMode"
+let g:help0 = "<F2> Next Window <F3> Next Buffer <F4> New ShellScript <F5> Python <F6> Command <F7> MRU <F8> UndoTree <F9> PasteMode"
 let g:help1 = "OHHHH"
 let g:help2 = "NOPE"
 set nocompatible
@@ -188,6 +188,20 @@ function! RandomString()
 endfunction
 
 function! SaveAndExecutePython()
+    " https://stackoverflow.com/questions/18948491/running-python-code-in-vim
+    " SOURCE [reusable window]: https://github.com/fatih/vim-go/blob/master/autoload/go/ui.vim
+    call MakeTempBuffer()
+
+    " add the console output
+    silent execute ".!python " . shellescape(s:current_buffer_file_path, 1)
+    call LockTempBuffer()
+    wincmd k
+endfunction
+
+
+
+
+function! SaveAndExecutePython22222()
     " https://stackoverflow.com/questions/18948491/running-python-code-in-vim
     " SOURCE [reusable window]: https://github.com/fatih/vim-go/blob/master/autoload/go/ui.vim
 
