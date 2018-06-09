@@ -1,6 +1,7 @@
 "=============================================================================
 "=    W e l c o m e   t o   m y  V I M R C                                   =
 "=============================================================================
+" Notes
 " There are several name spaces for variables.i
 " 
 " (nothing)            In a function: local to a function; otherwise: global
@@ -12,14 +13,16 @@
 " |script-variable|    s:	  Local to a |:source|'ed Vim script.
 " |function-argument|  a:	  Function argument (only inside a function).
 " |vim-variable|       v:	  Global, predefined by Vim.
+" nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
 "=============================================================================
-let g:help0 = "<F2> Next Window <F3> Next Buffer <F4> New ShellScript <F5> Python <F6> Command <F7> MRU <F8> UndoTree <F9> PasteMode"
+let g:help0 = "<F2> Next Window <F3> Next Buffer <F5> Python <F6> Command <F7> MRU <F8> UndoTree <F9> PasteMode"
 let g:help1 = "OHHHH"
 let g:help2 = "NOPE"
 set nocompatible
 set hidden
 set foldcolumn=3
 set foldmethod=marker
+set foldlevelstart=20
 set ruler                         " Display the cursor position on the last line of the screen or in the status line of a window
 set number                        " Display line numbers on the left
 set wildmenu                      " Better command-line completion
@@ -69,6 +72,7 @@ Plugin 'archernar/polymode.vim'
 "Plugin 'wincent/scalpel'
 Plugin 'scrooloose/nerdtree.git'
 Plugin 'Buffergator'
+Plugin 'tpope/surround'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-obsession'
 Plugin 'mbbill/undotree'
@@ -94,7 +98,6 @@ command! Be :call SetRegistersBE()
                                   " Function Keys
 nnoremap <F2> <C-W>w
 nnoremap <F3> :bnext<CR>
-nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
 nnoremap <leader><F5> :call Colorlet(-1)<cr><esc>
 nnoremap <silent> <F5> :call SaveAndExecutePython()<CR>
 vnoremap <silent> <F5> :<C-u>call SaveAndExecutePython()<CR>
@@ -130,9 +133,28 @@ nnoremap <leader>q :call VimNotesToggle()<cr>
 nnoremap <leader>w :call Smash()<cr>
                                   " *******************************************************************
                                   " MJE Polymode Keys
+                                  " https://stackoverflow.com/questions/11176159/how-to-jump-to-start-end-of-visual-selection
+                                  "
+vmap \q c()<ESC>P
 nnoremap <Home> :call PolyMode(-1)<cr>
 nnoremap <End>  :call PolyModeReset()<cr>
+          nnoremap <PageDown> viwo<esc>i[<esc>lviw<esc>a]<esc>
+          vnoremap <PageUp> o<esc>^i# ------------------------------------------------------------------<cr>#  <cr><esc>kll
+          vnoremap <silent> <Home> :s/^/# /<cr>
+          vnoremap <silent> <leader><Home> :s/^[#][ ]//<cr>
 nnoremap <Insert> <Nop>
+if !exists("myautocommands_loaded")
+     let myautocommands_loaded = 1
+     au BufNewFile,BufRead *.awk vnoremap <silent> <Home> :s/^/\/\/ /<cr>gv
+     au BufNewFile,BufRead *.awk vnoremap <silent> <leader><Home> :s/^[/][/][ ]//<cr>
+     au BufNewFile,BufRead *.java vnoremap <silent> <Home> :s/^/\/\/ /<cr>gv
+     au BufNewFile,BufRead *.java vnoremap <silent> <leader><Home> :s/^[/][/][ ]//<cr>
+     au BufNewFile,BufRead .vimrc vnoremap <silent> <Home> :s/^/" /<cr>gv
+     au BufNewFile,BufRead .vimrc vnoremap <silent> <leader><Home> :s/^["] //<cr>
+     au BufNewFile,BufRead .vimrc vnoremap <silent> <leader><PageUp> o<esc>^i" ------------------------------------------------------------------<cr>"  <cr><esc>kll
+     au BufNewFile,BufRead *.vim vnoremap <silent> <Home> :s/^/" /<cr>gv
+     au BufNewFile,BufRead *.vim vnoremap <silent> <leader><Home> :s/^["] //<cr>
+endif
                                   " *******************************************************************
                                   " Powerline
 set  rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim/
@@ -416,6 +438,10 @@ function! SaveAndExecuteGawk()
     call LockTempBuffer()
 endfunction
 
-
+" Uncomment the following to have Vim jump to the last position when reopening a file
+if has("autocmd")
+   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+   \| exe "normal! g'\"" | endif
+endif
 
 
