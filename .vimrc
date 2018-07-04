@@ -88,6 +88,7 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 " *****************************************************************************************************
                                   " *******************************************************************
                                   " Command Words
+command REPOS :call OpenRepoListInTempBuffer()
 command! TERMINAL :call Terminal()
 command! KSH :call OpenKshTop()
 command! GAWK :call SaveAndExecuteGawk()
@@ -138,15 +139,18 @@ nnoremap <leader>w :call Smash()<cr>
 vmap \q c()<ESC>P
 nnoremap <Home> :call PolyMode(-1)<cr>
 nnoremap <End>  :call PolyModeReset()<cr>
-          nnoremap <PageDown> viwo<esc>i[<esc>lviw<esc>a]<esc>
+" nnoremap <PageDown> viwo<esc>i[<esc>lviw<esc>a]<esc>
+          nnoremap <PageDown> viWo<esc>i"<esc>lviW<esc>a"<esc>
+          let @c = "\""
+          nnoremap <PageDown> viWo<esc>"cP<esc>lviW<esc>"cp<esc>
           vnoremap <PageUp> o<esc>^i# ------------------------------------------------------------------<cr>#  <cr><esc>kll
           vnoremap <silent> <Home> :s/^/# /<cr>
           vnoremap <silent> <leader><Home> :s/^[#][ ]//<cr>
 nnoremap <Insert> <Nop>
 if !exists("myautocommands_loaded")
      let myautocommands_loaded = 1
-     au BufNewFile,BufRead *.awk vnoremap <silent> <Home> :s/^/\/\/ /<cr>gv
-     au BufNewFile,BufRead *.awk vnoremap <silent> <leader><Home> :s/^[/][/][ ]//<cr>
+     " au BufNewFile,BufRead *.awk vnoremap <silent> <Home> :s/^/\/\/ /<cr>gv
+     " au BufNewFile,BufRead *.awk vnoremap <silent> <leader><Home> :s/^[/][/][ ]//<cr>
      au BufNewFile,BufRead *.java vnoremap <silent> <Home> :s/^/\/\/ /<cr>gv
      au BufNewFile,BufRead *.java vnoremap <silent> <leader><Home> :s/^[/][/][ ]//<cr>
      au BufNewFile,BufRead .vimrc vnoremap <silent> <Home> :s/^/" /<cr>gv
@@ -345,6 +349,10 @@ endfunction
 
 
 
+function! OpenRepoListInTempBuffer()
+     silent execute "!curl -s 'https://api.github.com/users/archernar/repos?per_page=100' | grep ssh_url >/tmp/myrepos"
+     call OpenInTempBuffer("/tmp/myrepos")
+endfunction
 
 function! OpenInTempBuffer(...)
      call MakeTempBuffer()
