@@ -49,7 +49,12 @@ let mapleader = " "               " Leader - ( Spacebar )
 let MRU_Auto_Close = 1            " Set MRU window to close after selection
 set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, but never time out on mappings
 syntax off                        " Enable syntax highlighting
+filetype off
 
+
+" *****************************************************************************************************
+                                  " Vundle
+                                  " *******************************************************************
                                   " Vundle            - see :h vundle for more details or wiki for FAQ
                                   " git clone  https://github.com/VundleVim/Vundle.vim.git  ~/.vim/bundle/Vundle.vim
                                   " :PluginList       - lists configured plugins
@@ -57,37 +62,33 @@ syntax off                        " Enable syntax highlighting
                                   " :PluginSearch foo - searches for foo; append `!` to refresh local cache
                                   " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
                                   " *******************************************************************
-                                  " Auto Commands
-                                  " *******************************************************************
-                                  " *******************************************************************
-                                  " Vundle
-filetype off
-set rtp+=~/.vim/bundle/Vundle.vim
-                                  " *******************************************************************
+set rtp+=~/.vim/bundle/Vundle.vim " Vundle BEGIN
 call vundle#begin()               " Vundle BEGIN
+                                  " *******************************************************************
 Plugin 'VundleVim/Vundle.vim'
-" Plugin 'file:///home/mestes/scm/polymode.vim'
-Plugin 'kristijanhusak/vim-carbon-now-sh'
 Plugin 'archernar/polymode.vim'
-"Plugin 'wincent/scalpel'
+Plugin 'kristijanhusak/vim-carbon-now-sh'
 Plugin 'scrooloose/nerdtree.git'
 Plugin 'Buffergator'
-Plugin 'tpope/surround'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-obsession'
 Plugin 'mbbill/undotree'
 Plugin 'NLKNguyen/papercolor-theme'
 Plugin 'gmarik/github-search.vim'
+"Plugin 'file:///home/mestes/scm/polymode.vim'
+"Plugin 'wincent/scalpel'
+"Plugin 'tpope/surround'
 "Plugin 'mhinz/vim-startify'
-" Plugin 'yegappan/mru'
+"Plugin 'yegappan/mru'
+                                  " *******************************************************************
 call vundle#end()                 " Vundle END 
-                                  " *******************************************************************
-filetype plugin indent on         " required, to ignore plugin indent changes, instead use: filetype plugin on
-                                  " *******************************************************************
+filetype plugin indent on         " required, to ignore plugin indent changes, instead use: 
+                                  " filetype plugin on
                                   " Put non-Plugin stuff after this line
+
 " *****************************************************************************************************
+                                  " Command Words/Aliases
                                   " *******************************************************************
-                                  " Command Words
 command REPOS :call OpenRepoListInTempBuffer()
 command! TERMINAL :call Terminal()
 command! KSH :call OpenKshTop()
@@ -95,8 +96,9 @@ command! GAWK :call SaveAndExecuteGawk()
 command! COLORLET :call Colorlet(-1)
 command! BE :call SetRegistersBE()
 command! Be :call SetRegistersBE()
-                                  " *******************************************************************
+" *****************************************************************************************************
                                   " Function Keys
+                                  " *******************************************************************
 nnoremap <F2> <C-W>w
 nnoremap <F3> :bnext<CR>
 nnoremap <leader><F5> :call Colorlet(-1)<cr><esc>
@@ -109,13 +111,15 @@ nnoremap <F8> :UndotreeToggle<cr>
 nnoremap <F9> :set paste!<cr>
 nnoremap <F12> :wa<CR>:!build<CR>
 nnoremap <leader><F12> :call SaveAndExecuteGawk()<CR>
-                                  " *******************************************************************
+" *****************************************************************************************************
                                   " Leader Function Keys
+                                  " *******************************************************************
 nnoremap <silent> <leader><F2> :wincmd _<cr>:wincmd \|<cr>
 nnoremap <silent> <leader><F3> :wincmd =<cr>
 nnoremap <silent> <leader><F4> :close<cr>
-                                  " *******************************************************************
+" *****************************************************************************************************
                                   " Leader Keys
+                                  " *******************************************************************
 nnoremap <leader>] *
 nnoremap <Leader>' diwi""<ESC>hp<ESC>
 nnoremap <Leader>nt :NERDTreeToggle<cr>
@@ -132,13 +136,16 @@ let g:vim_notes_is_open = 0
 let g:vim_notes         = "/home/mestes/.vim/vimnotes"
 nnoremap <leader>q :call VimNotesToggle()<cr>
 nnoremap <leader>w :call Smash()<cr>
-                                  " *******************************************************************
+
+" *****************************************************************************************************
                                   " MJE Polymode Keys
-                                  " https://stackoverflow.com/questions/11176159/how-to-jump-to-start-end-of-visual-selection
-                                  "
-vmap \q c()<ESC>P
+                                  " *******************************************************************
 nnoremap <Home> :call PolyMode(-1)<cr>
 nnoremap <End>  :call PolyModeReset()<cr>
+
+" *****************************************************************************************************
+
+vmap \q c()<ESC>P
 " nnoremap <PageDown> viwo<esc>i[<esc>lviw<esc>a]<esc>
           nnoremap <PageDown> viWo<esc>i"<esc>lviW<esc>a"<esc>
           let @c = "\""
@@ -147,6 +154,10 @@ nnoremap <End>  :call PolyModeReset()<cr>
           vnoremap <silent> <Home> :s/^/# /<cr>
           vnoremap <silent> <leader><Home> :s/^[#][ ]//<cr>
 nnoremap <Insert> <Nop>
+
+" *****************************************************************************************************
+                                  " Auto Commands
+                                  " *******************************************************************
 if !exists("myautocommands_loaded")
      let myautocommands_loaded = 1
      " au BufNewFile,BufRead *.awk vnoremap <silent> <Home> :s/^/\/\/ /<cr>gv
@@ -159,13 +170,15 @@ if !exists("myautocommands_loaded")
      au BufNewFile,BufRead *.vim vnoremap <silent> <Home> :s/^/" /<cr>gv
      au BufNewFile,BufRead *.vim vnoremap <silent> <leader><Home> :s/^["] //<cr>
 endif
-                                  " *******************************************************************
+" *****************************************************************************************************
                                   " Powerline
+                                  " *******************************************************************
 set  rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim/
 set laststatus=2
 set t_Co=256
-                                  " *******************************************************************
+" *****************************************************************************************************
                                   " Set Color Scheme
+                                  " *******************************************************************
 colorscheme darkblue
 colorscheme pablo
 hi Visual   cterm=reverse
@@ -195,6 +208,9 @@ nnoremap <leader>3 $"tp<esc>0jw
 " set wcm=<C-Z>
 " map <F4> :emenu <C-Z>
 
+" *****************************************************************************************************
+                                  " Functions
+                                  " *******************************************************************
 function! VimKeyMap()
      redir! > ~/.vimkeymap.txt
      silent verbose map
@@ -223,9 +239,6 @@ function! SaveAndExecutePython()
     call LockTempBuffer()
     wincmd k
 endfunction
-
-
-
 
 function! SaveAndExecutePython22222()
     " https://stackoverflow.com/questions/18948491/running-python-code-in-vim
@@ -285,9 +298,6 @@ function! SaveAndExecutePython22222()
     setlocal nomodifiable
     wincmd k
 endfunction
-
-
-
 
 function! Tb()
     let l:cWord = shellescape(expand("<cWORD>"))
@@ -453,3 +463,4 @@ if has("autocmd")
 endif
 
 
+" https://stackoverflow.com/questions/11176159/how-to-jump-to-start-end-of-visual-selection
