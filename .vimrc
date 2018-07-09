@@ -15,7 +15,7 @@
 " |vim-variable|       v:	  Global, predefined by Vim.
 " nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
 "=============================================================================
-let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU   <F5> Python <F6> Command <F8> UndoTree <F9> PasteMode"
+let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> NextTab   <F5> Python <F6> Command <F8> UndoTree <F9> PasteMode"
 let g:help1 = "OHHHH"
 let g:help2 = "NOPE"
 set nocompatible
@@ -145,6 +145,7 @@ function! PolyModeMapReset()
           nnoremap <F1> <C-W>w:call PolyModeReset()<cr>
           nnoremap <F2> :bnext<CR>:call PolyModeReset()<cr>
           nnoremap <F3> :MRU<cr>
+          nnoremap <F4> :tabn<cr>
           nnoremap <silent> r r
           nnoremap <silent> v v
           nnoremap <silent> s s
