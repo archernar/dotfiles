@@ -2,7 +2,7 @@
 "=    W e l c o m e   t o   m y  V I M R C                                   =
 "=============================================================================
 " Notes
-" There are several name spaces for variables.i
+" There are several name spaces for variables.
 " 
 " (nothing)            In a function: local to a function; otherwise: global
 " |buffer-variable|    b:	  Local to the current buffer.
@@ -15,7 +15,7 @@
 " |vim-variable|       v:	  Global, predefined by Vim.
 " nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
 "=============================================================================
-let g:help0 = "<F2> Next Window <F3> Next Buffer <F5> Python <F6> Command <F7> MRU <F8> UndoTree <F9> PasteMode"
+let g:help0 = "<F1> NxtWin <F2> NxtBuf   <F5> Python <F6> Command <F7> MRU <F8> UndoTree <F9> PasteMode"
 let g:help1 = "OHHHH"
 let g:help2 = "NOPE"
 set nocompatible
@@ -66,6 +66,8 @@ set rtp+=~/.vim/bundle/Vundle.vim " Vundle BEGIN
 call vundle#begin()               " Vundle BEGIN
                                   " *******************************************************************
 Plugin 'VundleVim/Vundle.vim'
+Plugin 'xolox/vim-misc'           " https://github.com/xolox/vim-misc 
+Plugin 'xolox/vim-notes'          " https://vimawesome.com/plugin/notes-vim
 Plugin 'archernar/polymode.vim'
 Plugin 'kristijanhusak/vim-carbon-now-sh'
 Plugin 'scrooloose/nerdtree.git'
@@ -142,6 +144,25 @@ nnoremap <leader>w :call Smash()<cr>
                                   " *******************************************************************
 nnoremap <Home> :call PolyMode(-1)<cr>
 nnoremap <End>  :call PolyModeReset()<cr>
+function! PolyModeMapReset()
+          nnoremap <F1> <C-W>w:call PolyModeReset()<cr>
+          nnoremap <F2> :bnext<CR>:call PolyModeReset()<cr>
+          nnoremap <silent> r r
+          nnoremap <silent> v v
+          nnoremap <silent> s s
+          nnoremap <silent> e e
+          nnoremap <silent> <Insert>   <Nop>
+          nnoremap <silent> <Right>    <right>
+          nnoremap <silent> <Left>     <left>
+          nnoremap <silent> <Up>       <up>
+          nnoremap <silent> <Down>     <down>
+          nnoremap <silent> <PageUp>   <pageup>
+          nnoremap <silent> <PageDown> <pagedown>
+          nnoremap <silent> <Delete>   <delete>
+          nnoremap <silent> <End>  :call PolyModeReset()<cr>
+endfunction
+call PolyModeMapReset()
+
 
 " *****************************************************************************************************
 
