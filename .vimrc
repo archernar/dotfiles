@@ -91,6 +91,10 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 " *****************************************************************************************************
                                   " Command Words/Aliases
                                   " *******************************************************************
+command! LOAD1 :source ~/vimsessions/session_1.vim
+command! LOAD2 :source ~/vimsessions/session_2.vim
+command! LOAD3 :source ~/vimsessions/session_3.vim
+
 command REPOS :call OpenRepoListInTempBuffer()
 command! TERMINAL :call Terminal()
 command! KSH :call OpenKshTop()
@@ -146,6 +150,12 @@ function! PolyModeMapReset()
           nnoremap <F2> :bnext<CR>:call PolyModeReset()<cr>
           nnoremap <F3> :MRU<cr>
           nnoremap <F4> :tabn<cr>
+          nnoremap <silent> 0 0
+          nnoremap <silent> 1 1
+          nnoremap <silent> 2 2
+          nnoremap <silent> 3 3
+          nnoremap <silent> o o
+          nnoremap <silent> O O
           nnoremap <silent> r r
           nnoremap <silent> v v
           nnoremap <silent> s s
