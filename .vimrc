@@ -52,7 +52,7 @@ syntax off                        " Enable syntax highlighting
 filetype off
 
 
-let NOVUNDLE = 1
+" let NOVUNDLE = 1
 if !exists("NOVUNDLE")
 " *****************************************************************************************************
                                   " Vundle
@@ -69,14 +69,14 @@ call vundle#begin()               " Vundle BEGIN
                                   " *******************************************************************
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'archernar/polymode.vim'
-Plugin 'kristijanhusak/vim-carbon-now-sh'
-Plugin 'scrooloose/nerdtree.git'
-Plugin 'Buffergator'
-Plugin 'tpope/vim-fugitive'
-Plugin 'mbbill/undotree'
-Plugin 'NLKNguyen/papercolor-theme'
-Plugin 'gmarik/github-search.vim'
-"Plugin 'tpope/vim-obsession'
+Plugin 'archernar/vimstuff'
+" Plugin 'kristijanhusak/vim-carbon-now-sh'
+" Plugin 'scrooloose/nerdtree.git'
+" Plugin 'Buffergator'
+" Plugin 'tpope/vim-fugitive'
+" Plugin 'mbbill/undotree'
+" Plugin 'NLKNguyen/papercolor-theme'
+" Plugin 'gmarik/github-search.vim'
 "Plugin 'xolox/vim-misc'           " https://github.com/xolox/vim-misc 
 "Plugin 'xolox/vim-notes'          " https://vimawesome.com/plugin/notes-vim
 "Plugin 'file:///home/mestes/scm/polymode.vim'
