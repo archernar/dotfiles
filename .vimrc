@@ -70,8 +70,8 @@ call vundle#begin()               " Vundle BEGIN
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'archernar/polymode.vim'
 Plugin 'archernar/vimstuff'
+Plugin 'scrooloose/nerdtree.git'
 " Plugin 'kristijanhusak/vim-carbon-now-sh'
-" Plugin 'scrooloose/nerdtree.git'
 " Plugin 'Buffergator'
 " Plugin 'tpope/vim-fugitive'
 " Plugin 'mbbill/undotree'
@@ -166,6 +166,7 @@ function! PolyModeMapReset()
           nnoremap <silent> r r
           nnoremap <silent> v v
           nnoremap <silent> s s
+          nnoremap <silent> n n
           nnoremap <silent> <Insert>   <Nop>
           nnoremap <silent> <Right>    <right>
           nnoremap <silent> <Left>     <left>
@@ -492,10 +493,10 @@ function! SaveAndExecuteGawk()
 endfunction
 
 " Uncomment the following to have Vim jump to the last position when reopening a file
-"if has("autocmd")
-"   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
-"   \| exe "normal! g'\"" | endif
-"endif
+if has("autocmd")
+   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+   \| exe "normal! g'\"" | endif
+endif
 
 
 " https://stackoverflow.com/questions/11176159/how-to-jump-to-start-end-of-visual-selection
