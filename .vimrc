@@ -91,10 +91,6 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 " *****************************************************************************************************
                                   " Command Words/Aliases
                                   " *******************************************************************
-command! LOAD1 :source ~/vimsessions/session_1.vim
-command! LOAD2 :source ~/vimsessions/session_2.vim
-command! LOAD3 :source ~/vimsessions/session_3.vim
-
 command REPOS :call OpenRepoListInTempBuffer()
 command! TERMINAL :call Terminal()
 command! KSH :call OpenKshTop()
@@ -105,9 +101,9 @@ command! Be :call SetRegistersBE()
 " *****************************************************************************************************
                                   " Function Keys
                                   " *******************************************************************
-nnoremap <leader><F5> :call Colorlet(-1)<cr><esc>
-nnoremap <silent> <F5> :call SaveAndExecutePython()<CR>
-vnoremap <silent> <F5> :<C-u>call SaveAndExecutePython()<CR>
+" nnoremap <leader><F5> :call Colorlet(-1)<cr><esc>
+" nnoremap <silent> <F5> :call SaveAndExecutePython()<CR>
+" vnoremap <silent> <F5> :<C-u>call SaveAndExecutePython()<CR>
 nnoremap <leader><F6> :colorscheme pablo<cr>hi Visual   cterm=reverse<cr><esc>
 nnoremap <silent> <F6> :call Tcmd()<CR>
 nnoremap <F8> :UndotreeToggle<cr>
@@ -150,16 +146,17 @@ function! PolyModeMapReset()
           nnoremap <F2> :bnext<CR>:call PolyModeReset()<cr>
           nnoremap <F3> :MRU<cr>
           nnoremap <F4> :tabn<cr>
-          nnoremap <silent> 0 0
-          nnoremap <silent> 1 1
-          nnoremap <silent> 2 2
-          nnoremap <silent> 3 3
+          nnoremap <silent> a a
+          nnoremap <silent> b b
+          nnoremap <silent> c c
+          nnoremap <silent> d d
+          nnoremap <silent> f f
+          nnoremap <silent> e e
           nnoremap <silent> o o
           nnoremap <silent> O O
           nnoremap <silent> r r
           nnoremap <silent> v v
           nnoremap <silent> s s
-          nnoremap <silent> e e
           nnoremap <silent> <Insert>   <Nop>
           nnoremap <silent> <Right>    <right>
           nnoremap <silent> <Left>     <left>
