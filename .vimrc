@@ -66,17 +66,17 @@ set rtp+=~/.vim/bundle/Vundle.vim " Vundle BEGIN
 call vundle#begin()               " Vundle BEGIN
                                   " *******************************************************************
 Plugin 'VundleVim/Vundle.vim'
-Plugin 'xolox/vim-misc'           " https://github.com/xolox/vim-misc 
-Plugin 'xolox/vim-notes'          " https://vimawesome.com/plugin/notes-vim
 Plugin 'archernar/polymode.vim'
 Plugin 'kristijanhusak/vim-carbon-now-sh'
 Plugin 'scrooloose/nerdtree.git'
 Plugin 'Buffergator'
 Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-obsession'
 Plugin 'mbbill/undotree'
 Plugin 'NLKNguyen/papercolor-theme'
 Plugin 'gmarik/github-search.vim'
+"Plugin 'tpope/vim-obsession'
+"Plugin 'xolox/vim-misc'           " https://github.com/xolox/vim-misc 
+"Plugin 'xolox/vim-notes'          " https://vimawesome.com/plugin/notes-vim
 "Plugin 'file:///home/mestes/scm/polymode.vim'
 "Plugin 'wincent/scalpel'
 "Plugin 'tpope/surround'
@@ -146,6 +146,9 @@ function! PolyModeMapReset()
           nnoremap <F2> :bnext<CR>:call PolyModeReset()<cr>
           nnoremap <F3> :MRU<cr>
           nnoremap <F4> :tabn<cr>
+          nnoremap <silent> 1 1
+          nnoremap <silent> 2 2
+          nnoremap <silent> 3 3
           nnoremap <silent> a a
           nnoremap <silent> b b
           nnoremap <silent> c c
