@@ -52,6 +52,8 @@ syntax off                        " Enable syntax highlighting
 filetype off
 
 
+let NOVUNDLE = 1
+if !exists("NOVUNDLE")
 " *****************************************************************************************************
                                   " Vundle
                                   " *******************************************************************
@@ -84,6 +86,11 @@ Plugin 'gmarik/github-search.vim'
 "Plugin 'yegappan/mru'
                                   " *******************************************************************
 call vundle#end()                 " Vundle END 
+endif                             " Vundle END
+                                  " *******************************************************************
+
+                                  
+                                  " *******************************************************************
 filetype plugin indent on         " required, to ignore plugin indent changes, instead use: 
                                   " filetype plugin on
                                   " Put non-Plugin stuff after this line
@@ -124,7 +131,6 @@ nnoremap <Leader>' diwi""<ESC>hp<ESC>
 nnoremap <Leader>nt :NERDTreeToggle<cr>
 nnoremap <Leader>p  :PluginUpdate<cr>
 nnoremap <leader>ev :split $MYVIMRC<cr>
-nnoremap <leader>sv :source $MYVIMRC<cr>
 nnoremap <leader>-  :wincmd _<cr>:wincmd \|<cr>
 nnoremap <leader>=  :wincmd =<cr>
 nnoremap <leader>l  :resize -5<cr>
@@ -232,7 +238,6 @@ nnoremap <leader>3 $"tp<esc>0jw
 
 " <li><kbd>TEST</kbd> TEST TEST TESTTEST TEST</li>
 " TEST TEST TEST TESTTEST TEST
-" source $VIMRUNTIME/menu.vim
 " set wildmenu
 " set cpo-=<
 " set wcm=<C-Z>
@@ -487,10 +492,10 @@ function! SaveAndExecuteGawk()
 endfunction
 
 " Uncomment the following to have Vim jump to the last position when reopening a file
-if has("autocmd")
-   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
-   \| exe "normal! g'\"" | endif
-endif
+"if has("autocmd")
+"   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+"   \| exe "normal! g'\"" | endif
+"endif
 
 
 " https://stackoverflow.com/questions/11176159/how-to-jump-to-start-end-of-visual-selection
