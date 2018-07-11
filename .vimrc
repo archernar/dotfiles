@@ -15,9 +15,6 @@
 " |vim-variable|       v:	  Global, predefined by Vim.
 " nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
 "=============================================================================
-let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> NextTab   <F5> Python <F6> Command <F8> UndoTree <F9> PasteMode"
-let g:help1 = "OHHHH"
-let g:help2 = "NOPE"
 set nocompatible
 set hidden
 set foldcolumn=3
@@ -111,8 +108,7 @@ command! Be :call SetRegistersBE()
 " nnoremap <leader><F5> :call Colorlet(-1)<cr><esc>
 " nnoremap <silent> <F5> :call SaveAndExecutePython()<CR>
 " vnoremap <silent> <F5> :<C-u>call SaveAndExecutePython()<CR>
-nnoremap <leader><F6> :colorscheme pablo<cr>hi Visual   cterm=reverse<cr><esc>
-nnoremap <silent> <F6> :call Tcmd()<CR>
+" nnoremap <leader><F6> :colorscheme pablo<cr>hi Visual   cterm=reverse<cr><esc>
 nnoremap <F8> :UndotreeToggle<cr>
 nnoremap <F9> :set paste!<cr>
 nnoremap <F12> :wa<CR>:!build<CR>
@@ -148,10 +144,14 @@ nnoremap <leader>w :call Smash()<cr>
 nnoremap <Home> :call PolyMode(-1)<cr>
 nnoremap <End>  :call PolyModeReset()<cr>
 function! PolyModeMapReset()
+          let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> NextTab   <F5> Python <F6> Command <F8> UndoTree <F9> PasteMode"
+          let g:help1 = ""
+          let g:help2 = ""
           nnoremap <F1> <C-W>w:call PolyModeReset()<cr>
           nnoremap <F2> :bnext<CR>:call PolyModeReset()<cr>
           nnoremap <F3> :MRU<cr>
           nnoremap <F4> :tabn<cr>
+          nnoremap <silent> <F6> :call Tcmd()<CR>
           nnoremap <silent> 1 1
           nnoremap <silent> 2 2
           nnoremap <silent> 3 3
