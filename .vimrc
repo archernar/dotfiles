@@ -65,9 +65,14 @@ set rtp+=~/.vim/bundle/Vundle.vim " Vundle BEGIN
 call vundle#begin()               " Vundle BEGIN
                                   " *******************************************************************
 Plugin 'VundleVim/Vundle.vim'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 Plugin 'archernar/polymode.vim'
 Plugin 'archernar/vimstuff'
 Plugin 'scrooloose/nerdtree.git'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'jeetsukumaran/vim-buffergator'
+
 " Plugin 'kristijanhusak/vim-carbon-now-sh'
 " Plugin 'Buffergator'
 " Plugin 'tpope/vim-fugitive'
@@ -210,7 +215,15 @@ endif
 " *****************************************************************************************************
                                   " Powerline
                                   " *******************************************************************
-set  rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim/
+let NOPOWERLINE = 1
+if !exists("NOPOWERLINE")
+     set  rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim/
+     set laststatus=2
+     set t_Co=256
+endif
+" *****************************************************************************************************
+                                  " For Status Line
+                                  " *******************************************************************
 set laststatus=2
 set t_Co=256
 " *****************************************************************************************************
