@@ -140,8 +140,9 @@ let g:vim_notes         = "/home/mestes/.vim/vimnotes"
 nnoremap <leader>q :call VimNotesToggle()<cr>
 nnoremap <leader>w :call Smash()<cr>
 
-let g:greppy_mode_active = 1
+let g:greppy_mode_active = 0
 function! Greppyon(...)
+    execute "ccl"
     if a:0 > 0 
          let s:szIn = input('grep for >> ')
          execute "vimgrep /" . s:szIn . "/ %"
@@ -149,11 +150,11 @@ function! Greppyon(...)
          execute "vimgrep /" . expand("<cword>") . "/ %"
     endif
     execute "cw"
-    let g:greppy_mode_active = 0
+    let g:greppy_mode_active = 1
 endfunction
 function! Greppyoff()
     execute "ccl"
-    let g:greppy_mode_active = 1
+    let g:greppy_mode_active = 0
 endfunction
 " *****************************************************************************************************
                                   " MJE Polymode Keys
@@ -169,8 +170,8 @@ function! PolyModeMapReset()
           nnoremap <F3> :MRU<cr>
           nnoremap <F4> :tabn<cr>
           nnoremap <F5> :call Tcmd()<cr>
-          nnoremap <silent> <expr> <F6> (g:greppy_mode_active == 1) ? ':call Greppyon()<cr>' : ':call Greppyoff()<cr>'
-          nnoremap <silent> <expr> <F7> (g:greppy_mode_active == 1) ? ':call Greppyon(1)<cr>' : ':call Greppyoff()<cr>'
+          nnoremap <F6> :call Greppyon()<cr>
+          nnoremap <F7> :call Greppyon(1)<cr>
           nnoremap <F9> :set paste!<cr>
           nnoremap <F12> :wa<cr>:!build<cr>
           nnoremap <silent> 1 1
