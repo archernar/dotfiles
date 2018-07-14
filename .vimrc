@@ -16,6 +16,7 @@
 " nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
 "=============================================================================
 set nocompatible
+set relativenumber
 set hidden
 set foldcolumn=3
 set foldmethod=marker
@@ -38,7 +39,6 @@ set t_vb=
                                   " If visualbell is set, and this line is also included, vim will neither flash nor beep.
                                   " If visualbell is unset, this does nothing.
 set cmdheight=2                   " Set the command window height to 2 lines, to avoid many cases of having to  press <Enter> to continue
-set pastetoggle=<F11>             " Use <F11> to toggle between 'paste' and 'nopaste'
 set shiftwidth=4                  " Indent settings for using 4 spaces instead of tabs.  Do not change 'tabstop' from its default value of 8 
 set softtabstop=4                 " with this setup.
 set expandtab
@@ -47,7 +47,6 @@ let MRU_Auto_Close = 1            " Set MRU window to close after selection
 set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, but never time out on mappings
 syntax off                        " Enable syntax highlighting
 filetype off
-
 
 " let NOVUNDLE = 1
 if !exists("NOVUNDLE")
@@ -65,25 +64,25 @@ set rtp+=~/.vim/bundle/Vundle.vim " Vundle BEGIN
 call vundle#begin()               " Vundle BEGIN
                                   " *******************************************************************
 Plugin 'VundleVim/Vundle.vim'
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
 Plugin 'archernar/polymode.vim'
 Plugin 'archernar/vimstuff'
 Plugin 'scrooloose/nerdtree.git'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'jeetsukumaran/vim-buffergator'
-
-" Plugin 'kristijanhusak/vim-carbon-now-sh'
-" Plugin 'Buffergator'
-" Plugin 'tpope/vim-fugitive'
-" Plugin 'mbbill/undotree'
-" Plugin 'NLKNguyen/papercolor-theme'
-" Plugin 'gmarik/github-search.vim'
+Plugin 'tpope/vim-surround'
+Plugin 'vim-scripts/grep.vim'      " https://github.com/vim-scripts/grep.vim
+"Plugin 'vim-airline/vim-airline'
+"Plugin 'vim-airline/vim-airline-themes'
+"Plugin 'kristijanhusak/vim-carbon-now-sh'
+"Plugin 'Buffergator'
+"Plugin 'tpope/vim-fugitive'
+"Plugin 'mbbill/undotree'
+"Plugin 'NLKNguyen/papercolor-theme'
+"Plugin 'gmarik/github-search.vim'
 "Plugin 'xolox/vim-misc'           " https://github.com/xolox/vim-misc 
 "Plugin 'xolox/vim-notes'          " https://vimawesome.com/plugin/notes-vim
 "Plugin 'file:///home/mestes/scm/polymode.vim'
 "Plugin 'wincent/scalpel'
-"Plugin 'tpope/surround'
 "Plugin 'mhinz/vim-startify'
 "Plugin 'yegappan/mru'
                                   " *******************************************************************
@@ -114,10 +113,8 @@ command! Be :call SetRegistersBE()
 " nnoremap <silent> <F5> :call SaveAndExecutePython()<CR>
 " vnoremap <silent> <F5> :<C-u>call SaveAndExecutePython()<CR>
 " nnoremap <leader><F6> :colorscheme pablo<cr>hi Visual   cterm=reverse<cr><esc>
-nnoremap <F8> :UndotreeToggle<cr>
-nnoremap <F9> :set paste!<cr>
-nnoremap <F12> :wa<CR>:!build<CR>
-nnoremap <leader><F12> :call SaveAndExecuteGawk()<CR>
+" nnoremap <F8> :UndotreeToggle<cr>
+" nnoremap <leader><F12> :call SaveAndExecuteGawk()<CR>
 " *****************************************************************************************************
                                   " Leader Function Keys
                                   " *******************************************************************
@@ -143,20 +140,39 @@ let g:vim_notes         = "/home/mestes/.vim/vimnotes"
 nnoremap <leader>q :call VimNotesToggle()<cr>
 nnoremap <leader>w :call Smash()<cr>
 
+let g:greppy_mode_active = 1
+function! Greppyon(...)
+    if a:0 > 0 
+         let s:szIn = input('grep for >> ')
+         execute "vimgrep /" . s:szIn . "/ %"
+    else
+         execute "vimgrep /" . expand("<cword>") . "/ %"
+    endif
+    execute "cw"
+    let g:greppy_mode_active = 0
+endfunction
+function! Greppyoff()
+    execute "ccl"
+    let g:greppy_mode_active = 1
+endfunction
 " *****************************************************************************************************
                                   " MJE Polymode Keys
                                   " *******************************************************************
 nnoremap <Home> :call PolyMode(-1)<cr>
 nnoremap <End>  :call PolyModeReset()<cr>
 function! PolyModeMapReset()
-          let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> NextTab   <F5> Python <F6> Command <F8> UndoTree <F9> PasteMode"
+          let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> NextTab <F5> Cmd <F6> Grep   <F9> PasteMode <F12> Build"
           let g:help1 = ""
           let g:help2 = ""
           nnoremap <F1> <C-W>w:call PolyModeReset()<cr>
           nnoremap <F2> :bnext<CR>:call PolyModeReset()<cr>
           nnoremap <F3> :MRU<cr>
           nnoremap <F4> :tabn<cr>
-          nnoremap <silent> <F6> :call Tcmd()<CR>
+          nnoremap <F5> :call Tcmd()<cr>
+          nnoremap <silent> <expr> <F6> (g:greppy_mode_active == 1) ? ':call Greppyon()<cr>' : ':call Greppyoff()<cr>'
+          nnoremap <silent> <expr> <F7> (g:greppy_mode_active == 1) ? ':call Greppyon(1)<cr>' : ':call Greppyoff()<cr>'
+          nnoremap <F9> :set paste!<cr>
+          nnoremap <F12> :wa<cr>:!build<cr>
           nnoremap <silent> 1 1
           nnoremap <silent> 2 2
           nnoremap <silent> 3 3
@@ -164,8 +180,9 @@ function! PolyModeMapReset()
           nnoremap <silent> b b
           nnoremap <silent> c c
           nnoremap <silent> d d
-          nnoremap <silent> f f
           nnoremap <silent> e e
+          nnoremap <silent> f f
+          nnoremap <silent> g g
           nnoremap <silent> o o
           nnoremap <silent> O O
           nnoremap <silent> r r
@@ -215,7 +232,7 @@ endif
 " *****************************************************************************************************
                                   " Powerline
                                   " *******************************************************************
-let NOPOWERLINE = 1
+" let NOPOWERLINE = 1
 if !exists("NOPOWERLINE")
      set  rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim/
      set laststatus=2
