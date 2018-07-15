@@ -45,6 +45,15 @@ set expandtab
 let mapleader = " "               " Leader - ( Spacebar )
 let MRU_Auto_Close = 1            " Set MRU window to close after selection
 set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, but never time out on mappings
+
+" *****************************************************************************************************
+                                  " The 'External Command' Command Setup
+                                  " *******************************************************************
+command! -nargs=* -complete=shellcmd R new | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
+
+" *****************************************************************************************************
+                                  " Compete Pre Vundle Setup
+                                  " *******************************************************************
 syntax off                        " Enable syntax highlighting
 filetype off
 
@@ -99,6 +108,7 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 " *****************************************************************************************************
                                   " Command Words/Aliases
                                   " *******************************************************************
+command! S3PUT :call S3put()
 command REPOS :call OpenRepoListInTempBuffer()
 command! TERMINAL :call Terminal()
 command! KSH :call OpenKshTop()
@@ -514,6 +524,10 @@ function! OpenKshTop()
     call Tput("")
 endfunction
 
+function! S3put()
+    echom   "R cuu -a ECD3 -b ecd3pub -F -c VIMS3PUT -D " . @%
+    execute "R cuu -a ECD3 -b ecd3pub -F -c VIMS3PUT -D " . @%
+endfunction
 
 function! SaveAndExecuteGawk()
     let s:current_buffer_file_path = expand("%")
