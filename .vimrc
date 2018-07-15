@@ -194,6 +194,7 @@ function! PolyModeMapReset()
           nnoremap <silent> e e
           nnoremap <silent> f f
           nnoremap <silent> g g
+          nnoremap <silent> k k
           nnoremap <silent> o o
           nnoremap <silent> O O
           nnoremap <silent> r r
