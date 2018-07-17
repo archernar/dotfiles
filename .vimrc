@@ -50,6 +50,11 @@ set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, b
                                   " The 'External Command' Command Setup
                                   " *******************************************************************
 command! -nargs=* -complete=shellcmd R new | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
+command! -nargs=1 L silent call Redir(<f-args>)
+
+" Usage:
+"       :Redir hi ............. show the full output of command ':hi' in a scratch window
+"       :Redir !ls -al ........ show the full output of command ':!ls -al' in a scratch window
 
 " *****************************************************************************************************
                                   " Compete Pre Vundle Setup
@@ -200,6 +205,7 @@ function! PolyModeMapReset()
           nnoremap <silent> r r
           nnoremap <silent> v v
           nnoremap <silent> s s
+          nnoremap <silent> t t
           nnoremap <silent> n n
           nnoremap <silent> <Insert>   <Nop>
           nnoremap <silent> <Right>    <right>
@@ -543,6 +549,27 @@ if has("autocmd")
    au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
    \| exe "normal! g'\"" | endif
 endif
+
+function! Redir(cmd)
+        for win in range(1, winnr('$'))
+                if getwinvar(win, 'scratch')
+                        execute win . 'windo close'
+                endif
+        endfor
+        let s:thiscmd= "!" . a:cmd
+        if s:thiscmd =~ '^!'
+                execute "let output = system('" . substitute(s:thiscmd, '^!', '', '') . "')"
+        else
+                redir => output
+                execute s:thiscmd
+                redir END
+        endif
+        vnew
+        let w:scratch = 1
+        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
+        call setline(1, split(output, "\n"))
+endfunction
+
 
 
 " https://stackoverflow.com/questions/11176159/how-to-jump-to-start-end-of-visual-selection
