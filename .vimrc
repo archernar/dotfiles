@@ -178,11 +178,12 @@ endfunction
 let g:MyKeyList = []
 let g:MyValueList = []
 let g:MyKeyDict = {} 
-function! MyKeyMapper(...)
+let g:MyKeyMapperMode = "STD " 
+function! g:MyKeyMapper(...)
      let l:szKey = substitute(a:1, "<silent> ", "", "")
      let l:szKey = substitute(l:szKey, "nnoremap ", "", "")
      let l:szKey = substitute(l:szKey, " .*$", "", "g")
-     let g:MyKeyDict[l:szKey] = a:2
+     let g:MyKeyDict[g:MyKeyMapperMode . " " . l:szKey] = a:2
      execute a:1
 endfunction
 function! MyKeyMapperDump()
@@ -192,8 +193,7 @@ function! MyKeyMapperDump()
         let l:maxline=-1
         setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
 	for key in sort(keys(g:MyKeyDict))
-          let l:padding=repeat(' ', 12-len(key))
-          let l:line=key . padding . g:MyKeyDict[key]
+          let l:line=key . repeat(' ', 12-len(key)) . g:MyKeyDict[key]
           call setline(l:nn, l:line)
           let l:nn= l:nn + 1
 	endfor
@@ -202,23 +202,24 @@ endfunction
 " *****************************************************************************************************
                                   " MJE Polymode Keys
                                   " *******************************************************************
-call MyKeyMapper("nnoremap <Home> :call PolyMode(-1)<cr>",       "PolyMode On")
-call MyKeyMapper("nnoremap <End>  :call PolyModeReset()<cr>",    "PoluMode Off")
+call g:MyKeyMapper("nnoremap <Home> :call PolyMode(-1)<cr>",       "PolyMode On")
+call g:MyKeyMapper("nnoremap <End>  :call PolyModeReset()<cr>",    "PolyMode Off")
 function! PolyModeMapReset()
           let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> NextTab <F5> Cmd <F6> Grep   <F9> PasteMode <F12> Build"
           let g:help1 = ""
           let g:help2 = ""
-          call MyKeyMapper("nnoremap <F1> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
-          call MyKeyMapper("nnoremap <F2> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
-          call MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>",   "MRU")
-          call MyKeyMapper("nnoremap <F4> :tabn<cr>",                           "Next Tab")
-          call MyKeyMapper("nnoremap <F5> :call Tcmd()<cr>",                    "TCmd")
-          call MyKeyMapper("nnoremap <F6> :call Greppyon()<cr>",                "Greppy First Form, word under cursor")
-          call MyKeyMapper("nnoremap <F7> :call Greppyon(1)<cr>",               "Greppy Second Form, prompt for word")
-          call MyKeyMapper("nnoremap <F8> :call MyKeyMapperDump()<cr>",         "MyKeyMapper Help")
-          call MyKeyMapper("nnoremap <F9> :set paste!<cr>",                     "Toggle Paste Setting")
-          call MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
-          call MyKeyMapper("nnoremap <silent> <End>  :call PolyModeReset()<cr>","PolyMode Off")
+          let g:MyKeyMapperMode = "STD " 
+          call g:MyKeyMapper("nnoremap <F1> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
+          call g:MyKeyMapper("nnoremap <F2> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
+          call g:MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>",   "MRU")
+          call g:MyKeyMapper("nnoremap <F4> :tabn<cr>",                           "Next Tab")
+          call g:MyKeyMapper("nnoremap <F5> :call Tcmd()<cr>",                    "TCmd")
+          call g:MyKeyMapper("nnoremap <F6> :call Greppyon()<cr>",                "Greppy First Form, word under cursor")
+          call g:MyKeyMapper("nnoremap <F7> :call Greppyon(1)<cr>",               "Greppy Second Form, prompt for word")
+          call g:MyKeyMapper("nnoremap <F8> :call MyKeyMapperDump()<cr>",         "MyKeyMapper Help")
+          call g:MyKeyMapper("nnoremap <F9> :set paste!<cr>",                     "Toggle Paste Setting")
+          call g:MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
+          call g:MyKeyMapper("nnoremap <silent> <End>  :call PolyModeReset()<cr>","PolyMode Off")
           nnoremap <silent> 1 1
           nnoremap <silent> 2 2
           nnoremap <silent> 3 3
@@ -251,6 +252,14 @@ endfunction
 call PolyModeMapReset()
 
 
+runtime plugin/polymode.vim
+if !exists('polymode_loaded')
+     echo "Sorry some polymode initializations will be ignored"
+else
+     call PolyModeZeroMappings()
+endif
+
+call PolyModeMapReset()
 " *****************************************************************************************************
 
 vmap \q c()<ESC>P
