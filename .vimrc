@@ -49,7 +49,8 @@ set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, b
 " *****************************************************************************************************
                                   " The 'External Command' Command Setup
                                   " *******************************************************************
-command! -nargs=* -complete=shellcmd R new | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
+command! -nargs=* -complete=shellcmd R new  | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
+command! -nargs=* -complete=shellcmd V vnew | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
 command! -nargs=1 L silent call Redir(<f-args>)
 
 " Usage:
@@ -114,7 +115,7 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
                                   " Command Words/Aliases
                                   " *******************************************************************
 command! S3PUT :call S3put()
-command REPOS :call OpenRepoListInTempBuffer()
+command! REPOS :call OpenRepoListInTempBuffer()
 command! TERMINAL :call Terminal()
 command! KSH :call OpenKshTop()
 command! GAWK :call SaveAndExecuteGawk()
@@ -172,23 +173,52 @@ function! Greppyoff()
     let g:greppy_mode_active = 0
 endfunction
 " *****************************************************************************************************
+                                  " MJE MyKeyMapper 
+                                  " *******************************************************************
+let g:MyKeyList = []
+let g:MyValueList = []
+let g:MyKeyDict = {} 
+function! MyKeyMapper(...)
+     let l:szKey = substitute(a:1, "<silent> ", "", "")
+     let l:szKey = substitute(l:szKey, "nnoremap ", "", "")
+     let l:szKey = substitute(l:szKey, " .*$", "", "g")
+     let g:MyKeyDict[l:szKey] = a:2
+     execute a:1
+endfunction
+function! MyKeyMapperDump()
+        vnew
+        let w:scratch = 1
+        let l:nn=1
+        let l:maxline=-1
+        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
+	for key in sort(keys(g:MyKeyDict))
+          let l:padding=repeat(' ', 12-len(key))
+          let l:line=key . padding . g:MyKeyDict[key]
+          call setline(l:nn, l:line)
+          let l:nn= l:nn + 1
+	endfor
+        vertical resize 60 
+endfunction
+" *****************************************************************************************************
                                   " MJE Polymode Keys
                                   " *******************************************************************
-nnoremap <Home> :call PolyMode(-1)<cr>
-nnoremap <End>  :call PolyModeReset()<cr>
+call MyKeyMapper("nnoremap <Home> :call PolyMode(-1)<cr>",       "PolyMode On")
+call MyKeyMapper("nnoremap <End>  :call PolyModeReset()<cr>",    "PoluMode Off")
 function! PolyModeMapReset()
           let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> NextTab <F5> Cmd <F6> Grep   <F9> PasteMode <F12> Build"
           let g:help1 = ""
           let g:help2 = ""
-          nnoremap <F1> <C-W>w:call PolyModeReset()<cr>
-          nnoremap <F2> :bnext<CR>:call PolyModeReset()<cr>
-          nnoremap <F3> :MRU<cr>
-          nnoremap <F4> :tabn<cr>
-          nnoremap <F5> :call Tcmd()<cr>
-          nnoremap <F6> :call Greppyon()<cr>
-          nnoremap <F7> :call Greppyon(1)<cr>
-          nnoremap <F9> :set paste!<cr>
-          nnoremap <F12> :wa<cr>:!build<cr>
+          call MyKeyMapper("nnoremap <F1> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
+          call MyKeyMapper("nnoremap <F2> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
+          call MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>",   "MRU")
+          call MyKeyMapper("nnoremap <F4> :tabn<cr>",                           "Next Tab")
+          call MyKeyMapper("nnoremap <F5> :call Tcmd()<cr>",                    "TCmd")
+          call MyKeyMapper("nnoremap <F6> :call Greppyon()<cr>",                "Greppy First Form, word under cursor")
+          call MyKeyMapper("nnoremap <F7> :call Greppyon(1)<cr>",               "Greppy Second Form, prompt for word")
+          call MyKeyMapper("nnoremap <F8> :call MyKeyMapperDump()<cr>",         "MyKeyMapper Help")
+          call MyKeyMapper("nnoremap <F9> :set paste!<cr>",                     "Toggle Paste Setting")
+          call MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
+          call MyKeyMapper("nnoremap <silent> <End>  :call PolyModeReset()<cr>","PolyMode Off")
           nnoremap <silent> 1 1
           nnoremap <silent> 2 2
           nnoremap <silent> 3 3
@@ -200,7 +230,9 @@ function! PolyModeMapReset()
           nnoremap <silent> f f
           nnoremap <silent> g g
           nnoremap <silent> k k
+          nnoremap <silent> m m
           nnoremap <silent> o o
+          nnoremap <silent> p p
           nnoremap <silent> O O
           nnoremap <silent> r r
           nnoremap <silent> v v
@@ -215,7 +247,6 @@ function! PolyModeMapReset()
           nnoremap <silent> <PageUp>   <pageup>
           nnoremap <silent> <PageDown> <pagedown>
           nnoremap <silent> <Delete>   <delete>
-          nnoremap <silent> <End>  :call PolyModeReset()<cr>
 endfunction
 call PolyModeMapReset()
 
@@ -444,8 +475,14 @@ endfunction
 
 
 function! OpenRepoListInTempBuffer()
-     silent execute "!curl -s 'https://api.github.com/users/archernar/repos?per_page=100' | grep ssh_url >/tmp/myrepos"
-     call OpenInTempBuffer("/tmp/myrepos")
+        let s:thiscmd=  "!curl -s 'https://api.github.com/users/archernar/repos?per_page=100' | grep ssh_url"
+        execute "let output = system('" . substitute(s:thiscmd, '^!', '', '') . "')"
+        vnew
+        let w:scratch = 1
+        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
+
+"      silent execute "!curl -s 'https://api.github.com/users/archernar/repos?per_page=100' | grep ssh_url >/tmp/myrepos"
+"      call OpenInTempBuffer("/tmp/myrepos")
 endfunction
 
 function! OpenInTempBuffer(...)
@@ -549,6 +586,14 @@ if has("autocmd")
    au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
    \| exe "normal! g'\"" | endif
 endif
+
+function! KillScratchWindows()
+        for win in range(1, winnr('$'))
+                if getwinvar(win, 'scratch')
+                        execute win . 'windo close'
+                endif
+        endfor
+endfunction
 
 function! Redir(cmd)
         for win in range(1, winnr('$'))
