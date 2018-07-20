@@ -84,8 +84,10 @@ Plugin 'archernar/vimstuff'
 Plugin 'scrooloose/nerdtree.git'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'jeetsukumaran/vim-buffergator'
-Plugin 'tpope/vim-surround'
 Plugin 'vim-scripts/grep.vim'      " https://github.com/vim-scripts/grep.vim
+Plugin 'tpope/vim-surround'
+
+
 "Plugin 'vim-airline/vim-airline'
 "Plugin 'vim-airline/vim-airline-themes'
 "Plugin 'kristijanhusak/vim-carbon-now-sh'
@@ -189,21 +191,23 @@ function! g:MyStaticMapper(...)
 endfunction
 function! MyKeyMapperDump()
         vnew
+        nnoremap <silent> <buffer> q :close<cr>
         let w:scratch = 1
         let l:nn=1
         let l:maxline=-1
         setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
 	for key in sort(keys(g:MyKeyDict))
-          let l:line=key . repeat(' ', 12-len(key)) . g:MyKeyDict[key]
+          let l:line=key . repeat(' ', 18-len(key)) . g:MyKeyDict[key]
           call setline(l:nn, l:line)
           let l:nn= l:nn + 1
 	endfor
-        vertical resize 60 
+        vertical resize 80 
 endfunction
 " *****************************************************************************************************
                                   " Command Words/Aliases
                                   " *******************************************************************
 let g:MyKeyMapperMode = "COM " 
+call g:MyCommandMapper("command! DOC     :NERDTree /usr/share/vim/vim74/doc")
 call g:MyCommandMapper("command! ULS     :L ls /usr/share/vim/vim74/doc")
 call g:MyCommandMapper("command! UMOTION :e /usr/share/vim/vim74/doc/motion.txt")
 call g:MyCommandMapper("command! USER40  :e /usr/share/vim/vim74/doc/usr_40.txt")
@@ -218,9 +222,20 @@ call g:MyCommandMapper("command! GAWK :call SaveAndExecuteGawk()")
 call g:MyCommandMapper("command! COLORLET :call Colorlet(-1)")
 call g:MyCommandMapper("command! BE :call SetRegistersBE()")
 call g:MyCommandMapper("command! Be :call SetRegistersBE()")
+
 " Do the static entries here
 call g:MyStaticMapper("R", "Execute command, output horozontal")
 call g:MyStaticMapper("L", "Execute command, output vertical")
+
+let g:MyKeyMapperMode = "MRU " 
+call g:MyStaticMapper("<Enter>","Select a file name to edit") 
+call g:MyStaticMapper("o",        "Open file under cursor in new win")
+call g:MyStaticMapper("<Sft-Ent>","Open file under cursor in new win")
+call g:MyStaticMapper("w","Open a file in  read-only mode")
+call g:MyStaticMapper("t","Open a file in a new tab")
+call g:MyStaticMapper("u","Refresh MRU list")
+call g:MyStaticMapper("q","Close the MRU window")
+call g:MyStaticMapper("<Esc>","Close the MRU window")
 let g:MyKeyMapperMode = "STD " 
 " *****************************************************************************************************
                                   " MJE Polymode Keys
@@ -248,7 +263,6 @@ function! PolyModeMapReset()
           nnoremap <silent> 3 3
           nnoremap <silent> a a
           nnoremap <silent> b b
-          nnoremap <silent> c c
           nnoremap <silent> d d
           nnoremap <silent> e e
           nnoremap <silent> f f
