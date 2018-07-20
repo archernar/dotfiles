@@ -52,6 +52,7 @@ set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, b
 command! -nargs=* -complete=shellcmd R new  | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
 command! -nargs=* -complete=shellcmd V vnew | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
 command! -nargs=1 L silent call Redir(<f-args>)
+command! -nargs=1 P !xdg-open "<f-args>" >/dev/null 2>&1
 
 " Usage:
 "       :Redir hi ............. show the full output of command ':hi' in a scratch window
@@ -207,6 +208,7 @@ endfunction
                                   " Command Words/Aliases
                                   " *******************************************************************
 let g:MyKeyMapperMode = "COM " 
+call g:MyCommandMapper("command! RC      :e ~/.vimrc")
 call g:MyCommandMapper("command! DOC     :NERDTree /usr/share/vim/vim74/doc")
 call g:MyCommandMapper("command! ULS     :L ls /usr/share/vim/vim74/doc")
 call g:MyCommandMapper("command! UMOTION :e /usr/share/vim/vim74/doc/motion.txt")
