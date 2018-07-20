@@ -193,6 +193,7 @@ endfunction
 function! MyKeyMapperDump()
         vnew
         nnoremap <silent> <buffer> q :close<cr>
+        nnoremap <silent> <buffer> <F8>  :close<cr>
         let w:scratch = 1
         let l:nn=1
         let l:maxline=-1
@@ -210,7 +211,6 @@ endfunction
 let g:MyKeyMapperMode = "COM " 
 call g:MyCommandMapper("command! RC      :e ~/.vimrc")
 call g:MyCommandMapper("command! DOC     :NERDTree /usr/share/vim/vim74/doc")
-call g:MyCommandMapper("command! ULS     :L ls /usr/share/vim/vim74/doc")
 call g:MyCommandMapper("command! UMOTION :e /usr/share/vim/vim74/doc/motion.txt")
 call g:MyCommandMapper("command! USER40  :e /usr/share/vim/vim74/doc/usr_40.txt")
 call g:MyCommandMapper("command! U40     :e /usr/share/vim/vim74/doc/usr_40.txt")
