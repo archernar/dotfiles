@@ -112,17 +112,6 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
                                   " Put non-Plugin stuff after this line
 
 " *****************************************************************************************************
-                                  " Command Words/Aliases
-                                  " *******************************************************************
-command! S3PUT :call S3put()
-command! REPOS :call OpenRepoListInTempBuffer()
-command! TERMINAL :call Terminal()
-command! KSH :call OpenKshTop()
-command! GAWK :call SaveAndExecuteGawk()
-command! COLORLET :call Colorlet(-1)
-command! BE :call SetRegistersBE()
-command! Be :call SetRegistersBE()
-" *****************************************************************************************************
                                   " Function Keys
                                   " *******************************************************************
 " nnoremap <leader><F5> :call Colorlet(-1)<cr><esc>
@@ -186,6 +175,18 @@ function! g:MyKeyMapper(...)
      let g:MyKeyDict[g:MyKeyMapperMode . " " . l:szKey] = a:2
      execute a:1
 endfunction
+function! g:MyCommandMapper(...)
+"    command! ULS     :L ls /usr/share/vim/vim74/doc
+     let l:szCommand = substitute(a:1, "command! ", "", "")
+     let l:szCommand = substitute(l:szCommand, '^[A-Z,0-9]*[ ]*',"", "")
+     let l:szKey = substitute(a:1, "command! ", "", "")
+     let l:szKey = substitute(l:szKey, " .*$", "", "g")
+     let g:MyKeyDict[g:MyKeyMapperMode . " " . l:szKey] = l:szCommand 
+     execute a:1
+endfunction
+function! g:MyStaticMapper(...)
+     let g:MyKeyDict[g:MyKeyMapperMode . " " . a:1] = a:2
+endfunction
 function! MyKeyMapperDump()
         vnew
         let w:scratch = 1
@@ -199,6 +200,28 @@ function! MyKeyMapperDump()
 	endfor
         vertical resize 60 
 endfunction
+" *****************************************************************************************************
+                                  " Command Words/Aliases
+                                  " *******************************************************************
+let g:MyKeyMapperMode = "COM " 
+call g:MyCommandMapper("command! ULS     :L ls /usr/share/vim/vim74/doc")
+call g:MyCommandMapper("command! UMOTION :e /usr/share/vim/vim74/doc/motion.txt")
+call g:MyCommandMapper("command! USER40  :e /usr/share/vim/vim74/doc/usr_40.txt")
+call g:MyCommandMapper("command! U40     :e /usr/share/vim/vim74/doc/usr_40.txt")
+call g:MyCommandMapper("command! USER41  :e /usr/share/vim/vim74/doc/usr_41.txt")
+call g:MyCommandMapper("command! U41     :e /usr/share/vim/vim74/doc/usr_41.txt")
+call g:MyCommandMapper("command! S3PUT :call S3put()")
+call g:MyCommandMapper("command! REPOS :call OpenRepoListInTempBuffer()")
+call g:MyCommandMapper("command! TERMINAL :call Terminal()")
+call g:MyCommandMapper("command! KSH :call OpenKshTop()")
+call g:MyCommandMapper("command! GAWK :call SaveAndExecuteGawk()")
+call g:MyCommandMapper("command! COLORLET :call Colorlet(-1)")
+call g:MyCommandMapper("command! BE :call SetRegistersBE()")
+call g:MyCommandMapper("command! Be :call SetRegistersBE()")
+" Do the static entries here
+call g:MyStaticMapper("R", "Execute command, output horozontal")
+call g:MyStaticMapper("L", "Execute command, output vertical")
+let g:MyKeyMapperMode = "STD " 
 " *****************************************************************************************************
                                   " MJE Polymode Keys
                                   " *******************************************************************
@@ -254,7 +277,7 @@ call PolyModeMapReset()
 
 runtime plugin/polymode.vim
 if !exists('polymode_loaded')
-     echo "Sorry some polymode initializations will be ignored"
+     echo "Some polymode initializations will be ignored"
 else
      call PolyModeZeroMappings()
 endif
@@ -392,7 +415,8 @@ function! SaveAndExecutePython22222()
 	                          " bufhidden:  This option specifies what happens when a buffer is no longer displayed in a window
 	                          " buftype:    'nofile' means that the buffer is not associated with a file
     setlocal bufhidden=delete
-    setlocal buftype=nofile
+    setlocal buftype=:1
+    nofile
     setlocal noswapfile
     setlocal nobuflisted
     setlocal winfixheight
