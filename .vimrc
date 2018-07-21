@@ -179,6 +179,7 @@ endfunction
 function! MyItemDump()
         vnew
         nnoremap <silent> <buffer> q :close<cr>
+        nnoremap <silent> <buffer> <leader><F8>  :close<cr>
         let w:scratch = 1
         let l:nn=1
         let l:maxline=-1
@@ -294,6 +295,7 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <F6> :call Greppyon()<cr>",                "Greppy First Form, word under cursor")
           call g:MyKeyMapper("nnoremap <F7> :call Greppyon(1)<cr>",               "Greppy Second Form, prompt for word")
           call g:MyKeyMapper("nnoremap <F8> :call MyKeyMapperDump()<cr>",         "MyKeyMapper Help")
+          call g:MyKeyMapper("nnoremap <leader><F8> :call MyItemDump()<cr>",      "MyItem Help")
           call g:MyKeyMapper("nnoremap <F9> :set paste!<cr>",                     "Toggle Paste Setting")
           call g:MyKeyMapper("nnoremap <F10> :DOC<cr>",                           "Vim Doc")
           call g:MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
