@@ -191,7 +191,7 @@ function! MyItemDump()
           call setline(l:nn, l:line)
           let l:nn= l:nn + 1
 	endfor
-        vertical resize 80 
+        vertical resize 120 
 endfunction
 call g:MyItem("My Rememberers")
 call g:MyItem("dw",     "delete to the next word")
@@ -201,6 +201,26 @@ call g:MyItem("d2e",    "delete to the end of next word")
 call g:MyItem("dj",     "delete down a line (current and one below)")
 call g:MyItem("dt)",    "delete up until next closing parenthesis")
 call g:MyItem("d/rails","delete up until the first search match for 'rails'")
+
+call g:MyItem("-")
+call g:MyItem("Motions")
+call g:MyItem("()",     "Sentences (delimited words")
+call g:MyItem("{}",     "Paragraphs (Next empty line")
+call g:MyItem(";",      "Repeat last motion forward")
+call g:MyItem(",",      "Repeat last motion backward")
+call g:MyItem("<#>G",   "Go to Line #")
+call g:MyItem("gg",     "Go to the top of the file")
+call g:MyItem("]]",     "Next section (Depending on your current filetype this may move between functions")
+call g:MyItem("[[",     "Previous section")
+call g:MyItem("0",      "Front of line")
+call g:MyItem("^",      "Front of line (first non-blank)")
+call g:MyItem("%",      "Matching brace/bracket/paren/tag(with matchtag plugin, see session 3")
+call g:MyItem("$",      "End of line")
+
+
+
+
+
 " *****************************************************************************************************
                                   " MJE MyKeyMapper 
                                   " *******************************************************************
