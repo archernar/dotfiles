@@ -165,6 +165,42 @@ function! Greppyoff()
     let g:greppy_mode_active = 0
 endfunction
 " *****************************************************************************************************
+                                  " MJE MyItem 
+                                  " *******************************************************************
+let g:MyItemList = []
+function! g:MyItem(...)
+     if ( a:0 > 1)
+          let l:line =  a:1 . "!!!!" . a:2
+     else
+          let l:line =  a:1 . "!!!!"
+     endif
+     call add(g:MyItemList, l:line)
+endfunction
+function! MyItemDump()
+        vnew
+        nnoremap <silent> <buffer> q :close<cr>
+        let w:scratch = 1
+        let l:nn=1
+        let l:maxline=-1
+        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
+	for item in g:MyItemList
+          let l:szKey   = substitute(item, "!!!!.*", "", "")
+          let l:szValue = substitute(item, ".*!!!!", "", "")
+          let l:line=l:szKey . repeat(' ', 18-len(l:szKey)) . l:szValue
+          call setline(l:nn, l:line)
+          let l:nn= l:nn + 1
+	endfor
+        vertical resize 80 
+endfunction
+call g:MyItem("My Rememberers")
+call g:MyItem("dw",     "delete to the next word")
+call g:MyItem("dt,",    "delete up until the next comma on the current line")
+call g:MyItem("de",     "delete to the end of the current word")
+call g:MyItem("d2e",    "delete to the end of next word")
+call g:MyItem("dj",     "delete down a line (current and one below)")
+call g:MyItem("dt)",    "delete up until next closing parenthesis")
+call g:MyItem("d/rails","delete up until the first search match for 'rails'")
+" *****************************************************************************************************
                                   " MJE MyKeyMapper 
                                   " *******************************************************************
 let g:MyKeyList = []
@@ -209,6 +245,7 @@ endfunction
                                   " Command Words/Aliases
                                   " *******************************************************************
 let g:MyKeyMapperMode = "COM " 
+call g:MyCommandMapper("command! MI      :call MyItemDump()")
 call g:MyCommandMapper("command! RC      :e ~/.vimrc")
 call g:MyCommandMapper("command! DOC     :NERDTree /usr/share/vim/vim74/doc")
 call g:MyCommandMapper("command! UMOTION :e /usr/share/vim/vim74/doc/motion.txt")
@@ -217,13 +254,13 @@ call g:MyCommandMapper("command! U40     :e /usr/share/vim/vim74/doc/usr_40.txt"
 call g:MyCommandMapper("command! USER41  :e /usr/share/vim/vim74/doc/usr_41.txt")
 call g:MyCommandMapper("command! U41     :e /usr/share/vim/vim74/doc/usr_41.txt")
 call g:MyCommandMapper("command! S3PUT :call S3put()")
-call g:MyCommandMapper("command! REPOS :call OpenRepoListInTempBuffer()")
+call g:MyCommandMapper("command! REPOS :call RepoList()")
 call g:MyCommandMapper("command! TERMINAL :call Terminal()")
+call g:MyCommandMapper("command! TERM :call Terminal()")
 call g:MyCommandMapper("command! KSH :call OpenKshTop()")
 call g:MyCommandMapper("command! GAWK :call SaveAndExecuteGawk()")
 call g:MyCommandMapper("command! COLORLET :call Colorlet(-1)")
 call g:MyCommandMapper("command! BE :call SetRegistersBE()")
-call g:MyCommandMapper("command! Be :call SetRegistersBE()")
 
 " Do the static entries here
 call g:MyStaticMapper("R", "Execute command, output horozontal")
@@ -251,7 +288,7 @@ function! PolyModeMapReset()
           let g:MyKeyMapperMode = "STD " 
           call g:MyKeyMapper("nnoremap <F1> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
           call g:MyKeyMapper("nnoremap <F2> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
-          call g:MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>",   "MRU")
+          call g:MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>:call BufferLocalF3Quit()<cr>",   "MRU")
           call g:MyKeyMapper("nnoremap <F4> :tabn<cr>",                           "Next Tab")
           call g:MyKeyMapper("nnoremap <F5> :call Tcmd()<cr>",                    "TCmd")
           call g:MyKeyMapper("nnoremap <F6> :call Greppyon()<cr>",                "Greppy First Form, word under cursor")
@@ -348,10 +385,6 @@ colorscheme darkblue
 colorscheme pablo
 hi Visual   cterm=reverse
 
-" nnoremap <silent> <Leader><PageUp> :wincmd _<cr>:wincmd \|<cr>
-" nnoremap <silent> <Leader><PageDown> :wincmd =<cr>
-
-
                                   " *******************************************************************
                                   " Quick Customizations
 nnoremap <leader>x  $a<br><esc>0j<esc>
@@ -362,15 +395,6 @@ let @t = "</li>"
 nnoremap <leader>1 "bP<esc>
 nnoremap <leader>2 "ep<esc>
 nnoremap <leader>3 $"tp<esc>0jw
-                                  " *******************************************************************
-                                  " Tester Mapping
-
-" <li><kbd>TEST</kbd> TEST TEST TESTTEST TEST</li>
-" TEST TEST TEST TESTTEST TEST
-" set wildmenu
-" set cpo-=<
-" set wcm=<C-Z>
-" map <F4> :emenu <C-Z>
 
 " *****************************************************************************************************
                                   " Functions
@@ -507,8 +531,6 @@ function! Tb()
 endfunction
 
 
-
-
 function! Tcmd()
     call SetRegisterI()
     let l:cWord = @i
@@ -522,17 +544,17 @@ function! Tcmd()
 
 endfunction
 
+function! BufferLocalF3Quit()
+        nnoremap <silent> <buffer> <F3> :close<cr>
+endfunction
 
-
-function! OpenRepoListInTempBuffer()
-        let s:thiscmd=  "!curl -s 'https://api.github.com/users/archernar/repos?per_page=100' | grep ssh_url"
-        execute "let output = system('" . substitute(s:thiscmd, '^!', '', '') . "')"
+function! RepoList()
         vnew
-        let w:scratch = 1
         setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
-
-"      silent execute "!curl -s 'https://api.github.com/users/archernar/repos?per_page=100' | grep ssh_url >/tmp/myrepos"
-"      call OpenInTempBuffer("/tmp/myrepos")
+        nnoremap <silent> <buffer> q :close<cr>
+        let w:scratch = 1
+        vertical resize 80 
+        execute "r !curl -s 'https://api.github.com/users/archernar/repos?per_page=100' | grep ssh_url"
 endfunction
 
 function! OpenInTempBuffer(...)
@@ -605,7 +627,7 @@ function! Tput(sz)
     call append(line('$'), a:sz)
 endfunction
 function! Terminal()
-    execute "silent !gnome-terminal --title=vimsterTerm --geometry 135x30x200x200 &"
+    execute "silent !gnome-terminal --title=vimsterTerm --geometry 195x50+25+25 &"
     redraw!
 endfunction
 function! OpenKshTop()
@@ -664,7 +686,6 @@ function! Redir(cmd)
         setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
         call setline(1, split(output, "\n"))
 endfunction
-
 
 
 " https://stackoverflow.com/questions/11176159/how-to-jump-to-start-end-of-visual-selection
