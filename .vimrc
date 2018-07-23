@@ -114,6 +114,15 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
                                   " filetype plugin on
                                   " Put non-Plugin stuff after this line
 
+function! Vimtips()
+        vnew ~/vimtips.txt
+        nnoremap <silent> <buffer> q :close<cr>
+        let w:scratch = 1
+        let l:nn=1
+        let l:maxline=-1
+        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
+        vertical resize 105 
+endfunction
 " *****************************************************************************************************
                                   " MJE MyKeyMapper 
                                   " *******************************************************************
@@ -308,6 +317,7 @@ call g:MyCommandMapper("command! USER41  :e /usr/share/vim/vim74/doc/usr_41.txt"
 call g:MyCommandMapper("command! U41     :e /usr/share/vim/vim74/doc/usr_41.txt")
 call g:MyCommandMapper("command! S3PUT :call S3put()")
 call g:MyCommandMapper("command! REPOS :call RepoList()")
+call g:MyCommandMapper("command! TIPS  :call Vimtips()")
 call g:MyCommandMapper("command! TERMINAL :call Terminal()")
 call g:MyCommandMapper("command! TERM :call Terminal()")
 call g:MyCommandMapper("command! KSH :call OpenKshTop()")
