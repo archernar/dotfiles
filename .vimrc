@@ -115,6 +115,70 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
                                   " Put non-Plugin stuff after this line
 
 " *****************************************************************************************************
+                                  " MJE MyKeyMapper 
+                                  " *******************************************************************
+let g:MyKeyList = []
+let g:MyValueList = []
+let g:MyKeyDict = {} 
+let g:MyKeyMapperMode = "STD " 
+function! g:MyKeyMapper(...)
+     let l:szKey = substitute(a:1, "<silent> ", "", "")
+     let l:szKey = substitute(l:szKey, "nnoremap ", "", "")
+     let l:szKey = substitute(l:szKey, " .*$", "", "g")
+     let g:MyKeyDict[g:MyKeyMapperMode . " " . l:szKey] = a:2
+     execute a:1
+endfunction
+function! g:MyCommandMapper(...)
+"    command! ULS     :L ls /usr/share/vim/vim74/doc
+     let l:szCommand = substitute(a:1, "command! ", "", "")
+     let l:szCommand = substitute(l:szCommand, '^[A-Z,0-9]*[ ]*',"", "")
+     let l:szKey = substitute(a:1, "command! ", "", "")
+     let l:szKey = substitute(l:szKey, " .*$", "", "g")
+     let g:MyKeyDict[g:MyKeyMapperMode . " " . l:szKey] = l:szCommand 
+     execute a:1
+endfunction
+function! g:MyStaticMapper(...)
+     let g:MyKeyDict[g:MyKeyMapperMode . " " . a:1] = a:2
+endfunction
+function! MyKeyMapperDumpSeek()
+"    zt puts current line to top of screen
+"    z. or zz puts current line to center of screen
+"    zb puts current line to bottom of screen
+     let wuc = expand("<cword>") 
+     let currentLine   = getline(".")
+     let l:nn=0
+     let l:Here = line(".")
+     normal! G
+     let l:There = line(".")
+     call cursor(l:Here, 1)
+     while ( (l:nn < l:There) && (wuc ==  expand("<cword>")) )
+          execute "normal j"
+          let l:nn= l:nn + 1
+          if (l:nn >= l:There) 
+               let l:nn=1
+               call cursor(1, 1)
+          endif
+     endwhile
+     normal! zt 
+endfunction
+function! MyKeyMapperDump()
+        vnew
+        nnoremap <silent> <buffer> q :close<cr>
+        nnoremap <silent> <buffer> <F8>  :close<cr>
+        nnoremap <silent> <buffer> <leader><F8>  :close<cr>
+        nnoremap <silent> <buffer> s  :call MyKeyMapperDumpSeek()<cr>
+        let w:scratch = 1
+        let l:nn=1
+        let l:maxline=-1
+        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
+	for key in sort(keys(g:MyKeyDict))
+          let l:line=key . repeat(' ', 18-len(key)) . g:MyKeyDict[key]
+          call setline(l:nn, l:line)
+          let l:nn= l:nn + 1
+	endfor
+        vertical resize 80 
+endfunction
+" *****************************************************************************************************
                                   " Function Keys
                                   " *******************************************************************
 " nnoremap <leader><F5> :call Colorlet(-1)<cr><esc>
@@ -132,15 +196,16 @@ nnoremap <silent> <leader><F4> :close<cr>
 " *****************************************************************************************************
                                   " Leader Keys
                                   " *******************************************************************
+nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyKeyMapper(<esc>0
 nnoremap <leader>] *
 nnoremap <Leader>' diwi""<ESC>hp<ESC>
-nnoremap <Leader>nt :NERDTreeToggle<cr>
-nnoremap <Leader>p  :PluginUpdate<cr>
-nnoremap <leader>ev :split $MYVIMRC<cr>
+call g:MyKeyMapper("nnoremap <Leader>nt :NERDTreeToggle<cr>","NERDTree Toggle")
+call g:MyKeyMapper("nnoremap <Leader>p  :PluginUpdate<cr>","Vundle Update")
+call g:MyKeyMapper("nnoremap <leader>ev :split $MYVIMRC<cr>","Split Edit .vimrc")
 nnoremap <leader>-  :wincmd _<cr>:wincmd \|<cr>
 nnoremap <leader>=  :wincmd =<cr>
-nnoremap <leader>l  :resize -5<cr>
-nnoremap <leader>m  :resize +5<cr>
+call g:MyKeyMapper("nnoremap <leader>l :resize -5<cr>","Window Resize +")
+call g:MyKeyMapper("nnoremap <leader>m :resize +5<cr>","Window Resize -")
 nnoremap <leader>g  :silent execute "grep! -R " . shellescape(expand("<cWORD>")) . " ."<cr>:copen<cr>
 nnoremap <leader>h  :silent execute "help " . expand("<cWORD>")<cr> 
 let g:vim_notes_is_open = 0
@@ -180,6 +245,7 @@ function! MyItemDump()
         vnew
         nnoremap <silent> <buffer> q :close<cr>
         nnoremap <silent> <buffer> <leader><F8>  :close<cr>
+        nnoremap <silent> <buffer>         <F8>  :close<cr>
         let w:scratch = 1
         let l:nn=1
         let l:maxline=-1
@@ -201,7 +267,12 @@ call g:MyItem("d2e",    "delete to the end of next word")
 call g:MyItem("dj",     "delete down a line (current and one below)")
 call g:MyItem("dt)",    "delete up until next closing parenthesis")
 call g:MyItem("d/rails","delete up until the first search match for 'rails'")
-
+call g:MyItem("-")
+call g:MyItem("Main Motions")
+call g:MyItem("h,l", "move left/right by character")
+call g:MyItem("w", "move forward one (w)ord")
+call g:MyItem("b", "move (b)ackward one word")
+call g:MyItem("e", "move forward to the (e)nd of a word")
 call g:MyItem("-")
 call g:MyItem("Motions")
 call g:MyItem("()",     "Sentences (delimited words")
@@ -221,47 +292,6 @@ call g:MyItem("$",      "End of line")
 
 
 
-" *****************************************************************************************************
-                                  " MJE MyKeyMapper 
-                                  " *******************************************************************
-let g:MyKeyList = []
-let g:MyValueList = []
-let g:MyKeyDict = {} 
-let g:MyKeyMapperMode = "STD " 
-function! g:MyKeyMapper(...)
-     let l:szKey = substitute(a:1, "<silent> ", "", "")
-     let l:szKey = substitute(l:szKey, "nnoremap ", "", "")
-     let l:szKey = substitute(l:szKey, " .*$", "", "g")
-     let g:MyKeyDict[g:MyKeyMapperMode . " " . l:szKey] = a:2
-     execute a:1
-endfunction
-function! g:MyCommandMapper(...)
-"    command! ULS     :L ls /usr/share/vim/vim74/doc
-     let l:szCommand = substitute(a:1, "command! ", "", "")
-     let l:szCommand = substitute(l:szCommand, '^[A-Z,0-9]*[ ]*',"", "")
-     let l:szKey = substitute(a:1, "command! ", "", "")
-     let l:szKey = substitute(l:szKey, " .*$", "", "g")
-     let g:MyKeyDict[g:MyKeyMapperMode . " " . l:szKey] = l:szCommand 
-     execute a:1
-endfunction
-function! g:MyStaticMapper(...)
-     let g:MyKeyDict[g:MyKeyMapperMode . " " . a:1] = a:2
-endfunction
-function! MyKeyMapperDump()
-        vnew
-        nnoremap <silent> <buffer> q :close<cr>
-        nnoremap <silent> <buffer> <F8>  :close<cr>
-        let w:scratch = 1
-        let l:nn=1
-        let l:maxline=-1
-        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
-	for key in sort(keys(g:MyKeyDict))
-          let l:line=key . repeat(' ', 18-len(key)) . g:MyKeyDict[key]
-          call setline(l:nn, l:line)
-          let l:nn= l:nn + 1
-	endfor
-        vertical resize 80 
-endfunction
 " *****************************************************************************************************
                                   " Command Words/Aliases
                                   " *******************************************************************
