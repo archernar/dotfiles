@@ -201,6 +201,8 @@ nnoremap <leader>] *
 nnoremap <Leader>' diwi""<ESC>hp<ESC>
 call g:MyKeyMapper("nnoremap <Leader>nt :NERDTreeToggle<cr>","NERDTree Toggle")
 call g:MyKeyMapper("nnoremap <Leader>p  :PluginUpdate<cr>","Vundle Update")
+call g:MyKeyMapper("nnoremap <Leader>d  :! rm -rf /tmp/dotfiles;git clone http://github.com/archernar/dotfiles.git /tmp/dotfiles;<cr>","fetch .vimrc update")
+
 call g:MyKeyMapper("nnoremap <leader>ev :split $MYVIMRC<cr>","Split Edit .vimrc")
 nnoremap <leader>-  :wincmd _<cr>:wincmd \|<cr>
 nnoremap <leader>=  :wincmd =<cr>
