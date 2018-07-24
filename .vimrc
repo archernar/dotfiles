@@ -44,6 +44,7 @@ set softtabstop=4                 " with this setup.
 set expandtab
 let mapleader = " "               " Leader - ( Spacebar )
 let MRU_Auto_Close = 1            " Set MRU window to close after selection
+let g:PDFlib="/home/mestes/READS1"
 set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, but never time out on mappings
 
 " *****************************************************************************************************
@@ -117,11 +118,14 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 function! Vimtips()
         vnew ~/vimtips.txt
         nnoremap <silent> <buffer> q :close<cr>
+        nnoremap <silent> <buffer> s /^========<cr>zt
+        nnoremap <silent> <buffer> d ?^========<cr>zt
         let w:scratch = 1
         let l:nn=1
         let l:maxline=-1
         setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
         vertical resize 105 
+        echom "Vimtips:   usei <s> to page forward, <d> to page backward"
 endfunction
 " *****************************************************************************************************
                                   " MJE MyKeyMapper 
@@ -185,7 +189,7 @@ function! MyKeyMapperDump()
           call setline(l:nn, l:line)
           let l:nn= l:nn + 1
 	endfor
-        vertical resize 80 
+        vertical resize 110 
 endfunction
 " *****************************************************************************************************
                                   " Function Keys
@@ -310,6 +314,8 @@ let g:MyKeyMapperMode = "COM "
 call g:MyCommandMapper("command! MI      :call MyItemDump()")
 call g:MyCommandMapper("command! RC      :e ~/.vimrc")
 call g:MyCommandMapper("command! DOC     :NERDTree /usr/share/vim/vim74/doc")
+call g:MyCommandMapper("command! LIB     :call PDFList()")
+call g:MyCommandMapper("command! PDF     :call PDFList()")
 call g:MyCommandMapper("command! UMOTION :e /usr/share/vim/vim74/doc/motion.txt")
 call g:MyCommandMapper("command! USER40  :e /usr/share/vim/vim74/doc/usr_40.txt")
 call g:MyCommandMapper("command! U40     :e /usr/share/vim/vim74/doc/usr_40.txt")
@@ -317,7 +323,10 @@ call g:MyCommandMapper("command! USER41  :e /usr/share/vim/vim74/doc/usr_41.txt"
 call g:MyCommandMapper("command! U41     :e /usr/share/vim/vim74/doc/usr_41.txt")
 call g:MyCommandMapper("command! S3PUT :call S3put()")
 call g:MyCommandMapper("command! REPOS :call RepoList()")
+call g:MyCommandMapper("command! FOUR :call Four()")
+call g:MyCommandMapper("command! GETVUNDLE :!git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
 call g:MyCommandMapper("command! TIPS  :call Vimtips()")
+call g:MyCommandMapper("command! VT  :call Vimtips()")
 call g:MyCommandMapper("command! TERMINAL :call Terminal()")
 call g:MyCommandMapper("command! TERM :call Terminal()")
 call g:MyCommandMapper("command! KSH :call OpenKshTop()")
@@ -480,7 +489,13 @@ function! RandomString()
     endwhile 
     return l:szOut
 endfunction
-
+function Four()
+          new
+          vnew
+          wincmd w
+          wincmd w
+          vnew
+endfunction
 function! SaveAndExecutePython()
     " https://stackoverflow.com/questions/18948491/running-python-code-in-vim
     " SOURCE [reusable window]: https://github.com/fatih/vim-go/blob/master/autoload/go/ui.vim
@@ -612,8 +627,27 @@ function! BufferLocalF3Quit()
         nnoremap <silent> <buffer> <F3> :close<cr>
 endfunction
 
+function! PDFListEnterAction()
+     let currentLine   = getline(".")
+     echom currentLine
+     execute "silent !xdg-open " . currentLine . " >/dev/null 2>&1"
+     execute "redraw!"
+     setlocal readonly
+     setlocal nomodifiable
+endfunction
+function! PDFList()
+        vnew
+        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
+        nnoremap <silent> <buffer> <Enter> :call PDFListEnterAction()<cr>
+        nnoremap <silent> <buffer> q :close<cr>:call PolyModeReset()<cr>
+        let w:scratch = 1
+        vertical resize 80 
+        execute "r !ls " . g:PDFlib . "/*.pdf"
+        call cursor(1, 1)
+endfunction
 function! RepoList()
         vnew
+        nnoremap <silent> <buffer> q :close<cr>:call PolyModeReset()<cr>
         setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
         nnoremap <silent> <buffer> q :close<cr>
         let w:scratch = 1

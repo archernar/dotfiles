@@ -6,7 +6,15 @@ trap "exit 2" 1 2 3 13 15
 rm $Tmp  >/dev/null 2>&1
 
 if [ $# -eq 0 ] ; then
-                 vim -c MRU
+      vim -c MRU
 else
-                 vim -o $1 $2 $3 $4
+     if [ "$1" == "4" ] ; then
+        vi -c FOUR
+        exit
+     fi
+     if [ "$1" == "x" ] ; then
+         vim
+     else
+         vim -o $1 $2 $3 $4
+     fi
 fi
