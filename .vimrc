@@ -321,6 +321,7 @@ call g:MyCommandMapper("command! USER41  :e /usr/share/vim/vim74/doc/usr_41.txt"
 call g:MyCommandMapper("command! U41     :e /usr/share/vim/vim74/doc/usr_41.txt")
 call g:MyCommandMapper("command! S3PUT :call S3put()")
 call g:MyCommandMapper("command! C       :call CommanderList()")
+call g:MyCommandMapper("command! CE      :call CommanderListEdit()")
 call g:MyCommandMapper("command! REPOS   :call RepoList()")
 call g:MyCommandMapper("command! FOUR    :call Four()")
 call g:MyCommandMapper("command! GETVUNDLE :!git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
@@ -534,14 +535,24 @@ function! CommanderEnterAction()
      let currentLine   = getline(".")
      let l:szKey = substitute(currentLine, " .*$", "", "g")
      let l:szCommand = substitute(currentLine, "^[a-z]* ", "", "")
+     let l:szCommand = substitute(l:szCommand, "^[ ]*", "", "")
      execute "1"
      execute "normal! gg"
      execute "normal! dG"
-     execute "r !" . l:szCommand
+
+     echom l:szCommand[0:0]
+     if (l:szCommand[0:0] == "!")
+          execute "r " . l:szCommand
+     else
+          silent execute l:szCommand
+     endif
      execute "nnoremap <silent> <buffer> <Enter> <Nop>"
 endfunction
 function! CommanderList()
     call LeftWindowBuffer(":call CommanderEnterAction()<cr>", "r !cat " . $VIM_COMMANDER)
+endfunction
+function! CommanderListEdit()
+    silent execute  "e " . $VIM_COMMANDER
 endfunction
 
 " *****************************************************************************************************
