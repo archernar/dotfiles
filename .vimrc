@@ -116,16 +116,11 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
                                   " Put non-Plugin stuff after this line
 
 function! Vimtips()
-        vnew ~/vimtips.txt
-        nnoremap <silent> <buffer> q :close<cr>
-        nnoremap <silent> <buffer> s /^========<cr>zt
-        nnoremap <silent> <buffer> d ?^========<cr>zt
-        let w:scratch = 1
-        let l:nn=1
-        let l:maxline=-1
-        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
-        vertical resize 105 
-        echom "Vimtips:   usei <s> to page forward, <d> to page backward"
+     call LeftWindowFile("/home/mestes/vimtips.txt")
+     nnoremap <silent> <buffer> s /^========<cr>zt
+     nnoremap <silent> <buffer> d ?^========<cr>zt
+     vertical resize 105 
+     echom "Vimtips:   use <s> to page forward, <d> to page backward"
 endfunction
 " *****************************************************************************************************
                                   " MJE MyKeyMapper 
@@ -189,6 +184,7 @@ function! MyKeyMapperDump()
           call setline(l:nn, l:line)
           let l:nn= l:nn + 1
 	endfor
+        wincmd H
         vertical resize 110 
 endfunction
 " *****************************************************************************************************
@@ -209,7 +205,6 @@ nnoremap <silent> <leader><F4> :close<cr>
 " *****************************************************************************************************
                                   " Leader Keys
                                   " *******************************************************************
-nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyKeyMapper(<esc>0
 nnoremap <leader>] *
 nnoremap <Leader>' diwi""<ESC>hp<ESC>
 call g:MyKeyMapper("nnoremap <Leader>nt :NERDTreeToggle<cr>","NERDTree Toggle")
@@ -274,7 +269,18 @@ function! MyItemDump()
 	endfor
         vertical resize 120 
 endfunction
-call g:MyItem("My Rememberers")
+nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyItem(<esc>0
+call g:MyItem("---")
+call g:MyItem("i", "Enter insert mode at cursor")
+call g:MyItem("I", "Enter insert mode at first non-blank character")
+call g:MyItem("s", "Delete character under cursor and enter insert mode")
+call g:MyItem("S", "Delete line and begin insert at beginning of same line")
+call g:MyItem("a", "Enter insert mode _after_ cursor")
+call g:MyItem("A", "Enter insert mode at the end of the line")
+call g:MyItem("o", "Enter insert mode on the next line")
+call g:MyItem("O", "enter insert mode on the above line")
+call g:MyItem("C", "Delete from cursor to end of line and begin insert")
+call g:MyItem("---")
 call g:MyItem("dw",     "delete to the next word")
 call g:MyItem("dt,",    "delete up until the next comma on the current line")
 call g:MyItem("de",     "delete to the end of the current word")
@@ -305,12 +311,11 @@ call g:MyItem("$",      "End of line")
 
 
 
-
-
 " *****************************************************************************************************
                                   " Command Words/Aliases
                                   " *******************************************************************
 let g:MyKeyMapperMode = "COM " 
+call g:MyCommandMapper("command! CHEAT   :call MyItemDump()")
 call g:MyCommandMapper("command! MI      :call MyItemDump()")
 call g:MyCommandMapper("command! RC      :e ~/.vimrc")
 call g:MyCommandMapper("command! DOC     :NERDTree /usr/share/vim/vim74/doc")
@@ -322,15 +327,15 @@ call g:MyCommandMapper("command! U40     :e /usr/share/vim/vim74/doc/usr_40.txt"
 call g:MyCommandMapper("command! USER41  :e /usr/share/vim/vim74/doc/usr_41.txt")
 call g:MyCommandMapper("command! U41     :e /usr/share/vim/vim74/doc/usr_41.txt")
 call g:MyCommandMapper("command! S3PUT :call S3put()")
-call g:MyCommandMapper("command! REPOS :call RepoList()")
-call g:MyCommandMapper("command! FOUR :call Four()")
+call g:MyCommandMapper("command! C       :call CommanderList()")
+call g:MyCommandMapper("command! REPOS   :call RepoList()")
+call g:MyCommandMapper("command! FOUR    :call Four()")
 call g:MyCommandMapper("command! GETVUNDLE :!git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
-call g:MyCommandMapper("command! TIPS  :call Vimtips()")
-call g:MyCommandMapper("command! VT  :call Vimtips()")
-call g:MyCommandMapper("command! TERMINAL :call Terminal()")
-call g:MyCommandMapper("command! TERM :call Terminal()")
-call g:MyCommandMapper("command! KSH :call OpenKshTop()")
-call g:MyCommandMapper("command! GAWK :call SaveAndExecuteGawk()")
+call g:MyCommandMapper("command! TIPS    :call Vimtips()")
+call g:MyCommandMapper("command! VT      :call Vimtips()")
+call g:MyCommandMapper("command! TERM    :call Terminal()")
+call g:MyCommandMapper("command! KSH     :call KshTop()")
+call g:MyCommandMapper("command! GAWK    :call SaveAndExecuteGawk()")
 call g:MyCommandMapper("command! COLORLET :call Colorlet(-1)")
 call g:MyCommandMapper("command! BE :call SetRegistersBE()")
 
@@ -354,14 +359,14 @@ let g:MyKeyMapperMode = "STD "
 call g:MyKeyMapper("nnoremap <Home> :call PolyMode(-1)<cr>",       "PolyMode On")
 call g:MyKeyMapper("nnoremap <End>  :call PolyModeReset()<cr>",    "PolyMode Off")
 function! PolyModeMapReset()
-          let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> NextTab <F5> Cmd <F6> Grep   <F9> PasteMode <F12> Build"
+          let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> Commander <F5> Cmd <F6> Grep   <F9> PasteMode <F12> Build"
           let g:help1 = ""
           let g:help2 = ""
           let g:MyKeyMapperMode = "STD " 
           call g:MyKeyMapper("nnoremap <F1> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
           call g:MyKeyMapper("nnoremap <F2> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
           call g:MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>:call BufferLocalF3Quit()<cr>",   "MRU")
-          call g:MyKeyMapper("nnoremap <F4> :tabn<cr>",                           "Next Tab")
+          call g:MyKeyMapper("nnoremap <F4> :C<cr>",                              "Commander")
           call g:MyKeyMapper("nnoremap <F5> :call Tcmd()<cr>",                    "TCmd")
           call g:MyKeyMapper("nnoremap <F6> :call Greppyon()<cr>",                "Greppy First Form, word under cursor")
           call g:MyKeyMapper("nnoremap <F7> :call Greppyon(1)<cr>",               "Greppy Second Form, prompt for word")
@@ -369,6 +374,7 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <leader><F8> :call MyItemDump()<cr>",      "MyItem Help")
           call g:MyKeyMapper("nnoremap <F9> :set paste!<cr>",                     "Toggle Paste Setting")
           call g:MyKeyMapper("nnoremap <F10> :DOC<cr>",                           "Vim Doc")
+          call g:MyKeyMapper("nnoremap <leader><F10> :CHEAT<cr>",                 "My Cheat Sheet")
           call g:MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
           call g:MyKeyMapper("nnoremap <silent> <End>  :call PolyModeReset()<cr>","PolyMode Off")
           nnoremap <silent> 1 1
@@ -470,7 +476,7 @@ nnoremap <leader>2 "ep<esc>
 nnoremap <leader>3 $"tp<esc>0jw
 
 " *****************************************************************************************************
-                                  " Functions
+                                  " Utility Functions
                                   " *******************************************************************
 function! VimKeyMap()
      redir! > ~/.vimkeymap.txt
@@ -489,13 +495,13 @@ function! RandomString()
     endwhile 
     return l:szOut
 endfunction
-function Four()
-          new
-          vnew
-          wincmd w
-          wincmd w
-          vnew
+function! Four() 
+    new | vnew | wincmd w | wincmd w | vnew 
 endfunction
+function! LockTempBuffer()
+    setlocal readonly | setlocal nomodifiable
+endfunction
+
 function! SaveAndExecutePython()
     " https://stackoverflow.com/questions/18948491/running-python-code-in-vim
     " SOURCE [reusable window]: https://github.com/fatih/vim-go/blob/master/autoload/go/ui.vim
@@ -505,108 +511,6 @@ function! SaveAndExecutePython()
     silent execute ".!python " . shellescape(s:current_buffer_file_path, 1)
     call LockTempBuffer()
     wincmd k
-endfunction
-
-function! SaveAndExecutePython22222()
-    " https://stackoverflow.com/questions/18948491/running-python-code-in-vim
-    " SOURCE [reusable window]: https://github.com/fatih/vim-go/blob/master/autoload/go/ui.vim
-
-                                  " *******************************************************************
-                                  " Save and reload current file
-                                  " Get file path of current file
-    silent execute "update | edit"
-    let s:current_buffer_file_path = expand("%")
-    let s:output_buffer_name = "Python"
-    let s:output_buffer_filetype = "output"
-                                  " *******************************************************************
-                                  " Reuse existing buffer window if it exists otherwise create a new one
-    if !exists("s:buf_nr") || !bufexists(s:buf_nr)
-        silent execute 'botright new ' . s:output_buffer_name
-        let s:buf_nr = bufnr('%')
-    elseif bufwinnr(s:buf_nr) == -1
-        silent execute 'botright new'
-        silent execute s:buf_nr . 'buffer'
-    elseif bufwinnr(s:buf_nr) != bufwinnr('%')
-        silent execute bufwinnr(s:buf_nr) . 'wincmd w'
-    endif
-
-    silent execute "setlocal filetype=" . s:output_buffer_filetype
-                                  " *******************************************************************
-	                          " bufhidden:  This option specifies what happens when a buffer is no longer displayed in a window
-	                          " buftype:    'nofile' means that the buffer is not associated with a file
-    setlocal bufhidden=delete
-    setlocal buftype=:1
-    nofile
-    setlocal noswapfile
-    setlocal nobuflisted
-    setlocal winfixheight
-"    setlocal cursorline " make it easy to distinguish
-    setlocal nonumber
-    setlocal norelativenumber
-    setlocal showbreak=""
-
-    " clear the buffer
-    setlocal noreadonly
-    setlocal modifiable
-    %delete _
-
-    " add the console output
-    silent execute ".!python " . shellescape(s:current_buffer_file_path, 1)
-
-    " resize window to content length
-    " Note: This is annoying because if you print a lot of lines then your code buffer is
-    " forced to a height of one line every time you run this function.
-    " However without this line the buffer starts off as a default size and if you resize
-    " the buffer then it keeps that custom size after repeated runs of this function.
-    " But if you close the output buffer then it returns to using the default size when its recreated
-    "execute 'resize' . line('$')
-
-    " make the buffer non modifiable
-    setlocal readonly
-    setlocal nomodifiable
-    wincmd k
-endfunction
-
-function! Tb()
-    let l:cWord = shellescape(expand("<cWORD>"))
-    call SetRegisterI()
-    let l:cWord = @i
-    silent execute "update | edit"
-    let s:current_buffer_file_path = expand("%")
-    let s:output_buffer_name = RandomString()
-    let s:output_buffer_filetype = "output"
-    if !exists("s:buf_nr") || !bufexists(s:buf_nr)
-        silent execute 'botright new ' . s:output_buffer_name
-        let s:buf_nr = bufnr('%')
-    elseif bufwinnr(s:buf_nr) == -1
-        silent execute 'botright new'
-        silent execute s:buf_nr . 'buffer'
-    elseif bufwinnr(s:buf_nr) != bufwinnr('%')
-        silent execute bufwinnr(s:buf_nr) . 'wincmd w'
-    endif
-
-    silent execute "setlocal filetype=" . s:output_buffer_filetype
-    setlocal bufhidden=delete
-    setlocal buftype=nofile
-    setlocal noswapfile
-    setlocal nobuflisted
-    setlocal winfixheight
-"    setlocal cursorline " make it easy to distinguish
-    setlocal nonumber
-    setlocal norelativenumber
-    setlocal showbreak=""
-
-    " clear the buffer
-    setlocal noreadonly
-    setlocal modifiable
-    %delete _
-
-    " add the console output
-    let l:szCommand = ".!grep -n " .  l:cWord . " " . s:current_buffer_file_path
-    silent execute  l:szCommand
-    setlocal readonly
-    setlocal nomodifiable
-
 endfunction
 
 
@@ -626,7 +530,33 @@ endfunction
 function! BufferLocalF3Quit()
         nnoremap <silent> <buffer> <F3> :close<cr>
 endfunction
+   
+" *****************************************************************************************************
+                                  " Repo List Functions
+                                  " *******************************************************************
+function! RepoList()
+        call LeftWindowBuffer("", "r !curl -s 'https://api.github.com/users/archernar/repos?per_page=100' | grep ssh_url")
+endfunction
+" *****************************************************************************************************
+                                  " Commander Functions
+                                  " *******************************************************************
+function! CommanderEnterAction()
+     let currentLine   = getline(".")
+     let l:szKey = substitute(currentLine, " .*$", "", "g")
+     let l:szCommand = substitute(currentLine, "^[a-z]* ", "", "")
+     execute "1"
+     execute "normal! gg"
+     execute "normal! dG"
+     execute "r !" . l:szCommand
+     execute "nnoremap <silent> <buffer> <Enter> <Nop>"
+endfunction
+function! CommanderList()
+    call LeftWindowBuffer(":call CommanderEnterAction()<cr>", "r !cat /home/mestes/ffed")
+endfunction
 
+" *****************************************************************************************************
+                                  " PDF View Functions
+                                  " *******************************************************************
 function! PDFListEnterAction()
      let currentLine   = getline(".")
      echom currentLine
@@ -636,23 +566,56 @@ function! PDFListEnterAction()
      setlocal nomodifiable
 endfunction
 function! PDFList()
-        vnew
-        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
-        nnoremap <silent> <buffer> <Enter> :call PDFListEnterAction()<cr>
-        nnoremap <silent> <buffer> q :close<cr>:call PolyModeReset()<cr>
+          call LeftWindowBuffer(":call PDFListEnterAction()<cr>", "r !ls " . g:PDFlib . "/*.pdf")
+endfunction
+
+" *****************************************************************************************************
+                                  " Utility Functions
+                                  " *******************************************************************
+function! DQ(...)
+    let l:sz = substitute(a:1, "<cr>", "", "g")
+    let l:sz = substitute(l:sz, ":", "", "g")
+    return "\'" . l:sz . "\'"
+endfunction
+" *****************************************************************************************************
+                                  " Left Window-Buffer Functions
+                                  " *******************************************************************
+function! LeftWindowFile(...)
+        execute "vnew " . a:1
+        wincmd H
+        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile readonly nomodifiable | nnoremap <silent> <buffer> q :close<cr>
         let w:scratch = 1
         vertical resize 80 
-        execute "r !ls " . g:PDFlib . "/*.pdf"
         call cursor(1, 1)
 endfunction
-function! RepoList()
+function! LeftWindowBuffer(...)
+    " a:1    Enter Action
+    " a:2    Content Action
+    " *******************************************************************
+    " Reuse existing buffer window if it exists otherwise create a new one
+    if !exists("s:buf_nr") || !bufexists(s:buf_nr)
         vnew
-        nnoremap <silent> <buffer> q :close<cr>:call PolyModeReset()<cr>
+        wincmd H
+        let s:buf_nr = bufnr('%')
         setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
         nnoremap <silent> <buffer> q :close<cr>
-        let w:scratch = 1
-        vertical resize 80 
-        execute "r !curl -s 'https://api.github.com/users/archernar/repos?per_page=100' | grep ssh_url"
+    elseif bufwinnr(s:buf_nr) == -1
+        vnew
+        silent execute s:buf_nr . 'buffer'
+    elseif bufwinnr(s:buf_nr) != bufwinnr('%')
+        silent execute bufwinnr(s:buf_nr) . 'wincmd w'
+    endif
+    " *******************************************************************
+    if ( len(a:1) > 0)
+         execute "nnoremap <silent> <buffer> <Enter> " . a:1
+    endif
+    let w:scratch = 1
+    vertical resize 80 
+    call cursor(1, 1)
+    execute "normal! gg"
+    execute "normal! dG"
+    execute a:2
+    call cursor(1, 1)
 endfunction
 
 function! OpenInTempBuffer(...)
@@ -707,10 +670,6 @@ function! MakeTempBuffer()
     
 
 endfunction
-function! LockTempBuffer()
-    setlocal readonly
-    setlocal nomodifiable
-endfunction
 
 
 
@@ -721,21 +680,24 @@ function! SetRegisterI()
       echo "\r"
       echo ""
 endfunction
-function! Tput(sz)
-    call append(line('$'), a:sz)
-endfunction
 function! Terminal()
     execute "silent !gnome-terminal --title=vimsterTerm --geometry 195x50+25+25 &"
     redraw!
 endfunction
-function! OpenKshTop()
-    call MakeTempBuffer()
-    call Tput("#!/usr/bin/ksh")
-    call Tput("Tmp=\"/tmp/$$\"")
-    call Tput("TmpDir=\"/tmp/dir$$\"")
-    call Tput("trap 'rm -f \"$Tmp\" >/dev/null 2>&1' 0")
-    call Tput("trap \"exit 2\" 1 2 3 13 15")
-    call Tput("")
+
+" *****************************************************************************************************
+                                  " KSH Topper Functions
+                                  " *******************************************************************
+function! TopPut(...)
+    call append(line('0'), a:1)
+endfunction
+function! KshTop()
+    call TopPut("")
+    call TopPut("trap \"exit 2\" 1 2 3 13 15")
+    call TopPut("trap 'rm -f \"$Tmp\" >/dev/null 2>&1' 0")
+    call TopPut("TmpDir=\"/tmp/dir$$\"")
+    call TopPut("Tmp=\"/tmp/$$\"")
+    call TopPut("#!/usr/bin/ksh")
 endfunction
 
 function! S3put()
@@ -751,7 +713,9 @@ function! SaveAndExecuteGawk()
     call LockTempBuffer()
 endfunction
 
-" Uncomment the following to have Vim jump to the last position when reopening a file
+" *****************************************************************************************************
+                                  " Jump to Last Position When Reopening a File
+                                  " *******************************************************************
 if has("autocmd")
    au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
    \| exe "normal! g'\"" | endif
