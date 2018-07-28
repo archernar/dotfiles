@@ -168,15 +168,12 @@ function! MyKeyMapperDumpSeek()
      normal! zt 
 endfunction
 function! MyKeyMapperDump()
-        vnew
+        call LeftWindowBuffer()
         nnoremap <silent> <buffer> q :close<cr>
         nnoremap <silent> <buffer> <F8>  :close<cr>
         nnoremap <silent> <buffer> <leader><F8>  :close<cr>
         nnoremap <silent> <buffer> s  :call MyKeyMapperDumpSeek()<cr>
-        let w:scratch = 1
         let l:nn=1
-        let l:maxline=-1
-        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
 	for key in sort(keys(g:MyKeyDict))
           let l:line=key . repeat(' ', 18-len(key)) . g:MyKeyDict[key]
           call setline(l:nn, l:line)
@@ -184,6 +181,7 @@ function! MyKeyMapperDump()
 	endfor
         wincmd H
         vertical resize 110 
+        setlocal readonly nomodifiable
 endfunction
 " *****************************************************************************************************
                                   " Function Keys
@@ -251,8 +249,6 @@ function! MyItemDump()
         nnoremap <silent> <buffer> q :close<cr>
         nnoremap <silent> <buffer> <F10> :close<cr>
         let l:nn=1
-        let l:maxline=-1
-        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
 	for item in g:MyItemList
           let l:szKey   = substitute(item, "!!!!.*", "", "")
           let l:szValue = substitute(item, ".*!!!!", "", "")
@@ -261,6 +257,7 @@ function! MyItemDump()
           let l:nn= l:nn + 1
 	endfor
         vertical resize 120 
+        setlocal readonly nomodifiable
 endfunction
 nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyItem(<esc>0
 " *****************************************************************************************************
@@ -494,9 +491,6 @@ endfunction
 function! Four() 
     new | vnew | wincmd w | wincmd w | vnew 
 endfunction
-function! LockTempBuffer()
-    setlocal readonly | setlocal nomodifiable
-endfunction
 
 function! SaveAndExecutePython()
     " https://stackoverflow.com/questions/18948491/running-python-code-in-vim
@@ -505,7 +499,7 @@ function! SaveAndExecutePython()
 
     " add the console output
     silent execute ".!python " . shellescape(s:current_buffer_file_path, 1)
-    call LockTempBuffer()
+    setlocal readonly nomodifiable
     wincmd k
 endfunction
 
@@ -519,7 +513,7 @@ function! Tcmd()
     let l:szCommand = ".!" .  l:cWord
     silent execute  l:szCommand
 
-    call LockTempBuffer()
+    setlocal readonly nomodifiable
 
 endfunction
 
@@ -558,8 +552,7 @@ function! PDFListEnterAction()
      echom currentLine
      execute "silent !xdg-open " . currentLine . " >/dev/null 2>&1"
      execute "redraw!"
-     setlocal readonly
-     setlocal nomodifiable
+     setlocal readonly nomodifiable
 endfunction
 function! PDFList()
           call LeftWindowBuffer(":call PDFListEnterAction()<cr>", "r !ls " . $VIM_PDFLIB . "/*.pdf")
@@ -625,7 +618,7 @@ function! OpenInTempBuffer(...)
      nnoremap <silent> <buffer> <PageUp> :close<cr>:call PolyModeReset()<cr>
      nnoremap <silent> <buffer> <PageDown> :close<cr>:call PolyModeReset()<cr>
      nnoremap <silent> <buffer> <Delete> :close<cr>:call PolyModeReset()<cr>
-     call LockTempBuffer()
+     setlocal readonly nomodifiable
 endfunction
 function! EditInTempBuffer(...)
      call MakeTempBuffer()
@@ -708,7 +701,7 @@ function! SaveAndExecuteGawk()
     silent execute "update | edit"
     call MakeTempBuffer()
     silent execute ".!gawk -f " . shellescape(s:current_buffer_file_path, 1) . " input.txt"
-    call LockTempBuffer()
+    setlocal readonly nomodifiable
 endfunction
 
 " *****************************************************************************************************
