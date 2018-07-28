@@ -44,7 +44,6 @@ set softtabstop=4                 " with this setup.
 set expandtab
 let mapleader = " "               " Leader - ( Spacebar )
 let MRU_Auto_Close = 1            " Set MRU window to close after selection
-let g:PDFlib="/home/mestes/READS1"
 set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, but never time out on mappings
 
 " *****************************************************************************************************
@@ -100,7 +99,6 @@ Plugin 'tpope/vim-surround'
 "Plugin 'gmarik/github-search.vim'
 "Plugin 'xolox/vim-misc'           " https://github.com/xolox/vim-misc 
 "Plugin 'xolox/vim-notes'          " https://vimawesome.com/plugin/notes-vim
-"Plugin 'file:///home/mestes/scm/polymode.vim'
 "Plugin 'wincent/scalpel'
 "Plugin 'mhinz/vim-startify'
 "Plugin 'yegappan/mru'
@@ -116,14 +114,14 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
                                   " Put non-Plugin stuff after this line
 
 function! Vimtips()
-     call LeftWindowFile("/home/mestes/vimtips.txt")
+     call LeftWindowFile($VIM_VIMTIPS)
      nnoremap <silent> <buffer> s /^========<cr>zt
      nnoremap <silent> <buffer> d ?^========<cr>zt
      vertical resize 105 
      echom "Vimtips:   use <s> to page forward, <d> to page backward"
 endfunction
 " *****************************************************************************************************
-                                  " MJE MyKeyMapper 
+                                  " MyKeyMapper 
                                   " *******************************************************************
 let g:MyKeyList = []
 let g:MyValueList = []
@@ -218,9 +216,6 @@ call g:MyKeyMapper("nnoremap <leader>l :resize -5<cr>","Window Resize +")
 call g:MyKeyMapper("nnoremap <leader>m :resize +5<cr>","Window Resize -")
 nnoremap <leader>g  :silent execute "grep! -R " . shellescape(expand("<cWORD>")) . " ."<cr>:copen<cr>
 nnoremap <leader>h  :silent execute "help " . expand("<cWORD>")<cr> 
-let g:vim_notes_is_open = 0
-let g:vim_notes         = "/home/mestes/.vim/vimnotes"
-nnoremap <leader>q :call VimNotesToggle()<cr>
 nnoremap <leader>w :call Smash()<cr>
 
 let g:greppy_mode_active = 0
@@ -240,7 +235,7 @@ function! Greppyoff()
     let g:greppy_mode_active = 0
 endfunction
 " *****************************************************************************************************
-                                  " MJE MyItem 
+                                  " MyItem 
                                   " *******************************************************************
 let g:MyItemList = []
 function! g:MyItem(...)
@@ -252,11 +247,9 @@ function! g:MyItem(...)
      call add(g:MyItemList, l:line)
 endfunction
 function! MyItemDump()
-        vnew
+        call LeftWindowBuffer()
         nnoremap <silent> <buffer> q :close<cr>
-        nnoremap <silent> <buffer> <leader><F8>  :close<cr>
-        nnoremap <silent> <buffer>         <F8>  :close<cr>
-        let w:scratch = 1
+        nnoremap <silent> <buffer> <F10> :close<cr>
         let l:nn=1
         let l:maxline=-1
         setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
@@ -270,6 +263,9 @@ function! MyItemDump()
         vertical resize 120 
 endfunction
 nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyItem(<esc>0
+" *****************************************************************************************************
+                                  " My Cheat Sheet Items
+                                  " *******************************************************************
 call g:MyItem("---")
 call g:MyItem("i", "Enter insert mode at cursor")
 call g:MyItem("I", "Enter insert mode at first non-blank character")
@@ -354,12 +350,12 @@ call g:MyStaticMapper("q","Close the MRU window")
 call g:MyStaticMapper("<Esc>","Close the MRU window")
 let g:MyKeyMapperMode = "STD " 
 " *****************************************************************************************************
-                                  " MJE Polymode Keys
+                                  " Polymode Keys
                                   " *******************************************************************
 call g:MyKeyMapper("nnoremap <Home> :call PolyMode(-1)<cr>",       "PolyMode On")
 call g:MyKeyMapper("nnoremap <End>  :call PolyModeReset()<cr>",    "PolyMode Off")
 function! PolyModeMapReset()
-          let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> Commander <F5> Cmd <F6> Grep   <F9> PasteMode <F12> Build"
+          let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> Commander <F5> Cmd <F6> Grep   <F9> PasteMode <F10> Cheat/Doc <F12> Build"
           let g:help1 = ""
           let g:help2 = ""
           let g:MyKeyMapperMode = "STD " 
@@ -373,8 +369,8 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <F8> :call MyKeyMapperDump()<cr>",         "MyKeyMapper Help")
           call g:MyKeyMapper("nnoremap <leader><F8> :call MyItemDump()<cr>",      "MyItem Help")
           call g:MyKeyMapper("nnoremap <F9> :set paste!<cr>",                     "Toggle Paste Setting")
-          call g:MyKeyMapper("nnoremap <F10> :DOC<cr>",                           "Vim Doc")
-          call g:MyKeyMapper("nnoremap <leader><F10> :CHEAT<cr>",                 "My Cheat Sheet")
+          call g:MyKeyMapper("nnoremap <F10> :CHEAT<cr>",                         "My Cheat Sheet")
+          call g:MyKeyMapper("nnoremap <leader><F10> :DOC<cr>",                   "Vim Doc")
           call g:MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
           call g:MyKeyMapper("nnoremap <silent> <End>  :call PolyModeReset()<cr>","PolyMode Off")
           nnoremap <silent> 1 1
@@ -551,7 +547,7 @@ function! CommanderEnterAction()
      execute "nnoremap <silent> <buffer> <Enter> <Nop>"
 endfunction
 function! CommanderList()
-    call LeftWindowBuffer(":call CommanderEnterAction()<cr>", "r !cat /home/mestes/ffed")
+    call LeftWindowBuffer(":call CommanderEnterAction()<cr>", "r !cat " . $VIM_COMMANDER)
 endfunction
 
 " *****************************************************************************************************
@@ -566,7 +562,7 @@ function! PDFListEnterAction()
      setlocal nomodifiable
 endfunction
 function! PDFList()
-          call LeftWindowBuffer(":call PDFListEnterAction()<cr>", "r !ls " . g:PDFlib . "/*.pdf")
+          call LeftWindowBuffer(":call PDFListEnterAction()<cr>", "r !ls " . $VIM_PDFLIB . "/*.pdf")
 endfunction
 
 " *****************************************************************************************************
@@ -606,7 +602,7 @@ function! LeftWindowBuffer(...)
         silent execute bufwinnr(s:buf_nr) . 'wincmd w'
     endif
     " *******************************************************************
-    if ( len(a:1) > 0)
+    if ( a:0 > 0)
          execute "nnoremap <silent> <buffer> <Enter> " . a:1
     endif
     let w:scratch = 1
@@ -614,7 +610,9 @@ function! LeftWindowBuffer(...)
     call cursor(1, 1)
     execute "normal! gg"
     execute "normal! dG"
-    execute a:2
+    if ( a:0 > 0)
+         execute a:2
+    endif
     call cursor(1, 1)
 endfunction
 
