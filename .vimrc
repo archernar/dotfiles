@@ -15,6 +15,15 @@
 " |vim-variable|       v:	  Global, predefined by Vim.
 " nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
 "=============================================================================
+
+" *****************************************************************************************************
+                                  " External Environments Variables
+                                  " *******************************************************************
+" VIM_VIMTIPS                     - Full pathname of the vimtips file
+" VIM_COMMANDER                   - Full pathname of the vim commander file
+" VIM_PDFLIB                      - Folder name of PDF library
+
+
 set nocompatible
 set relativenumber
 set hidden
@@ -27,7 +36,7 @@ set wildmenu                      " Better command-line completion
 set showcmd                       " Show partial commands in the last line of the screen
 set ignorecase                    " Use case insensitive search, except when using capital letters
 set smartcase
-" set hlsearch incsearch            " Highlight searches (use <C-L> to temporarily turn off highlighting; see the mapping of <C-L> below)
+" set hlsearch incsearch          " Highlight searches (use <C-L> to temporarily turn off highlighting; see the mapping of <C-L> below)
 set backspace=indent,eol,start    " Allow backspacing over autoindent, line breaks and start of insert action
 set nostartofline                 " Stop certain movements from always going to the first character of a line.
 set laststatus=2                  " Always display the status line, even if only one window is displayed
@@ -233,74 +242,87 @@ function! Greppyoff()
     let g:greppy_mode_active = 0
 endfunction
 " *****************************************************************************************************
-                                  " MyItem 
+                                  " MyCheatsheet 
                                   " *******************************************************************
-let g:MyItemList = []
-function! g:MyItem(...)
+let g:MyCheatsheetList = []
+function! g:MyCheatsheet(...)
      if ( a:0 > 1)
           let l:line =  a:1 . "!!!!" . a:2
      else
           let l:line =  a:1 . "!!!!"
      endif
-     call add(g:MyItemList, l:line)
+     call add(g:MyCheatsheetList, l:line)
 endfunction
-function! MyItemDump()
+function! MyCheatsheetDump()
         call LeftWindowBuffer()
+        setlocal cursorline
+        setlocal t_ve=
         nnoremap <silent> <buffer> q :close<cr>
         nnoremap <silent> <buffer> <F10> :close<cr>
         let l:nn=1
-	for item in g:MyItemList
+	for item in g:MyCheatsheetList
           let l:szKey   = substitute(item, "!!!!.*", "", "")
           let l:szValue = substitute(item, ".*!!!!", "", "")
-          let l:line=l:szKey . repeat(' ', 18-len(l:szKey)) . l:szValue
+          let l:line=l:szKey . repeat(' ', 26-len(l:szKey)) . l:szValue
           call setline(l:nn, l:line)
           let l:nn= l:nn + 1
 	endfor
         vertical resize 120 
         setlocal readonly nomodifiable
 endfunction
-nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyItem(<esc>0
+nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyCheatsheet(<esc>0
 " *****************************************************************************************************
                                   " My Cheat Sheet Items
                                   " *******************************************************************
-call g:MyItem("---")
-call g:MyItem("i", "Enter insert mode at cursor")
-call g:MyItem("I", "Enter insert mode at first non-blank character")
-call g:MyItem("s", "Delete character under cursor and enter insert mode")
-call g:MyItem("S", "Delete line and begin insert at beginning of same line")
-call g:MyItem("a", "Enter insert mode _after_ cursor")
-call g:MyItem("A", "Enter insert mode at the end of the line")
-call g:MyItem("o", "Enter insert mode on the next line")
-call g:MyItem("O", "enter insert mode on the above line")
-call g:MyItem("C", "Delete from cursor to end of line and begin insert")
-call g:MyItem("---")
-call g:MyItem("dw",     "delete to the next word")
-call g:MyItem("dt,",    "delete up until the next comma on the current line")
-call g:MyItem("de",     "delete to the end of the current word")
-call g:MyItem("d2e",    "delete to the end of next word")
-call g:MyItem("dj",     "delete down a line (current and one below)")
-call g:MyItem("dt)",    "delete up until next closing parenthesis")
-call g:MyItem("d/rails","delete up until the first search match for 'rails'")
-call g:MyItem("-")
-call g:MyItem("Main Motions")
-call g:MyItem("h,l", "move left/right by character")
-call g:MyItem("w", "move forward one (w)ord")
-call g:MyItem("b", "move (b)ackward one word")
-call g:MyItem("e", "move forward to the (e)nd of a word")
-call g:MyItem("-")
-call g:MyItem("Motions")
-call g:MyItem("()",     "Sentences (delimited words")
-call g:MyItem("{}",     "Paragraphs (Next empty line")
-call g:MyItem(";",      "Repeat last motion forward")
-call g:MyItem(",",      "Repeat last motion backward")
-call g:MyItem("<#>G",   "Go to Line #")
-call g:MyItem("gg",     "Go to the top of the file")
-call g:MyItem("]]",     "Next section (Depending on your current filetype this may move between functions")
-call g:MyItem("[[",     "Previous section")
-call g:MyItem("0",      "Front of line")
-call g:MyItem("^",      "Front of line (first non-blank)")
-call g:MyItem("%",      "Matching brace/bracket/paren/tag(with matchtag plugin, see session 3")
-call g:MyItem("$",      "End of line")
+call g:MyCheatsheet("### Variable Scope")
+call g:MyCheatsheet("nothing              ","In a function: local to a function; otherwise: global")
+call g:MyCheatsheet("buffer-variable    b:","Local to the current buffer")
+call g:MyCheatsheet("window-variable    w:","Local to the current window")
+call g:MyCheatsheet("tabpage-variable   t:","Local to the current tab page")
+call g:MyCheatsheet("global-variable    g:","Global")
+call g:MyCheatsheet("local-variable     l:","Local to a function")
+call g:MyCheatsheet("script-variable    s:","Local to a |:source|'ed Vim script")
+call g:MyCheatsheet("function-argument  a:","Function argument (only inside a function)")
+call g:MyCheatsheet("vim-variable       v:","Global, predefined by Vim")
+
+call g:MyCheatsheet("---")
+call g:MyCheatsheet("i", "Enter insert mode at cursor")
+call g:MyCheatsheet("I", "Enter insert mode at first non-blank character")
+call g:MyCheatsheet("s", "Delete character under cursor and enter insert mode")
+call g:MyCheatsheet("S", "Delete line and begin insert at beginning of same line")
+call g:MyCheatsheet("a", "Enter insert mode _after_ cursor")
+call g:MyCheatsheet("A", "Enter insert mode at the end of the line")
+call g:MyCheatsheet("o", "Enter insert mode on the next line")
+call g:MyCheatsheet("O", "enter insert mode on the above line")
+call g:MyCheatsheet("C", "Delete from cursor to end of line and begin insert")
+call g:MyCheatsheet("---")
+call g:MyCheatsheet("dw",     "delete to the next word")
+call g:MyCheatsheet("dt,",    "delete up until the next comma on the current line")
+call g:MyCheatsheet("de",     "delete to the end of the current word")
+call g:MyCheatsheet("d2e",    "delete to the end of next word")
+call g:MyCheatsheet("dj",     "delete down a line (current and one below)")
+call g:MyCheatsheet("dt)",    "delete up until next closing parenthesis")
+call g:MyCheatsheet("d/rails","delete up until the first search match for 'rails'")
+call g:MyCheatsheet("-")
+call g:MyCheatsheet("Main Motions")
+call g:MyCheatsheet("h,l", "move left/right by character")
+call g:MyCheatsheet("w", "move forward one (w)ord")
+call g:MyCheatsheet("b", "move (b)ackward one word")
+call g:MyCheatsheet("e", "move forward to the (e)nd of a word")
+call g:MyCheatsheet("-")
+call g:MyCheatsheet("Motions")
+call g:MyCheatsheet("()",     "Sentences (delimited words")
+call g:MyCheatsheet("{}",     "Paragraphs (Next empty line")
+call g:MyCheatsheet(";",      "Repeat last motion forward")
+call g:MyCheatsheet(",",      "Repeat last motion backward")
+call g:MyCheatsheet("<#>G",   "Go to Line #")
+call g:MyCheatsheet("gg",     "Go to the top of the file")
+call g:MyCheatsheet("]]",     "Next section (Depending on your current filetype this may move between functions")
+call g:MyCheatsheet("[[",     "Previous section")
+call g:MyCheatsheet("0",      "Front of line")
+call g:MyCheatsheet("^",      "Front of line (first non-blank)")
+call g:MyCheatsheet("%",      "Matching brace/bracket/paren/tag(with matchtag plugin, see session 3")
+call g:MyCheatsheet("$",      "End of line")
 
 
 
@@ -308,8 +330,8 @@ call g:MyItem("$",      "End of line")
                                   " Command Words/Aliases
                                   " *******************************************************************
 let g:MyKeyMapperMode = "COM " 
-call g:MyCommandMapper("command! CHEAT   :call MyItemDump()")
-call g:MyCommandMapper("command! MI      :call MyItemDump()")
+call g:MyCommandMapper("command! CHEAT   :call MyCheatsheetDump()")
+call g:MyCommandMapper("command! MI      :call MyCheatsheetDump()")
 call g:MyCommandMapper("command! RC      :e ~/.vimrc")
 call g:MyCommandMapper("command! DOC     :NERDTree /usr/share/vim/vim74/doc")
 call g:MyCommandMapper("command! LIB     :call PDFList()")
@@ -365,7 +387,7 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <F6> :call Greppyon()<cr>",                "Greppy First Form, word under cursor")
           call g:MyKeyMapper("nnoremap <F7> :call Greppyon(1)<cr>",               "Greppy Second Form, prompt for word")
           call g:MyKeyMapper("nnoremap <F8> :call MyKeyMapperDump()<cr>",         "MyKeyMapper Help")
-          call g:MyKeyMapper("nnoremap <leader><F8> :call MyItemDump()<cr>",      "MyItem Help")
+          call g:MyKeyMapper("nnoremap <leader><F8> :call MyCheatsheetDump()<cr>","My Cheatsheet")
           call g:MyKeyMapper("nnoremap <F9> :set paste!<cr>",                     "Toggle Paste Setting")
           call g:MyKeyMapper("nnoremap <F10> :CHEAT<cr>",                         "My Cheat Sheet")
           call g:MyKeyMapper("nnoremap <leader><F10> :DOC<cr>",                   "Vim Doc")
@@ -532,17 +554,14 @@ endfunction
                                   " Commander Functions
                                   " *******************************************************************
 function! CommanderEnterAction()
-     let currentLine   = getline(".")
-     let l:szKey = substitute(currentLine, " .*$", "", "g")
-     let l:szCommand = substitute(currentLine, "^[a-z]* ", "", "")
+     let l:szKey = substitute(getline("."), " .*$", "", "g")
+     let l:szCommand = substitute(getline("."), "^[a-z]* ", "", "")
      let l:szCommand = substitute(l:szCommand, "^[ ]*", "", "")
      execute "1"
      execute "normal! gg"
      execute "normal! dG"
-
-     echom l:szCommand[0:0]
      if (l:szCommand[0:0] == "!")
-          execute "r " . l:szCommand
+          silent execute "r " . l:szCommand
      else
           silent execute l:szCommand
      endif
