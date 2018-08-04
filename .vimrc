@@ -178,6 +178,7 @@ function! MyKeyMapperDumpSeek()
 endfunction
 function! MyKeyMapperDump()
         call LeftWindowBuffer()
+        setlocal cursorline
         nnoremap <silent> <buffer> q :close<cr>
         nnoremap <silent> <buffer> <F8>  :close<cr>
         nnoremap <silent> <buffer> <leader><F8>  :close<cr>
@@ -191,6 +192,7 @@ function! MyKeyMapperDump()
         wincmd H
         vertical resize 110 
         setlocal readonly nomodifiable
+        echom ""
 endfunction
 " *****************************************************************************************************
                                   " Function Keys
@@ -231,8 +233,10 @@ function! Greppyon(...)
     if a:0 > 0 
          let s:szIn = input('grep for >> ')
          execute "vimgrep /" . s:szIn . "/ %"
+         echom "vimgrep /" . s:szIn . "/ %"
     else
          execute "vimgrep /" . expand("<cword>") . "/ %"
+         echom "vimgrep /" . expand("<cword>") . "/ %"
     endif
     execute "cw"
     let g:greppy_mode_active = 1
@@ -255,8 +259,8 @@ function! g:MyCheatsheet(...)
 endfunction
 function! MyCheatsheetDump()
         call LeftWindowBuffer()
-        setlocal cursorline
-        setlocal t_ve=
+       setlocal cursorline
+"        setlocal t_ve=
         nnoremap <silent> <buffer> q :close<cr>
         nnoremap <silent> <buffer> <F10> :close<cr>
         let l:nn=1
@@ -406,6 +410,7 @@ function! PolyModeMapReset()
           nnoremap <silent> m m
           nnoremap <silent> o o
           nnoremap <silent> p p
+          nnoremap <silent> q q
           nnoremap <silent> O O
           nnoremap <silent> r r
           nnoremap <silent> v v
@@ -449,6 +454,9 @@ nnoremap <Insert> <Nop>
                                   " *******************************************************************
 if !exists("myautocommands_loaded")
      let myautocommands_loaded = 1
+     autocmd FileType qf resize 25 
+     autocmd FileType qf nnoremap <silent> <buffer> q :ccl<cr>
+
      " au BufNewFile,BufRead *.awk vnoremap <silent> <Home> :s/^/\/\/ /<cr>gv
      " au BufNewFile,BufRead *.awk vnoremap <silent> <leader><Home> :s/^[/][/][ ]//<cr>
      au BufNewFile,BufRead *.java vnoremap <silent> <Home> :s/^/\/\/ /<cr>gv
@@ -628,7 +636,7 @@ function! LeftWindowBuffer(...)
     if ( a:0 > 0)
          execute "nnoremap <silent> <buffer> <Enter> " . a:1
     endif
-    let w:scratch = 1
+    " let w:scratch = 1
     vertical resize 80 
     call cursor(1, 1)
     execute "normal! gg"
