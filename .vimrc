@@ -144,7 +144,6 @@ function! g:MyKeyMapper(...)
      execute a:1
 endfunction
 function! g:MyCommandMapper(...)
-"    command! ULS     :L ls /usr/share/vim/vim74/doc
      let l:szCommand = substitute(a:1, "command! ", "", "")
      let l:szCommand = substitute(l:szCommand, '^[A-Z,0-9]*[ ]*',"", "")
      let l:szKey = substitute(a:1, "command! ", "", "")
@@ -176,7 +175,7 @@ function! MyKeyMapperDumpSeek()
      endwhile
      normal! zt 
 endfunction
-function! MyKeyMapperDump()
+function! MyKeyMapperDump(...)
         call LeftWindowBuffer()
         setlocal cursorline
         nnoremap <silent> <buffer> q :close<cr>
@@ -186,8 +185,17 @@ function! MyKeyMapperDump()
         let l:nn=1
 	for key in sort(keys(g:MyKeyDict))
           let l:line=key . repeat(' ', 18-len(key)) . g:MyKeyDict[key]
-          call setline(l:nn, l:line)
-          let l:nn= l:nn + 1
+          let l:list = split(l:line)
+          let l:section = l:list[0]
+          if ( a:0 == 1)
+               if ( l:section == a:1)
+                    call setline(l:nn, l:line )
+                    let l:nn= l:nn + 1
+          endif
+          else
+               call setline(l:nn, l:line )
+               let l:nn= l:nn + 1
+          endif
 	endfor
         wincmd H
         vertical resize 110 
@@ -358,6 +366,13 @@ call g:MyCommandMapper("command! KSH     :call KshTop()")
 call g:MyCommandMapper("command! GAWK    :call SaveAndExecuteGawk()")
 call g:MyCommandMapper("command! COLORLET :call Colorlet(-1)")
 call g:MyCommandMapper("command! BE :call SetRegistersBE()")
+
+call g:MyCommandMapper("command! KALL     :call MyKeyMapperDump()")
+call g:MyCommandMapper("command! KSTD     :call MyKeyMapperDump('STD')")
+call g:MyCommandMapper("command! KCOM     :call MyKeyMapperDump('COM')")
+call g:MyCommandMapper("command! KMRU     :call MyKeyMapperDump('MRU')")
+call g:MyCommandMapper("command! KPOLY    :call MyKeyMapperDump('POLY')")
+
 
 " Do the static entries here
 call g:MyStaticMapper("R", "Execute command, output horozontal")
