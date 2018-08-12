@@ -136,9 +136,15 @@ let g:MyKeyList = []
 let g:MyValueList = []
 let g:MyKeyDict = {} 
 let g:MyKeyMapperMode = "STD " 
+function! MyTest()
+     let l:szKey = "abcd-no"
+     let l:szKey = substitute(l:szKey, "^[cga]", "X", "")
+     echom l:szKey
+endfunction
 function! g:MyKeyMapper(...)
      let l:szKey = substitute(a:1, "<silent> ", "", "")
      let l:szKey = substitute(l:szKey, "nnoremap ", "", "")
+     let l:szKey = substitute(l:szKey, "vnoremap ", "", "")
      let l:szKey = substitute(l:szKey, " .*$", "", "g")
      let g:MyKeyDict[g:MyKeyMapperMode . " " . l:szKey] = a:2
      execute a:1
@@ -199,7 +205,7 @@ function! MyKeyMapperDump(...)
 	endfor
         wincmd H
         vertical resize 110 
-        setlocal readonly nomodifiable
+"         setlocal readonly nomodifiable
         echom ""
 endfunction
 " *****************************************************************************************************
@@ -255,8 +261,31 @@ function! Greppyoff()
 endfunction
 " *****************************************************************************************************
                                   " MyCheatsheet 
+                                  " if (l:szCommand[0:0] == "!")
                                   " *******************************************************************
 let g:MyCheatsheetList = []
+function! MyCheatsheetEnter()
+     let l:szLine  = getline(".")
+"      let l:szKey   = substitute(l:szLine, "!!!!.*", "", "")
+     let l:szKey   = substitute(l:szLine, " .*", "", "")
+     if ( l:szKey == "DOCUMENT")
+         let l:szValue = substitute(l:szLine, "DOCUMENT *", "", "")
+         call cursor(1, 1)
+         execute "normal! gg"
+         execute "normal! dG"
+         execute "r " . l:szValue
+         echom l:szValue[0:3]
+         setlocal nocursorline
+     endif
+     if ( l:szKey[0:3] == "URL")
+         let l:szValue = substitute(l:szLine, "URL *", "", "")
+         echom l:szValue
+         execute "silent !xdg-open " . l:szValue . " >/dev/null 2>&1"
+         execute "redraw!"
+         execute "normal q"
+     endif
+
+endfunction
 function! g:MyCheatsheet(...)
      if ( a:0 > 1)
           let l:line =  a:1 . "!!!!" . a:2
@@ -275,38 +304,48 @@ function! MyCheatsheetDump()
 	for item in g:MyCheatsheetList
           let l:szKey   = substitute(item, "!!!!.*", "", "")
           let l:szValue = substitute(item, ".*!!!!", "", "")
-          let l:line=l:szKey . repeat(' ', 26-len(l:szKey)) . l:szValue
+          let l:line=l:szKey . repeat(' ', 20-len(l:szKey)) . l:szValue
           call setline(l:nn, l:line)
           let l:nn= l:nn + 1
 	endfor
         vertical resize 120 
-        setlocal readonly nomodifiable
+        nnoremap <silent> <buffer> <Enter> :call MyCheatsheetEnter()<cr>
+"       setlocal readonly nomodifiable
 endfunction
 nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyCheatsheet(<esc>0
 " *****************************************************************************************************
                                   " My Cheat Sheet Items
                                   " *******************************************************************
+call g:MyCheatsheet("### Documents")
+call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/motion.txt")
+call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/pattern.txt")
+call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/usr_27.txt")
+call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/usr_40.txt")
+call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/usr_41.txt")
+call g:MyCheatsheet("URL","https://www.youtube.com/watch?v=XA2WjJbmmoM")
 call g:MyCheatsheet("### Variable Scope")
-call g:MyCheatsheet("nothing              ","In a function: local to a function; otherwise: global")
-call g:MyCheatsheet("buffer-variable    b:","Local to the current buffer")
-call g:MyCheatsheet("window-variable    w:","Local to the current window")
-call g:MyCheatsheet("tabpage-variable   t:","Local to the current tab page")
-call g:MyCheatsheet("global-variable    g:","Global")
-call g:MyCheatsheet("local-variable     l:","Local to a function")
-call g:MyCheatsheet("script-variable    s:","Local to a |:source|'ed Vim script")
-call g:MyCheatsheet("function-argument  a:","Function argument (only inside a function)")
-call g:MyCheatsheet("vim-variable       v:","Global, predefined by Vim")
+call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
+call g:MyCheatsheet("nothing      In a function: local to a function; otherwise: global")
+call g:MyCheatsheet("buffer  b:   Local to the current buffer      |    window   w:   Local to the current window")
+call g:MyCheatsheet("vim     v:   Global, predefined by Vim        |    tabpage  t:   Local to the current tab page")
+call g:MyCheatsheet("global  g:   Global                           |    local    l:   Local to a function")
+call g:MyCheatsheet("script  s:   Local to |:src|'ed Vim script    |    fun-arg  a:   Function argument (inside a function)")
+call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
 
-call g:MyCheatsheet("---")
-call g:MyCheatsheet("i", "Enter insert mode at cursor")
-call g:MyCheatsheet("I", "Enter insert mode at first non-blank character")
-call g:MyCheatsheet("s", "Delete character under cursor and enter insert mode")
-call g:MyCheatsheet("S", "Delete line and begin insert at beginning of same line")
-call g:MyCheatsheet("a", "Enter insert mode _after_ cursor")
-call g:MyCheatsheet("A", "Enter insert mode at the end of the line")
-call g:MyCheatsheet("o", "Enter insert mode on the next line")
-call g:MyCheatsheet("O", "enter insert mode on the above line")
-call g:MyCheatsheet("C", "Delete from cursor to end of line and begin insert")
+" call g:MyCheatsheet("buffer   b:","Local to the current buffer")
+" call g:MyCheatsheet("window   w:","Local to the current window")
+" call g:MyCheatsheet("tabpage  t:","Local to the current tab page")
+" call g:MyCheatsheet("global   g:","Global")
+" call g:MyCheatsheet("local    l:","Local to a function")
+" call g:MyCheatsheet("script   s:","Local to a |:source|'ed Vim script")
+" call g:MyCheatsheet("fun-arg  a:","Function argument (only inside a function)")
+" call g:MyCheatsheet("vim      v:","Global, predefined by Vim")
+
+call g:MyCheatsheet("i  Enter insert mode at cursor                |    I  Enter insert mode at first non-blank char")
+call g:MyCheatsheet("s  Delete char under cursor enter insert mode |    S  Delete line & insert @ begin of same line")
+call g:MyCheatsheet("a  Enter insert mode _after_ cursor           |    A  Enter insert mode at the end of the line")
+call g:MyCheatsheet("o  Enter insert mode on the next line         |    O  rEenter insert mode on the above line")
+call g:MyCheatsheet("C  Delete from cursor to EOL & begin insert   |")
 call g:MyCheatsheet("---")
 call g:MyCheatsheet("dw",     "delete to the next word")
 call g:MyCheatsheet("dt,",    "delete up until the next comma on the current line")
@@ -353,6 +392,7 @@ call g:MyCommandMapper("command! USER40  :e /usr/share/vim/vim74/doc/usr_40.txt"
 call g:MyCommandMapper("command! U40     :e /usr/share/vim/vim74/doc/usr_40.txt")
 call g:MyCommandMapper("command! USER41  :e /usr/share/vim/vim74/doc/usr_41.txt")
 call g:MyCommandMapper("command! U41     :e /usr/share/vim/vim74/doc/usr_41.txt")
+call g:MyCommandMapper("command! U27     :e /usr/share/vim/vim74/doc/usr_27.txt")
 call g:MyCommandMapper("command! S3PUT :call S3put()")
 call g:MyCommandMapper("command! C       :call CommanderList()")
 call g:MyCommandMapper("command! CE      :call CommanderListEdit()")
