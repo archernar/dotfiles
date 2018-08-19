@@ -474,6 +474,7 @@ function! PolyModeMapReset()
           nnoremap <silent> t t
           nnoremap <silent> n n
           nnoremap <silent> w w
+          nnoremap <silent> ? ?
           nnoremap <silent> <Insert>   <Nop>
           nnoremap <silent> <Right>    <right>
           nnoremap <silent> <Left>     <left>
