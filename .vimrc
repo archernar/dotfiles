@@ -135,6 +135,7 @@ endfunction
 let g:MyKeyList = []
 let g:MyValueList = []
 let g:MyKeyDict = {} 
+let g:MyKeyDictCT = 1000 
 let g:MyKeyMapperMode = "STD " 
 function! MyTest()
      let l:szKey = "abcd-no"
@@ -146,7 +147,11 @@ function! g:MyKeyMapper(...)
      let l:szKey = substitute(l:szKey, "nnoremap ", "", "")
      let l:szKey = substitute(l:szKey, "vnoremap ", "", "")
      let l:szKey = substitute(l:szKey, " .*$", "", "g")
-     let g:MyKeyDict[g:MyKeyMapperMode . " " . l:szKey] = a:2
+
+     let l:prefix = g:MyKeyMapperMode . " " . g:MyKeyDictCT 
+     let g:MyKeyDictCT = g:MyKeyDictCT +1
+
+     let g:MyKeyDict[l:prefix . " " . l:szKey] = a:2
      execute a:1
 endfunction
 function! g:MyCommandMapper(...)
@@ -154,11 +159,18 @@ function! g:MyCommandMapper(...)
      let l:szCommand = substitute(l:szCommand, '^[A-Z,0-9]*[ ]*',"", "")
      let l:szKey = substitute(a:1, "command! ", "", "")
      let l:szKey = substitute(l:szKey, " .*$", "", "g")
-     let g:MyKeyDict[g:MyKeyMapperMode . " " . l:szKey] = l:szCommand 
+
+     let l:prefix = g:MyKeyMapperMode . " " . g:MyKeyDictCT 
+     let g:MyKeyDictCT = g:MyKeyDictCT +1
+
+     let g:MyKeyDict[l:prefix . " " . l:szKey] = l:szCommand 
      execute a:1
 endfunction
 function! g:MyStaticMapper(...)
-     let g:MyKeyDict[g:MyKeyMapperMode . " " . a:1] = a:2
+     let l:prefix = g:MyKeyMapperMode . " " . g:MyKeyDictCT 
+     let g:MyKeyDictCT = g:MyKeyDictCT +1
+
+     let g:MyKeyDict[l:prefix . " " . a:1] = a:2
 endfunction
 function! MyKeyMapperDumpSeek()
 "    zt puts current line to top of screen
@@ -181,10 +193,22 @@ function! MyKeyMapperDumpSeek()
      endwhile
      normal! zt 
 endfunction
+function! Pad(s,amt)
+        return a:s . repeat(' ',a:amt - len(a:s))
+endfunction
+function! PrePad(s,amt,...)
+        if a:0 > 0
+             let char = a:1
+        else
+             let char = ' '
+        endif
+        return repeat(char,a:amt - len(a:s)) . a:s
+endfunction
 function! MyKeyMapperDump(...)
         call LeftWindowBuffer()
         setlocal cursorline
         nnoremap <silent> <buffer> q :close<cr>
+        nnoremap <silent> <buffer> ? :close<cr>
         nnoremap <silent> <buffer> <F8>  :close<cr>
         nnoremap <silent> <buffer> <leader><F8>  :close<cr>
         nnoremap <silent> <buffer> s  :call MyKeyMapperDumpSeek()<cr>
@@ -192,14 +216,19 @@ function! MyKeyMapperDump(...)
 	for key in sort(keys(g:MyKeyDict))
           let l:line=key . repeat(' ', 18-len(key)) . g:MyKeyDict[key]
           let l:list = split(l:line)
-          let l:section = l:list[0]
+          let l:section = l:list[0:0]
+          let l:punch = l:list[2:2]
+          let l:linemod = l:list[3:]
+          let l:sz = Pad(join(l:section, ''), 8) .  Pad(join(l:punch, '     '),24) . join(l:linemod, ' ')
+          "let l:sz = join(l:section + l:linemod, ' ')
+
           if ( a:0 == 1)
                if ( l:section == a:1)
-                    call setline(l:nn, l:line )
+                    call setline(l:nn, l:line)
                     let l:nn= l:nn + 1
           endif
           else
-               call setline(l:nn, l:line )
+               call setline(l:nn, l:sz)
                let l:nn= l:nn + 1
           endif
 	endfor
