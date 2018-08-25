@@ -122,6 +122,20 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
                                   " filetype plugin on
                                   " Put non-Plugin stuff after this line
 
+" *****************************************************************************************************
+                                  " Utilities 
+                                  " *******************************************************************
+function! Pad(s,amt)
+        return a:s . repeat(' ',a:amt - len(a:s))
+endfunction
+function! PrePad(s,amt,...)
+        if a:0 > 0
+             let char = a:1
+        else
+             let char = ' '
+        endif
+        return repeat(char,a:amt - len(a:s)) . a:s
+endfunction
 function! Vimtips()
      call LeftWindowFile($VIM_VIMTIPS)
      nnoremap <silent> <buffer> s /^========<cr>zt
@@ -193,17 +207,6 @@ function! MyKeyMapperDumpSeek()
      endwhile
      normal! zt 
 endfunction
-function! Pad(s,amt)
-        return a:s . repeat(' ',a:amt - len(a:s))
-endfunction
-function! PrePad(s,amt,...)
-        if a:0 > 0
-             let char = a:1
-        else
-             let char = ' '
-        endif
-        return repeat(char,a:amt - len(a:s)) . a:s
-endfunction
 function! MyKeyMapperDump(...)
         call LeftWindowBuffer()
         setlocal cursorline
@@ -213,14 +216,17 @@ function! MyKeyMapperDump(...)
         nnoremap <silent> <buffer> <leader><F8>  :close<cr>
         nnoremap <silent> <buffer> s  :call MyKeyMapperDumpSeek()<cr>
         let l:nn=1
+"  	for key in sort(keys(g:MyKeyDict))
+"                      call setline(l:nn, g:MyKeyDict[key] . "    [[    |" .  key)
+"                      let l:nn= l:nn + 1
+"  	endfor
 	for key in sort(keys(g:MyKeyDict))
-          let l:line=key . repeat(' ', 18-len(key)) . g:MyKeyDict[key]
-          let l:list = split(l:line)
+          let l:list = split(key)
           let l:section = l:list[0:0]
+          let l:number = l:list[1:1]
           let l:punch = l:list[2:2]
-          let l:linemod = l:list[3:]
-          let l:sz = Pad(join(l:section, ''), 8) .  Pad(join(l:punch, '     '),24) . join(l:linemod, ' ')
-          "let l:sz = join(l:section + l:linemod, ' ')
+          let l:linemod = g:MyKeyDict[key]
+          let l:sz = Pad(join(l:section, ''), 8) .  Pad(join(l:punch, '     '),18) . l:linemod
 
           if ( a:0 == 1)
                if ( l:section == a:1)
@@ -233,7 +239,8 @@ function! MyKeyMapperDump(...)
           endif
 	endfor
         wincmd H
-        vertical resize 110 
+        vertical resize 80 
+        set nowrap
 "         setlocal readonly nomodifiable
         echom ""
 endfunction
@@ -360,29 +367,21 @@ call g:MyCheatsheet("vim     v:   Global, predefined by Vim        |    tabpage 
 call g:MyCheatsheet("global  g:   Global                           |    local    l:   Local to a function")
 call g:MyCheatsheet("script  s:   Local to |:src|'ed Vim script    |    fun-arg  a:   Function argument (inside a function)")
 call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
-
-" call g:MyCheatsheet("buffer   b:","Local to the current buffer")
-" call g:MyCheatsheet("window   w:","Local to the current window")
-" call g:MyCheatsheet("tabpage  t:","Local to the current tab page")
-" call g:MyCheatsheet("global   g:","Global")
-" call g:MyCheatsheet("local    l:","Local to a function")
-" call g:MyCheatsheet("script   s:","Local to a |:source|'ed Vim script")
-" call g:MyCheatsheet("fun-arg  a:","Function argument (only inside a function)")
-" call g:MyCheatsheet("vim      v:","Global, predefined by Vim")
-
-call g:MyCheatsheet("i  Enter insert mode at cursor                |    I  Enter insert mode at first non-blank char")
-call g:MyCheatsheet("s  Delete char under cursor enter insert mode |    S  Delete line & insert @ begin of same line")
-call g:MyCheatsheet("a  Enter insert mode _after_ cursor           |    A  Enter insert mode at the end of the line")
-call g:MyCheatsheet("o  Enter insert mode on the next line         |    O  rEenter insert mode on the above line")
-call g:MyCheatsheet("C  Delete from cursor to EOL & begin insert   |")
-call g:MyCheatsheet("---")
-call g:MyCheatsheet("dw",     "delete to the next word")
-call g:MyCheatsheet("dt,",    "delete up until the next comma on the current line")
-call g:MyCheatsheet("de",     "delete to the end of the current word")
-call g:MyCheatsheet("d2e",    "delete to the end of next word")
-call g:MyCheatsheet("dj",     "delete down a line (current and one below)")
-call g:MyCheatsheet("dt)",    "delete up until next closing parenthesis")
-call g:MyCheatsheet("d/rails","delete up until the first search match for 'rails'")
+call g:MyCheatsheet("zt  puts current line to top of screen        |    z. or zz puts current line to center of screen")
+call g:MyCheatsheet("zb  puts current line to bottom of screen     |")
+call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
+call g:MyCheatsheet("i   Enter insert mode at cursor               |    I   Enter insert mode at first non-blank char")
+call g:MyCheatsheet("s   Delete char under cursor enter i-mode     |    S   Delete line & insert @ begin of same line")
+call g:MyCheatsheet("a   Enter insert mode _after_ cursor          |    A   Enter insert mode at the end of the line")
+call g:MyCheatsheet("o   Enter insert mode on the next line        |    O   rEenter insert mode on the above line")
+call g:MyCheatsheet("C   Delete from cursor to EOL & begin insert  |")
+call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
+call g:MyCheatsheet("dw  delete to the next word                   |    dt  delete up until the next comma on the current line")
+call g:MyCheatsheet("de  delete to the end of the current word     |    d2e delete to the end of next word")
+call g:MyCheatsheet("dj delete down a line (current and one below  |    dt) delete up until next closing parenthesis")
+call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
+call g:MyCheatsheet("                     d/rails delete up until the first search match for 'rails'")
+call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
 call g:MyCheatsheet("-")
 call g:MyCheatsheet("### Main Motions")
 call g:MyCheatsheet("h,l", "move left/right by character")
@@ -427,7 +426,7 @@ call g:MyCommandMapper("command! C       :call CommanderList()")
 call g:MyCommandMapper("command! CE      :call CommanderListEdit()")
 call g:MyCommandMapper("command! REPOS   :call RepoList()")
 call g:MyCommandMapper("command! FOUR    :call Four()")
-call g:MyCommandMapper("command! GETVUNDLE :!git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
+call g:MyCommandMapper("command! GETVUNDLE     :!git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
 call g:MyCommandMapper("command! TIPS    :call Vimtips()")
 call g:MyCommandMapper("command! VT      :call Vimtips()")
 call g:MyCommandMapper("command! TERM    :call Terminal()")
