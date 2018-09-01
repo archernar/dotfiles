@@ -313,6 +313,14 @@ function! MyCheatsheetEnter()
          echom l:szValue[0:3]
          setlocal nocursorline
      endif
+     if ( l:szKey == "PDF")
+         let l:szValue = substitute(l:szLine, "PDF *", "", "")
+         echom l:szValue
+         execute "silent !xdg-open " . l:szValue . " >/dev/null 2>&1"
+         execute "redraw!"
+         execute "normal q"
+         setlocal nocursorline
+     endif
      if ( l:szKey[0:3] == "URL")
          let l:szValue = substitute(l:szLine, "URL *", "", "")
          echom l:szValue
@@ -353,6 +361,7 @@ nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyCheatsheet(<esc>0
                                   " My Cheat Sheet Items
                                   " *******************************************************************
 call g:MyCheatsheet("### Documents")
+call g:MyCheatsheet("PDF","~/pdfs/gnuplot4_6.pdf")
 call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/motion.txt")
 call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/pattern.txt")
 call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/usr_27.txt")
