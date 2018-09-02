@@ -336,6 +336,15 @@ function! MyCheatsheetEnter()
          execute "normal q"
          setlocal nocursorline
      endif
+     if ( l:szKey == "MP3")
+         let l:szValue = substitute(l:szLine, "MP3 *", "", "")
+         let l:szValue = substitute(l:szValue, ">>.*", "", "")
+         echom l:szValue
+         execute "silent !xdg-open " . l:szValue . " >/dev/null 2>&1"
+         execute "redraw!"
+         execute "normal q"
+         setlocal nocursorline
+     endif
      if ( l:szKey[0:3] == "URL")
          let l:szValue = substitute(l:szLine, "URL *", "", "")
          let l:szValue = substitute(l:szValue, ">>.*", "", "")
@@ -455,6 +464,7 @@ call g:MyCommandMapper("command! RC      :e ~/.vimrc")
 call g:MyCommandMapper("command! DOC     :NERDTree /usr/share/vim/vim74/doc")
 call g:MyCommandMapper("command! LIB     :call PDFList()")
 call g:MyCommandMapper("command! PDF     :call PDFList()")
+call g:MyCommandMapper("command! MP3     :call MP3List()")
 call g:MyCommandMapper("command! UMOTION :e /usr/share/vim/vim74/doc/motion.txt")
 call g:MyCommandMapper("command! USER40  :e /usr/share/vim/vim74/doc/usr_40.txt")
 call g:MyCommandMapper("command! U40     :e /usr/share/vim/vim74/doc/usr_40.txt")
@@ -711,7 +721,7 @@ endfunction
 " *****************************************************************************************************
                                   " PDF View Functions
                                   " *******************************************************************
-function! PDFListEnterAction()
+function! ListEnterAction()
      let currentLine   = getline(".")
      echom currentLine
      execute "silent !xdg-open " . currentLine . " >/dev/null 2>&1"
@@ -719,7 +729,10 @@ function! PDFListEnterAction()
      setlocal readonly nomodifiable
 endfunction
 function! PDFList()
-          call LeftWindowBuffer(":call PDFListEnterAction()<cr>", "r !ls " . $VIM_PDFLIB . "/*.pdf")
+          call LeftWindowBuffer(":call ListEnterAction()<cr>", "r !ls " . $VIM_PDFLIB . "/*.pdf")
+endfunction
+function! MP3List()
+          call LeftWindowBuffer(":call ListEnterAction()<cr>", "r !ls " . $VIM_MP3LIB . "/*.mp3")
 endfunction
 
 " *****************************************************************************************************
