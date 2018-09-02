@@ -302,10 +302,10 @@ endfunction
 let g:MyCheatsheetList = []
 function! MyCheatsheetEnter()
      let l:szLine  = getline(".")
-"      let l:szKey   = substitute(l:szLine, "!!!!.*", "", "")
      let l:szKey   = substitute(l:szLine, " .*", "", "")
-     if ( l:szKey == "DOCUMENT")
-         let l:szValue = substitute(l:szLine, "DOCUMENT *", "", "")
+     if ( l:szKey == "TXT")
+         let l:szValue = substitute(l:szLine, "TXT *", "", "")
+         let l:szValue = substitute(l:szValue, ">>.*", "", "")
          call cursor(1, 1)
          execute "normal! gg"
          execute "normal! dG"
@@ -315,6 +315,7 @@ function! MyCheatsheetEnter()
      endif
      if ( l:szKey == "PDF")
          let l:szValue = substitute(l:szLine, "PDF *", "", "")
+         let l:szValue = substitute(l:szValue, ">>.*", "", "")
          echom l:szValue
          execute "silent !xdg-open " . l:szValue . " >/dev/null 2>&1"
          execute "redraw!"
@@ -323,6 +324,7 @@ function! MyCheatsheetEnter()
      endif
      if ( l:szKey[0:3] == "URL")
          let l:szValue = substitute(l:szLine, "URL *", "", "")
+         let l:szValue = substitute(l:szValue, ">>.*", "", "")
          echom l:szValue
          execute "silent !xdg-open " . l:szValue . " >/dev/null 2>&1"
          execute "redraw!"
@@ -331,24 +333,34 @@ function! MyCheatsheetEnter()
 
 endfunction
 function! g:MyCheatsheet(...)
-     if ( a:0 > 1)
-          let l:line =  a:1 . "!!!!" . a:2
-     else
-          let l:line =  a:1 . "!!!!"
+      if ( a:0 == 3)
+           let l:line =  a:1 . "!!!!" . a:2 . "@@@@>>" . a:3
+      endif
+     if ( a:0 == 2)
+          let l:line =  a:1 . "!!!!" . a:2 ."@@@@"
+     endif
+     if ( a:0 == 1)
+          let l:line =  a:1 . "!!!!@@@@"
      endif
      call add(g:MyCheatsheetList, l:line)
 endfunction
 function! MyCheatsheetDump()
         call LeftWindowBuffer()
-       setlocal cursorline
+        setlocal cursorline
 "        setlocal t_ve=
         nnoremap <silent> <buffer> q :close<cr>
         nnoremap <silent> <buffer> <F10> :close<cr>
         let l:nn=1
 	for item in g:MyCheatsheetList
           let l:szKey   = substitute(item, "!!!!.*", "", "")
+          let l:szDesc  = substitute(item, ".*@@@@", "", "")
           let l:szValue = substitute(item, ".*!!!!", "", "")
-          let l:line=l:szKey . repeat(' ', 20-len(l:szKey)) . l:szValue
+          let l:szValue  = substitute(l:szValue, "@@@@.*", "", "")
+          if (l:szValue == "" )
+               let l:line=l:szKey
+          else
+               let l:line=l:szKey . repeat(' ', 6-len(l:szKey)) . l:szValue . repeat(' ', 52-len(l:szValue)) . l:szDesc
+          endif
           call setline(l:nn, l:line)
           let l:nn= l:nn + 1
 	endfor
@@ -356,20 +368,21 @@ function! MyCheatsheetDump()
         nnoremap <silent> <buffer> <Enter> :call MyCheatsheetEnter()<cr>
 "       setlocal readonly nomodifiable
 endfunction
-nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyCheatsheet(<esc>0
+"nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyCheatsheet(<esc>0
 " *****************************************************************************************************
                                   " My Cheat Sheet Items
                                   " *******************************************************************
-call g:MyCheatsheet("### Documents")
-call g:MyCheatsheet("PDF","~/pdfs/gnuplot4_6.pdf")
-call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/motion.txt")
-call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/pattern.txt")
-call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/usr_27.txt")
-call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/usr_40.txt")
-call g:MyCheatsheet("DOCUMENT","/usr/share/vim/vim74/doc/usr_41.txt")
-call g:MyCheatsheet("URL","https://www.youtube.com/watch?v=XA2WjJbmmoM")
-call g:MyCheatsheet("### Variable Scope")
+call g:MyCheatsheet("Documents")
+call g:MyCheatsheet("PDF","~/pdfs/gnuplot4_6.pdf", "GnuPlot 4.6 Documentation")
+call g:MyCheatsheet("PDF","~/pdfs/SpringBootInAction.pdf")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/motion.txt","VIM Doc")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/pattern.txt")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_27.txt")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_40.txt")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_41.txt","Write a VIM Script")
+call g:MyCheatsheet("URL","https://www.youtube.com/watch?v=XA2WjJbmmoM","How to Do 90% of What Plugins Do (With Just Vim)")
 call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
+call g:MyCheatsheet("                                        Variable Scope")
 call g:MyCheatsheet("nothing      In a function: local to a function; otherwise: global")
 call g:MyCheatsheet("buffer  b:   Local to the current buffer      |    window   w:   Local to the current window")
 call g:MyCheatsheet("vim     v:   Global, predefined by Vim        |    tabpage  t:   Local to the current tab page")
@@ -391,12 +404,10 @@ call g:MyCheatsheet("dj delete down a line (current and one below  |    dt) dele
 call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
 call g:MyCheatsheet("                     d/rails delete up until the first search match for 'rails'")
 call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
-call g:MyCheatsheet("-")
-call g:MyCheatsheet("### Main Motions")
-call g:MyCheatsheet("h,l", "move left/right by character")
-call g:MyCheatsheet("w", "move forward one (w)ord")
-call g:MyCheatsheet("b", "move (b)ackward one word")
-call g:MyCheatsheet("e", "move forward to the (e)nd of a word")
+call g:MyCheatsheet("                                         Main Motions")
+call g:MyCheatsheet("h,l  move left/right by character             |    w   move forward one (w)ord")
+call g:MyCheatsheet("b    move (b)ackward one word                 |    e   move forward to the (e)nd of a word")
+call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
 call g:MyCheatsheet("-")
 call g:MyCheatsheet("### Motions")
 call g:MyCheatsheet("()",     "Sentences (delimited words")
