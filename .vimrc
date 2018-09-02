@@ -136,6 +136,13 @@ function! PrePad(s,amt,...)
         endif
         return repeat(char,a:amt - len(a:s)) . a:s
 endfunction
+" stringToCenter.PadLeft(((totalLength - stringToCenter.Length) / 2) + stringToCenter.Length)
+
+
+function! CenterPad(...)
+        let l:n = (((s:LW-strlen(a:1)) / 2) + strlen(a:1)) - 0
+        return PrePad(a:1, l:n)
+endfunction
 function! Vimtips()
      call LeftWindowFile($VIM_VIMTIPS)
      nnoremap <silent> <buffer> s /^========<cr>zt
@@ -303,6 +310,13 @@ let g:MyCheatsheetList = []
 function! MyCheatsheetEnter()
      let l:szLine  = getline(".")
      let l:szKey   = substitute(l:szLine, " .*", "", "")
+     if ( l:szKey == "COM")
+         let l:szValue = substitute(l:szLine, "COM *", "", "")
+         let l:szValue = substitute(l:szValue, ">>.*", "", "")
+         echom l:szValue
+         execute "normal q"
+         execute l:szValue
+     endif
      if ( l:szKey == "TXT")
          let l:szValue = substitute(l:szLine, "TXT *", "", "")
          let l:szValue = substitute(l:szValue, ">>.*", "", "")
@@ -346,7 +360,7 @@ function! g:MyCheatsheet(...)
 endfunction
 function! MyCheatsheetDump()
         call LeftWindowBuffer()
-        setlocal cursorline
+"        setlocal cursorline
 "        setlocal t_ve=
         nnoremap <silent> <buffer> q :close<cr>
         nnoremap <silent> <buffer> <F10> :close<cr>
@@ -369,10 +383,17 @@ function! MyCheatsheetDump()
 "       setlocal readonly nomodifiable
 endfunction
 "nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyCheatsheet(<esc>0
+let s:LW = 106
+let s:barline = repeat('-', s:LW)
 " *****************************************************************************************************
                                   " My Cheat Sheet Items
                                   " *******************************************************************
-call g:MyCheatsheet("Documents")
+call g:MyCheatsheet(s:barline)
+call g:MyCheatsheet(CenterPad("Commands"))
+call g:MyCheatsheet("COM", "call CommanderList()")
+call g:MyCheatsheet("COM", "call CommanderListEdit()")
+call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
+call g:MyCheatsheet(CenterPad("Documents"))
 call g:MyCheatsheet("PDF","~/pdfs/gnuplot4_6.pdf", "GnuPlot 4.6 Documentation")
 call g:MyCheatsheet("PDF","~/pdfs/SpringBootInAction.pdf")
 call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/motion.txt","VIM Doc")
@@ -382,31 +403,31 @@ call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_40.txt")
 call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_41.txt","Write a VIM Script")
 call g:MyCheatsheet("URL","https://www.youtube.com/watch?v=XA2WjJbmmoM","How to Do 90% of What Plugins Do (With Just Vim)")
 call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
-call g:MyCheatsheet("                                        Variable Scope")
+call g:MyCheatsheet(CenterPad("Variable Scope"))
 call g:MyCheatsheet("nothing      In a function: local to a function; otherwise: global")
-call g:MyCheatsheet("buffer  b:   Local to the current buffer      |    window   w:   Local to the current window")
-call g:MyCheatsheet("vim     v:   Global, predefined by Vim        |    tabpage  t:   Local to the current tab page")
-call g:MyCheatsheet("global  g:   Global                           |    local    l:   Local to a function")
-call g:MyCheatsheet("script  s:   Local to |:src|'ed Vim script    |    fun-arg  a:   Function argument (inside a function)")
+call g:MyCheatsheet("buffer  b:   Local to the current buffer           |    window   w:   Local to the current window")
+call g:MyCheatsheet("vim     v:   Global, predefined by Vim             |    tabpage  t:   Local to the current tab page")
+call g:MyCheatsheet("global  g:   Global                                |    local    l:   Local to a function")
+call g:MyCheatsheet("script  s:   Local to |:src|'ed Vim script         |    fun-arg  a:   Function argument (inside a function)")
 call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
-call g:MyCheatsheet("zt  puts current line to top of screen        |    z. or zz puts current line to center of screen")
-call g:MyCheatsheet("zb  puts current line to bottom of screen     |")
+call g:MyCheatsheet("zt  puts current line to top of screen             |    z. or zz puts current line to center of screen")
+call g:MyCheatsheet("zb  puts current line to bottom of screen          |")
 call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
-call g:MyCheatsheet("i   Enter insert mode at cursor               |    I   Enter insert mode at first non-blank char")
-call g:MyCheatsheet("s   Delete char under cursor enter i-mode     |    S   Delete line & insert @ begin of same line")
-call g:MyCheatsheet("a   Enter insert mode _after_ cursor          |    A   Enter insert mode at the end of the line")
-call g:MyCheatsheet("o   Enter insert mode on the next line        |    O   rEenter insert mode on the above line")
-call g:MyCheatsheet("C   Delete from cursor to EOL & begin insert  |")
+call g:MyCheatsheet("i   Enter insert mode at cursor                    |    I   Enter insert mode at first non-blank char")
+call g:MyCheatsheet("s   Delete char under cursor enter i-mode          |    S   Delete line & insert @ begin of same line")
+call g:MyCheatsheet("a   Enter insert mode _after_ cursor               |    A   Enter insert mode at the end of the line")
+call g:MyCheatsheet("o   Enter insert mode on the next line             |    O   rEenter insert mode on the above line")
+call g:MyCheatsheet("C   Delete from cursor to EOL & begin insert       |")
 call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
-call g:MyCheatsheet("dw  delete to the next word                   |    dt  delete up until the next comma on the current line")
-call g:MyCheatsheet("de  delete to the end of the current word     |    d2e delete to the end of next word")
-call g:MyCheatsheet("dj delete down a line (current and one below  |    dt) delete up until next closing parenthesis")
+call g:MyCheatsheet("dw  delete to the next word                        |    dt  delete up until the next comma on the current line")
+call g:MyCheatsheet("de  delete to the end of the current word          |    d2e delete to the end of next word")
+call g:MyCheatsheet("dj delete down a line (current and one below       |    dt) delete up until next closing parenthesis")
 call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
 call g:MyCheatsheet("                     d/rails delete up until the first search match for 'rails'")
 call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
 call g:MyCheatsheet("                                         Main Motions")
-call g:MyCheatsheet("h,l  move left/right by character             |    w   move forward one (w)ord")
-call g:MyCheatsheet("b    move (b)ackward one word                 |    e   move forward to the (e)nd of a word")
+call g:MyCheatsheet("h,l  move left/right by character                  |    w   move forward one (w)ord")
+call g:MyCheatsheet("b    move (b)ackward one word                      |    e   move forward to the (e)nd of a word")
 call g:MyCheatsheet("----------------------------------------------------------------------------------------------------------")
 call g:MyCheatsheet("-")
 call g:MyCheatsheet("### Motions")
