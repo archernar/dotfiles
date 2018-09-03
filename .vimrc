@@ -400,6 +400,10 @@ function! MyCheatsheetDump()
           else
                let l:line=l:szKey . repeat(' ', 6-len(l:szKey)) . l:szValue . repeat(' ', 52-len(l:szValue)) . l:szDesc
           endif
+          let l:n = match(l:line,'-------')
+          if (l:n == -1 )
+               let l:line = strpart(l:line, 0, s:LW-2)
+          endif
           call setline(l:nn, l:line)
           let l:nn= l:nn + 1
 	endfor
@@ -437,7 +441,7 @@ function! MyCheatsheetDump22()
 "       setlocal readonly nomodifiable
 endfunction
 "nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyCheatsheet(<esc>0
-let s:LW = 108
+let s:LW = 110
 let s:barline = repeat('-', s:LW)
 " *****************************************************************************************************
                                   " My Cheat Sheet Items
@@ -457,6 +461,7 @@ call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_27.txt")
 call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_40.txt")
 call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_41.txt","Write a VIM Script")
 call g:MyCheatsheet("URL","https://www.youtube.com/watch?v=XA2WjJbmmoM","How to Do 90% of What Plugins Do (With Just Vim)")
+call g:MyCheatsheet("URL","https://devhints.io/vimscript-functions","VimScript Functions")
 call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet(CenterPad("Variable Scope"))
 call g:MyCheatsheet("nothing      In a function: local to a function; otherwise: global")
@@ -474,20 +479,18 @@ call g:MyCheatsheet("a   Enter insert mode _after_ cursor               ,,,    A
 call g:MyCheatsheet("o   Enter insert mode on the next line             ,,,    O   rEenter insert mode on the above line")
 call g:MyCheatsheet("C   Delete from cursor to EOL & begin insert       ,,,")
 call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet("dw  delete to the next word                        ,,,    dt  delete up until the next comma on the current line")
+call g:MyCheatsheet("dw  delete to the next word                        ,,,    dt  delete until next comma on the curline")
 call g:MyCheatsheet("de  delete to the end of the current word          ,,,    d2e delete to the end of next word")
 call g:MyCheatsheet("dj delete down a line (current and one below       ,,,    dt) delete up until next closing parenthesis")
 call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet("                     d/rails delete up until the first search match for 'rails'")
 call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet(CenterPad("Main Motions"))
+call g:MyCheatsheet(CenterPad("Motions"))
 call g:MyCheatsheet("h,l  move left/right by character                  ,,,    w   move forward one (w)ord")
 call g:MyCheatsheet("b    move (b)ackward one word                      ,,,    e   move forward to the (e)nd of a word")
+call g:MyCheatsheet("aw  a word (surrounding white space)      ,,,    iw  inner word (not surrounding white space)")
 call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet(CenterPad("Motions"))
-call g:MyCheatsheet("aw  a word (surrounding white space)      ,,,    iw  inner word (not surrounding white space)")
-call g:MyCheatsheet("aw  a word (surrounding white space)      ,,,    iw  inner word (not surrounding white space)")
-call g:MyCheatsheet("aw  a word (surrounding white space)      ,,,    iw  inner word (not surrounding white space)")
+call g:MyCheatsheet(s:barline)
 " call g:MyCheatsheet("
 
 call g:MyCheatsheet("()",     "Sentences (delimited words")
