@@ -470,6 +470,11 @@ call g:MyCheatsheet("vim     v:   Global, predefined by Vim             ,,,tabpa
 call g:MyCheatsheet("global  g:   Global                                ,,,local    l:   Local to a function")
 call g:MyCheatsheet("script  s:   Local to |:src|'ed Vim script         ,,,fun-arg  a:   Function argument (inside a function)")
 call g:MyCheatsheet(s:barline)
+
+call g:MyCheatsheet(CenterPad("Plaintext Text Objects"))
+call g:MyCheatsheet(CenterPad("Words"))
+call g:MyCheatsheet("aw – a word (includes surrounding white space)     ,,, iw – inner word (does not include surrounding white space)")
+call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet("zt  puts current line to top of screen             ,,,    z. or zz puts current line to center of screen")
 call g:MyCheatsheet("zb  puts current line to bottom of screen          ,,,")
 call g:MyCheatsheet(s:barline)
@@ -583,6 +588,7 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <F10> :CHEAT<cr>",                         "My Cheat Sheet")
           call g:MyKeyMapper("nnoremap <leader><F10> :DOC<cr>",                   "Vim Doc")
           call g:MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
+          call g:MyKeyMapper("nnoremap <leader><F12> maj0d$`ahp",                 "grabandtuck")
           call g:MyKeyMapper("nnoremap <silent> <End>  :call PolyModeReset()<cr>","PolyMode Off")
           nnoremap <silent> 1 1
           nnoremap <silent> 2 2
@@ -594,7 +600,9 @@ function! PolyModeMapReset()
           nnoremap <silent> f f
           nnoremap <silent> g g
           nnoremap <silent> h h
+          nnoremap <silent> j j
           nnoremap <silent> k k
+          nnoremap <silent> l l
           nnoremap <silent> m m
           nnoremap <silent> o o
           nnoremap <silent> p p
