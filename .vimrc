@@ -96,8 +96,6 @@ Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'jeetsukumaran/vim-buffergator'
 Plugin 'vim-scripts/grep.vim'      " https://github.com/vim-scripts/grep.vim
 Plugin 'tpope/vim-surround'
-
-
 "Plugin 'vim-airline/vim-airline'
 "Plugin 'vim-airline/vim-airline-themes'
 "Plugin 'kristijanhusak/vim-carbon-now-sh'
@@ -375,8 +373,6 @@ function! g:MyCheatsheet(...)
 endfunction
 function! MyCheatsheetDump()
         call LeftWindowBuffer()
-"        setlocal cursorline
-"        setlocal t_ve=
         nnoremap <silent> <buffer> q :close<cr>
         nnoremap <silent> <buffer> <F10> :close<cr>
         let l:nn=1
@@ -411,36 +407,6 @@ function! MyCheatsheetDump()
         nnoremap <silent> <buffer> <Enter> :call MyCheatsheetEnter()<cr>
 "       setlocal readonly nomodifiable
 endfunction
-function! MyCheatsheetDump22()
-        call LeftWindowBuffer()
-"        setlocal cursorline
-"        setlocal t_ve=
-        nnoremap <silent> <buffer> q :close<cr>
-        nnoremap <silent> <buffer> <F10> :close<cr>
-        let l:nn=1
-	for item in g:MyCheatsheetList
-          let l:szKey   = substitute(item, "!!!!.*", "", "")
-          let l:szDesc  = substitute(item, ".*@@@@", "", "")
-          let l:szValue = substitute(item, ".*!!!!", "", "")
-          let l:szValue  = substitute(l:szValue, "@@@@.*", "", "")
-          let l:n = match(l:szValue,'    ')
-          let l:szPart1 = strpart(l:szValue, 0, n)
-          let l:szPart2 = strpart(l:szValue, n)
-
-
-          if (l:szValue == "" )
-               let l:line=l:szKey
-          else
-               let l:line=l:szKey . repeat(' ', 6-len(l:szKey)) . l:szValue . repeat(' ', 52-len(l:szValue)) . l:szDesc
-          endif
-          call setline(l:nn, l:line)
-          let l:nn= l:nn + 1
-	endfor
-        vertical resize 120 
-        nnoremap <silent> <buffer> <Enter> :call MyCheatsheetEnter()<cr>
-"       setlocal readonly nomodifiable
-endfunction
-"nnoremap <Leader>k 0i"<esc>$a"<esc>$a,"")<esc>0icall g:MyCheatsheet(<esc>0
 let s:LW = 110
 let s:barline = repeat('-', s:LW)
 " *****************************************************************************************************
@@ -471,9 +437,8 @@ call g:MyCheatsheet("global  g:   Global                                ,,,local
 call g:MyCheatsheet("script  s:   Local to |:src|'ed Vim script         ,,,fun-arg  a:   Function argument (inside a function)")
 call g:MyCheatsheet(s:barline)
 
-call g:MyCheatsheet(CenterPad("Plaintext Text Objects"))
-call g:MyCheatsheet(CenterPad("Words"))
-call g:MyCheatsheet("aw – a word (includes surrounding white space)     ,,, iw – inner word (does not include surrounding white space)")
+call g:MyCheatsheet(CenterPad("Plaintext Text Objects - Words"))
+call g:MyCheatsheet("aw  a word (includes surrounding white space)     ,,, iw  inner word (does not include surrounding white space)")
 call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet("zt  puts current line to top of screen             ,,,    z. or zz puts current line to center of screen")
 call g:MyCheatsheet("zb  puts current line to bottom of screen          ,,,")
@@ -486,25 +451,21 @@ call g:MyCheatsheet("C   Delete from cursor to EOL & begin insert       ,,,")
 call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet("dw  delete to the next word                        ,,,    dt  delete until next comma on the curline")
 call g:MyCheatsheet("de  delete to the end of the current word          ,,,    d2e delete to the end of next word")
-call g:MyCheatsheet("dj delete down a line (current and one below       ,,,    dt) delete up until next closing parenthesis")
+call g:MyCheatsheet("dj  delete down a line (current and one below      ,,,    dt) delete up until next closing parenthesis")
 call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet("                     d/rails delete up until the first search match for 'rails'")
+call g:MyCheatsheet("                     d/rails delete up until the first of 'rails'")
 call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet(CenterPad("Motions"))
 call g:MyCheatsheet("h,l  move left/right by character                  ,,,    w   move forward one (w)ord")
 call g:MyCheatsheet("b    move (b)ackward one word                      ,,,    e   move forward to the (e)nd of a word")
-call g:MyCheatsheet("aw  a word (surrounding white space)      ,,,    iw  inner word (not surrounding white space)")
+call g:MyCheatsheet("aw   a word (surrounding white space)              ,,,    iw  inner word (not surrounding white space)")
 call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet(s:barline)
-" call g:MyCheatsheet("
-
-call g:MyCheatsheet("()    Sentences (delimited words)                   ,,, {}   Paragraphs (Next empty line)")
-call g:MyCheatsheet(";     Repeat last motion forward                    ,,, ,    Repeat last motion backward")
-call g:MyCheatsheet("<#>G  Go to Line #                                  ,,, gg   Go to the top of the file")
-call g:MyCheatsheet("]]    Next section                                  ,,, [[   Previous section")
-call g:MyCheatsheet("0     Front of line                             ,,, ^    Front of line (first non-blank)")
-call g:MyCheatsheet("%",      "Matching brace/bracket/paren/tag(with matchtag plugin, see session 3")
-call g:MyCheatsheet("$",      "End of line")
+call g:MyCheatsheet("()    Sentences (delimited words)                  ,,, {}   Paragraphs (Next empty line)")
+call g:MyCheatsheet(";     Repeat last motion forward                   ,,, ,    Repeat last motion backward")
+call g:MyCheatsheet("<#>G  Go to Line #                                 ,,, gg   Go to the top of the file")
+call g:MyCheatsheet("]]    Next section                                 ,,, [[   Previous section")
+call g:MyCheatsheet("0     Front of line                                ,,, ^    Front of line (first non-blank)")
+call g:MyCheatsheet("%     Matching brace/bracket/paren/tag             ,,, $    End of line")
 
 
 
@@ -544,6 +505,15 @@ call g:MyCommandMapper("command! KSTD     :call MyKeyMapperDump('STD')")
 call g:MyCommandMapper("command! KCOM     :call MyKeyMapperDump('COM')")
 call g:MyCommandMapper("command! KMRU     :call MyKeyMapperDump('MRU')")
 call g:MyCommandMapper("command! KPOLY    :call MyKeyMapperDump('POLY')")
+call g:MyCommandMapper("command! DARKBLUE :colorscheme darkblue")
+call g:MyCommandMapper("command! MYCOLOR  :colorscheme pablo")
+call g:MyCommandMapper("command! PABLO    :colorscheme pablo")
+call g:MyCommandMapper("command! BLUE     :colorscheme blue")
+call g:MyCommandMapper("command! SLATE    :colorscheme slate")
+call g:MyCommandMapper("command! RON      :colorscheme ron")
+call g:MyCommandMapper("command! DESERT   :colorscheme desert")
+call g:MyCommandMapper("command! SHINE    :colorscheme shine")
+call g:MyCommandMapper("command! EVENING  :colorscheme evening")
 
 
 " Do the static entries here
