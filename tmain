@@ -1,0 +1,11 @@
+#!/usr/bin/ksh
+# WIDTHxHEIGHT+XOFF+YOFF 
+# gnome-terminal --geometry 132x24+50+200
+tonto() {
+     # gnome-terminal --title=$1 --hide-menubar --geometry $2x$3+$4+$5 &
+     # gnome-terminal --command=screen --title=$1 --geometry $2x$3+$4+$5 &
+     gnome-terminal  --title=$1 --geometry $2x$3+$4+$5 &
+}
+
+tonto five  195 50 25 25 
+
