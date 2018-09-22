@@ -22,6 +22,7 @@
 " VIM_VIMTIPS                     - Full pathname of the vimtips file
 " VIM_COMMANDER                   - Full pathname of the vim commander file
 " VIM_PDFLIB                      - Folder name of PDF library
+" VIM_S3                          - S3 bucket
 
 
 set nocompatible
@@ -58,8 +59,8 @@ set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, b
 " *****************************************************************************************************
                                   " The 'External Command' Command Setup
                                   " *******************************************************************
-command! -nargs=* -complete=shellcmd R new  | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
-command! -nargs=* -complete=shellcmd V vnew | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
+command! -nargs=* -complete=shellcmd H new  | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
+command! -nargs=* -complete=shellcmd V botright 60vnew | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
 command! -nargs=1 L silent call Redir(<f-args>)
 command! -nargs=1 P !xdg-open "<f-args>" >/dev/null 2>&1
 
@@ -123,8 +124,13 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 " *****************************************************************************************************
                                   " Utilities 
                                   " *******************************************************************
+function! Trim(s1)
+     let l:szPart = substitute(a:s1, "^ *", "", "")
+     let l:szPart = substitute(l:szPart, " *$", "", "")
+     return l:szPart
+endfunction
 function! Trimmer(s1,s2)
-     let l:szPart = substitute(a:s1, a:s2, "", "")
+     let l:szPart = substitute(a:s1,     a:s2,  "", "")
      let l:szPart = substitute(l:szPart, "^ *", "", "")
      let l:szPart = substitute(l:szPart, " *$", "", "")
      return l:szPart
@@ -310,6 +316,7 @@ endfunction
                                   " MyCheatsheet 
                                   " if (l:szCommand[0:0] == "!")
                                   " *******************************************************************
+let g:MyQuickList = []
 let g:MyCheatsheetList = []
 function! MyCheatsheetEnter()
      let l:szLine  = getline(".")
@@ -359,10 +366,16 @@ function! MyCheatsheetEnter()
      endif
 
 endfunction
+function! g:QLA(...)
+           call add(g:MyQuickList, a:1)
+endfunction
+function! g:QuickListAdd(...)
+           call add(g:MyQuickList, a:1)
+endfunction
 function! g:MyCheatsheet(...)
-      if ( a:0 == 3)
+     if ( a:0 == 3)
            let l:line =  a:1 . "!!!!" . a:2 . "@@@@>>" . a:3
-      endif
+     endif
      if ( a:0 == 2)
           let l:line =  a:1 . "!!!!" . a:2 ."@@@@"
      endif
@@ -371,6 +384,18 @@ function! g:MyCheatsheet(...)
      endif
      call add(g:MyCheatsheetList, l:line)
 endfunction
+function! MyQuickListDump()
+        call LeftWindowBuffer()
+        nnoremap <silent> <buffer> q :close<cr>
+        nnoremap <silent> <buffer> <F10> :close<cr>
+        let l:nn=1
+	for item in g:MyQuickList
+             call setline(l:nn, item)
+             let l:nn= l:nn + 1
+	endfor
+        vertical resize 120 
+endfunction
+
 function! MyCheatsheetDump()
         call LeftWindowBuffer()
         nnoremap <silent> <buffer> q :close<cr>
@@ -412,6 +437,11 @@ let s:barline = repeat('-', s:LW)
 " *****************************************************************************************************
                                   " My Cheat Sheet Items
                                   " *******************************************************************
+call g:MyCheatsheet(CenterPad("Things to Learn"))
+call g:MyCheatsheet("zt puts current line to top of screen ,,,  z. or zz puts current line to center of screen ")
+" call g:QLA("zt puts current line to top of screen")
+" call g:QLA("z. or zz puts current line to center of screen")
+call g:MyCheatsheet("zb puts current line to bottom of screen")
 call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet(CenterPad("Commands"))
 call g:MyCheatsheet("COM", "call CommanderList()")
@@ -428,7 +458,9 @@ call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_40.txt")
 call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_41.txt","Write a VIM Script")
 call g:MyCheatsheet("URL","https://www.youtube.com/watch?v=XA2WjJbmmoM","How to Do 90% of What Plugins Do (With Just Vim)")
 call g:MyCheatsheet("URL","https://devhints.io/vimscript-functions","VimScript Functions")
+
 call g:MyCheatsheet(s:barline)
+
 call g:MyCheatsheet(CenterPad("Variable Scope"))
 call g:MyCheatsheet("nothing      In a function: local to a function; otherwise: global")
 call g:MyCheatsheet("buffer  b:   Local to the current buffer           ,,,window   w:   Local to the current window")
@@ -489,6 +521,9 @@ call g:MyCommandMapper("command! U27     :e /usr/share/vim/vim74/doc/usr_27.txt"
 call g:MyCommandMapper("command! S3PUT :call S3put()")
 call g:MyCommandMapper("command! C       :call CommanderList()")
 call g:MyCommandMapper("command! CE      :call CommanderListEdit()")
+
+call g:MyCommandMapper("command! TEST    :echom Trim('    Hello Jane  3  ,,,  eee    ')")
+
 call g:MyCommandMapper("command! REPOS   :call RepoList()")
 call g:MyCommandMapper("command! FOUR    :call Four()")
 call g:MyCommandMapper("command! GETVUNDLE     :!git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
@@ -514,7 +549,6 @@ call g:MyCommandMapper("command! RON      :colorscheme ron")
 call g:MyCommandMapper("command! DESERT   :colorscheme desert")
 call g:MyCommandMapper("command! SHINE    :colorscheme shine")
 call g:MyCommandMapper("command! EVENING  :colorscheme evening")
-
 
 " Do the static entries here
 call g:MyStaticMapper("R", "Execute command, output horozontal")
@@ -550,10 +584,12 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <F8> :call MyKeyMapperDump()<cr>",         "MyKeyMapper Help")
           call g:MyKeyMapper("nnoremap <leader><F8> :call MyCheatsheetDump()<cr>","My Cheatsheet")
           call g:MyKeyMapper("nnoremap <F9> :set paste!<cr>",                     "Toggle Paste Setting")
+          call g:MyKeyMapper("nnoremap <leader><F9> :call MyQuickListDump()<cr>", "My QuickList")
           call g:MyKeyMapper("nnoremap <F10> :CHEAT<cr>",                         "My Cheat Sheet")
           call g:MyKeyMapper("nnoremap <leader><F10> :DOC<cr>",                   "Vim Doc")
           call g:MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
-          call g:MyKeyMapper("nnoremap <leader><F12> maj0d$`ahp",                 "grabandtuck")
+          call g:MyKeyMapper("nnoremap <leader><F12> lmaj0d$`ahp`ah",             "grabandtuck")
+          call g:MyKeyMapper("nnoremap <leader><F12> lmaj0d$`ahpj0dd",            "grabandtuck")
           call g:MyKeyMapper("nnoremap <silent> <End>  :call PolyModeReset()<cr>","PolyMode Off")
           nnoremap <silent> 1 1
           nnoremap <silent> 2 2
@@ -896,8 +932,8 @@ function! KshTop()
 endfunction
 
 function! S3put()
-    echom   "R cuu -a ECD3 -b ecd3pub -F -c VIMS3PUT -D " . @%
-    execute "R cuu -a ECD3 -b ecd3pub -F -c VIMS3PUT -D " . @%
+    echom   "R cuu -a  -b ecd3pub -F -c VIMS3PUT -D " . @%
+    execute "R cuu -a  -b ecd3pub -F -c VIMS3PUT -D " . @%
 endfunction
 
 function! SaveAndExecuteGawk()
