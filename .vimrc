@@ -195,6 +195,11 @@ function! g:MyCommandMapper(...)
      let g:MyKeyDictCT = g:MyKeyDictCT +1
 
      let g:MyKeyDict[l:prefix . " " . l:szKey] = l:szCommand 
+
+     " Insert Command Info into Cheatsheet
+     call g:MyCheatsheet(Pad(l:szKey,16)  . "" . l:szCommand)
+     call g:MyCommandsheet(Pad(l:szKey,16)  . "" . l:szCommand)
+
      execute a:1
 endfunction
 function! g:MyStaticMapper(...)
@@ -311,6 +316,26 @@ endfunction
 function! Greppyoff()
     execute "ccl"
     let g:greppy_mode_active = 0
+endfunction
+" *****************************************************************************************************
+                                  " MyCommandsheet 
+                                  " *******************************************************************
+let g:MyCommandsheetList = []
+function! g:MyCommandsheet(...)
+     call add(g:MyCommandsheetList, a:1)
+endfunction
+function! MyCommandsheetDump()
+        call LeftWindowBuffer()
+        nnoremap <silent> <buffer> q :close<cr>
+        let l:nn=1
+        let l:new_list = deepcopy(g:MyCommandsheetList)
+        call sort(l:new_list)
+	for item in l:new_list
+          call setline(l:nn, item)
+          let l:nn= l:nn + 1
+	endfor
+        vertical resize 120 
+        setlocal readonly nomodifiable
 endfunction
 " *****************************************************************************************************
                                   " MyCheatsheet 
@@ -504,6 +529,8 @@ call g:MyCheatsheet("%     Matching brace/bracket/paren/tag             ,,, $   
 " *****************************************************************************************************
                                   " Command Words/Aliases
                                   " *******************************************************************
+call g:MyCheatsheet(s:barline)
+call g:MyCheatsheet(CenterPad("My Commands"))
 let g:MyKeyMapperMode = "COM " 
 call g:MyCommandMapper("command! CHEAT   :call MyCheatsheetDump()")
 call g:MyCommandMapper("command! MI      :call MyCheatsheetDump()")
@@ -523,6 +550,8 @@ call g:MyCommandMapper("command! C       :call CommanderList()")
 call g:MyCommandMapper("command! CE      :call CommanderListEdit()")
 
 call g:MyCommandMapper("command! TEST    :echom Trim('    Hello Jane  3  ,,,  eee    ')")
+
+call g:MyCommandMapper("command! CSD     :call MyCommandsheetDump()")
 
 call g:MyCommandMapper("command! REPOS   :call RepoList()")
 call g:MyCommandMapper("command! FOUR    :call Four()")
