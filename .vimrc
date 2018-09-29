@@ -234,7 +234,7 @@ function! MyKeyMapperDump(...)
         setlocal cursorline
         nnoremap <silent> <buffer> q :close<cr>
         nnoremap <silent> <buffer> ? :close<cr>
-        nnoremap <silent> <buffer> <F8>  :close<cr>
+        nnoremap <silent> <buffer> <F8>  :call MyKeyMapperDumpSeek()<cr>
         nnoremap <silent> <buffer> <leader><F8>  :close<cr>
         nnoremap <silent> <buffer> s  :call MyKeyMapperDumpSeek()<cr>
         let l:nn=1
@@ -299,6 +299,23 @@ nnoremap <leader>g  :silent execute "grep! -R " . shellescape(expand("<cWORD>"))
 nnoremap <leader>h  :silent execute "help " . expand("<cWORD>")<cr> 
 nnoremap <leader>w :call Smash()<cr>
 
+
+" *****************************************************************************************************
+                                  " Window and Buffer Splitters
+                                  " *******************************************************************
+" Window Splits
+" nmap <leader>sw<left>  :topleft  vnew<CR>
+" nmap <leader>sw<right> :botright vnew<CR>
+" nmap <leader>sw<up>    :topleft  new<CR>
+" nmap <leader>sw<down>  :botright new<CR>
+" Buffer Splits
+" nmap <leader>sb<left>   :leftabove  vnew<CR>
+" nmap <leader>sb<right>  :rightbelow vnew<CR>
+" nmap <leader>sb<up>     :leftabove  new<CR>
+" nmap <leader>sb<down>   :rightbelow new<CR>
+
+
+
 let g:greppy_mode_active = 0
 function! Greppyon(...)
     execute "ccl"
@@ -325,7 +342,6 @@ function! g:MyCommandsheet(...)
      call add(g:MyCommandsheetList, a:1)
 endfunction
 function! MyCommandsheetDump()
-        call LeftWindowBuffer()
         nnoremap <silent> <buffer> q :close<cr>
         let l:nn=1
         let l:new_list = deepcopy(g:MyCommandsheetList)
@@ -483,6 +499,7 @@ call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_40.txt")
 call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_41.txt","Write a VIM Script")
 call g:MyCheatsheet("URL","https://www.youtube.com/watch?v=XA2WjJbmmoM","How to Do 90% of What Plugins Do (With Just Vim)")
 call g:MyCheatsheet("URL","https://devhints.io/vimscript-functions","VimScript Functions")
+call g:MyCheatsheet("URL","https://technotales.wordpress.com/2010/04/29/vim-splits-a-guide-to-doing-exactly-what-you-want/","spliting the way you want")
 
 call g:MyCheatsheet(s:barline)
 
@@ -551,7 +568,8 @@ call g:MyCommandMapper("command! CE      :call CommanderListEdit()")
 
 call g:MyCommandMapper("command! TEST    :echom Trim('    Hello Jane  3  ,,,  eee    ')")
 
-call g:MyCommandMapper("command! CSD     :call MyCommandsheetDump()")
+call g:MyCommandMapper("command! XXCSD   :call CallMan('LeftWindowBuffer()', 'MyCommandsheetDump()')")
+call g:MyCommandMapper("command! CSD     :call ExeMan('botright new', 'call MyCommandsheetDump()')")
 
 call g:MyCommandMapper("command! REPOS   :call RepoList()")
 call g:MyCommandMapper("command! FOUR    :call Four()")
@@ -620,6 +638,19 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <leader><F12> lmaj0d$`ahp`ah",             "grabandtuck")
           call g:MyKeyMapper("nnoremap <leader><F12> lmaj0d$`ahpj0dd",            "grabandtuck")
           call g:MyKeyMapper("nnoremap <silent> <End>  :call PolyModeReset()<cr>","PolyMode Off")
+          " Window
+          call g:MyKeyMapper("nnoremap <leader>sw<left>  :topleft  vnew<CR>","Split Window Left")
+          call g:MyKeyMapper("nnoremap <leader>sw<right> :botright vnew<CR>","Split Window Right")
+          call g:MyKeyMapper("nnoremap <leader>sw<up>    :topleft  new<CR>","Split Window Up")
+          call g:MyKeyMapper("nnoremap <leader>sw<down>  :botright new<CR>","Split Window Down")
+          " Buffer  
+          call g:MyKeyMapper("nnoremap <leader>sb<left>  :leftabove  vnew<CR>","Split Buffer Left")
+          call g:MyKeyMapper("nnoremap <leader>sb<right> :rightbelow vnew<CR>","Split Buffer Right")
+          call g:MyKeyMapper("nnoremap <leader>sb<up>    :leftabove  new<CR>","Split Buffer Up")
+          call g:MyKeyMapper("nnoremap <leader>sb<down>  :rightbelow new<CR>","Split Buffer Down")
+          " Close  
+          call g:MyKeyMapper("nnoremap <leader>c  :close<CR>","Close Window")
+          call g:MyKeyMapper("nnoremap <leader>q  :quit<CR>","Close Window")
           nnoremap <silent> 1 1
           nnoremap <silent> 2 2
           nnoremap <silent> 3 3
@@ -730,6 +761,26 @@ nnoremap <leader>3 $"tp<esc>0jw
 " *****************************************************************************************************
                                   " Utility Functions
                                   " *******************************************************************
+function! CallMan(...)
+     execute "call " . a:1
+     execute "call " . a:2
+endfunction
+function! CallMan3(...)
+     execute "call " . a:1
+     execute "call " . a:2
+     execute "call " . a:3
+endfunction
+function! ExeMan(...)
+     execute "" . a:1
+     execute "" . a:2
+endfunction
+function! ExeMan3(...)
+     execute "" . a:1
+     execute "" . a:2
+     execute "" . a:3
+endfunction
+
+
 function! VimKeyMap()
      redir! > ~/.vimkeymap.txt
      silent verbose map
@@ -1011,3 +1062,35 @@ endfunction
 
 
 " https://stackoverflow.com/questions/11176159/how-to-jump-to-start-end-of-visual-selection
+"
+"
+" Swap window buffers.
+" function! SwapWindowBuffers()
+"     if !exists("g:markedWinNum")
+"         " set window marked for swap
+"         let g:markedWinNum = winnr()
+"         :echo "window marked for swap"
+"     else
+"         " mark destination
+"         let curNum = winnr()
+"         let curBuf = bufnr( "%" )
+"         if g:markedWinNum == curNum
+"             :echo "window unmarked for swap"
+"         else
+"             exe g:markedWinNum . "wincmd w"
+"             " switch to source and shuffle dest->source
+"             let markedBuf = bufnr( "%" )
+"             " hide and open so that we aren't prompted and keep history
+"             exe 'hide buf' curBuf
+"             " switch to dest and shuffle source->dest
+"             exe curNum . "wincmd w"
+"             " hide and open so that we aren't prompted and keep history
+"             exe 'hide buf' markedBuf
+"             :echo "windows swapped"
+"         endif
+"         " unset window marked for swap
+"         unlet g:markedWinNum
+"     endif
+" endfunction
+" 
+" noremap <F10> :call SwapWindowBuffers()<CR>
