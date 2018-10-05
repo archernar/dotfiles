@@ -24,7 +24,7 @@
 " VIM_PDFLIB                      - Folder name of PDF library
 " VIM_S3                          - S3 bucket
 
-
+set nowrap
 set nocompatible
 set relativenumber
 set hidden
@@ -489,6 +489,7 @@ call g:MyCheatsheet("COM", "call CommanderList()")
 call g:MyCheatsheet("COM", "call CommanderListEdit()")
 call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet(CenterPad("Documents"))
+call g:MyCheatsheet("PDF","~/pdfs/vim-sq.pdf", "The Vim Tutorial and Reference")
 call g:MyCheatsheet("PDF","~/vimdocs/gnuplot4_6.pdf", "GnuPlot 4.6 Documentation")
 call g:MyCheatsheet("PDF","~/vimdocs/progit.pdf","Pro Git Book")
 call g:MyCheatsheet("PDF","~/vimdocs/SpringBootInAction.pdf")
@@ -569,8 +570,9 @@ call g:MyCommandMapper("command! CE      :call CommanderListEdit()")
 call g:MyCommandMapper("command! TEST    :echom Trim('    Hello Jane  3  ,,,  eee    ')")
 
 call g:MyCommandMapper("command! XXCSD   :call CallMan('LeftWindowBuffer()', 'MyCommandsheetDump()')")
-call g:MyCommandMapper("command! CSD     :call ExeMan('botright new', 'call MyCommandsheetDump()')")
+call g:MyCommandMapper("command! CSD     :call XMan('botright new', 'MyCommandsheetDump()')")
 
+call g:MyCommandMapper("command! SNIPS   :topleft vnew ~/snips.java")
 call g:MyCommandMapper("command! REPOS   :call RepoList()")
 call g:MyCommandMapper("command! FOUR    :call Four()")
 call g:MyCommandMapper("command! GETVUNDLE     :!git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
@@ -651,6 +653,7 @@ function! PolyModeMapReset()
           " Close  
           call g:MyKeyMapper("nnoremap <leader>c  :close<CR>","Close Window")
           call g:MyKeyMapper("nnoremap <leader>q  :quit<CR>","Close Window")
+          call g:MyKeyMapper("vnoremap <silent> <End> y:call LeftBuffer('~/snips.java')<cr>:set paste<cr>G$a<cr>===<cr>===<cr><esc>pG$a<cr><esc>:w<cr>:set nopaste<cr>","snip")
           nnoremap <silent> 1 1
           nnoremap <silent> 2 2
           nnoremap <silent> 3 3
@@ -714,7 +717,9 @@ nnoremap <Insert> <Nop>
 if !exists("myautocommands_loaded")
      let myautocommands_loaded = 1
      autocmd FileType qf resize 25 
-     autocmd FileType qf nnoremap <silent> <buffer> q :ccl<cr>
+     autocmd FileType qf nnoremap <silent> <buffer> q :ccl<cr
+
+
 
      " au BufNewFile,BufRead *.awk vnoremap <silent> <Home> :s/^/\/\/ /<cr>gv
      " au BufNewFile,BufRead *.awk vnoremap <silent> <leader><Home> :s/^[/][/][ ]//<cr>
@@ -770,6 +775,23 @@ function! CallMan3(...)
      execute "call " . a:2
      execute "call " . a:3
 endfunction
+function! XMan(...)
+     let l:pre = ""
+     let l:x = 1
+     let l:n = match(a:(l:x), '(')
+     if (l:n > 0 )
+          let l:pre = "call "
+     endif
+     execute l:pre . a:1
+
+     let l:pre = ""
+     let l:n = match(a:2, '(')
+     if (l:n > 0 )
+          let l:pre = "call "
+     endif
+     execute l:pre . a:2
+endfunction
+
 function! ExeMan(...)
      execute "" . a:1
      execute "" . a:2
@@ -895,6 +917,14 @@ function! LeftWindowFile(...)
         setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile readonly nomodifiable | nnoremap <silent> <buffer> q :close<cr>
         let w:scratch = 1
         vertical resize 80 
+        call cursor(1, 1)
+endfunction
+function! LeftBuffer(...)
+        execute "vnew " . a:1
+        wincmd H
+        nnoremap <silent> <buffer> q :bdelete<cr>
+        let w:scratch = 1
+        vertical resize 120 
         call cursor(1, 1)
 endfunction
 function! LeftWindowBuffer(...)
