@@ -124,6 +124,14 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 " *****************************************************************************************************
                                   " Utilities 
                                   " *******************************************************************
+function! TrimLeft(s1)
+     let l:szPart = substitute(a:s1, "^ *", "", "")
+     return l:szPart
+endfunction
+function! TrimRight(s1)
+     let l:szPart = substitute(l:szPart, " *$", "", "")
+     return l:szPart
+endfunction
 function! Trim(s1)
      let l:szPart = substitute(a:s1, "^ *", "", "")
      let l:szPart = substitute(l:szPart, " *$", "", "")
@@ -478,30 +486,13 @@ let s:barline = repeat('-', s:LW)
 " *****************************************************************************************************
                                   " My Cheat Sheet Items
                                   " *******************************************************************
+call g:MyCheatsheet(CenterPad(""))
+call g:MyCheatsheet(CenterPad("My Cheat Sheet"))
 call g:MyCheatsheet(CenterPad("Things to Learn"))
 call g:MyCheatsheet("zt puts current line to top of screen ,,,  z. or zz puts current line to center of screen ")
 " call g:QLA("zt puts current line to top of screen")
 " call g:QLA("z. or zz puts current line to center of screen")
 call g:MyCheatsheet("zb puts current line to bottom of screen")
-call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet(CenterPad("Commands"))
-call g:MyCheatsheet("COM", "call CommanderList()")
-call g:MyCheatsheet("COM", "call CommanderListEdit()")
-call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet(CenterPad("Documents"))
-call g:MyCheatsheet("PDF","~/pdfs/vim-sq.pdf", "The Vim Tutorial and Reference")
-call g:MyCheatsheet("PDF","~/vimdocs/gnuplot4_6.pdf", "GnuPlot 4.6 Documentation")
-call g:MyCheatsheet("PDF","~/vimdocs/progit.pdf","Pro Git Book")
-call g:MyCheatsheet("PDF","~/vimdocs/SpringBootInAction.pdf")
-call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/motion.txt","VIM Doc")
-call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/pattern.txt")
-call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_27.txt")
-call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_40.txt")
-call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_41.txt","Write a VIM Script")
-call g:MyCheatsheet("URL","https://www.youtube.com/watch?v=XA2WjJbmmoM","How to Do 90% of What Plugins Do (With Just Vim)")
-call g:MyCheatsheet("URL","https://devhints.io/vimscript-functions","VimScript Functions")
-call g:MyCheatsheet("URL","https://technotales.wordpress.com/2010/04/29/vim-splits-a-guide-to-doing-exactly-what-you-want/","spliting the way you want")
-
 call g:MyCheatsheet(s:barline)
 
 call g:MyCheatsheet(CenterPad("Variable Scope"))
@@ -543,6 +534,25 @@ call g:MyCheatsheet("0     Front of line                                ,,, ^   
 call g:MyCheatsheet("%     Matching brace/bracket/paren/tag             ,,, $    End of line")
 
 
+call g:MyCheatsheet(CenterPad("Commands"))
+call g:MyCheatsheet("COM", "call CommanderList()")
+call g:MyCheatsheet("COM", "call CommanderListEdit()")
+call g:MyCheatsheet(s:barline)
+call g:MyCheatsheet(CenterPad("Documents"))
+call g:MyCheatsheet("PDF","~/pdfs/vim-sq.pdf", "The Vim Tutorial and Reference")
+call g:MyCheatsheet("PDF","~/vimdocs/gnuplot4_6.pdf", "GnuPlot 4.6 Documentation")
+call g:MyCheatsheet("PDF","~/vimdocs/progit.pdf","Pro Git Book")
+call g:MyCheatsheet("PDF","~/vimdocs/SpringBootInAction.pdf")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/motion.txt","VIM Doc")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/pattern.txt")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_27.txt")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_40.txt")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_41.txt","Write a VIM Script")
+call g:MyCheatsheet("URL","https://www.youtube.com/watch?v=XA2WjJbmmoM","How to Do 90% of What Plugins Do (With Just Vim)")
+call g:MyCheatsheet("URL","https://devhints.io/vimscript-functions","VimScript Functions")
+call g:MyCheatsheet("URL","https://technotales.wordpress.com/2010/04/29/vim-splits-a-guide-to-doing-exactly-what-you-want/","spliting the way you want")
+
+call g:MyCheatsheet(s:barline)
 
 " *****************************************************************************************************
                                   " Command Words/Aliases
@@ -637,8 +647,8 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <F10> :CHEAT<cr>",                         "My Cheat Sheet")
           call g:MyKeyMapper("nnoremap <leader><F10> :DOC<cr>",                   "Vim Doc")
           call g:MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
-          call g:MyKeyMapper("nnoremap <leader><F12> lmaj0d$`ahp`ah",             "grabandtuck")
-          call g:MyKeyMapper("nnoremap <leader><F12> lmaj0d$`ahpj0dd",            "grabandtuck")
+          " call g:MyKeyMapper("nnoremap <leader><F12> lmaj0d$`ahp`ah",             "grabandtuck")
+          call g:MyKeyMapper("nnoremap <leader><F12> lmaj0:s/^ *//<cr>0:s/ *$//<cr>0d$`ahpj0dd",            "grabandtuck")
           call g:MyKeyMapper("nnoremap <silent> <End>  :call PolyModeReset()<cr>","PolyMode Off")
           " Window
           call g:MyKeyMapper("nnoremap <leader>sw<left>  :topleft  vnew<CR>","Split Window Left")
@@ -650,10 +660,12 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <leader>sb<right> :rightbelow vnew<CR>","Split Buffer Right")
           call g:MyKeyMapper("nnoremap <leader>sb<up>    :leftabove  new<CR>","Split Buffer Up")
           call g:MyKeyMapper("nnoremap <leader>sb<down>  :rightbelow new<CR>","Split Buffer Down")
+          call g:MyKeyMapper("nnoremap <leader>kb<down>  :bdelete!<CR>","Buffer Delete")
           " Close  
           call g:MyKeyMapper("nnoremap <leader>c  :close<CR>","Close Window")
           call g:MyKeyMapper("nnoremap <leader>q  :quit<CR>","Close Window")
-          call g:MyKeyMapper("vnoremap <silent> <End> y:call LeftBuffer('~/snips.java')<cr>:set paste<cr>G$a<cr>===<cr>===<cr><esc>pG$a<cr><esc>:w<cr>:set nopaste<cr>","snip")
+          " Visual Mode  
+          call g:MyKeyMapper("vnoremap <silent> <End> y:call BottomBuffer('~/snips.java')<cr>:set paste<cr>G$a<cr>===<cr>===<cr><esc>pG$a<cr><esc>:w<cr>:set nopaste<cr>","snip")
           nnoremap <silent> 1 1
           nnoremap <silent> 2 2
           nnoremap <silent> 3 3
@@ -919,12 +931,8 @@ function! LeftWindowFile(...)
         vertical resize 80 
         call cursor(1, 1)
 endfunction
-function! LeftBuffer(...)
-        execute "vnew " . a:1
-        wincmd H
-        nnoremap <silent> <buffer> q :bdelete<cr>
-        let w:scratch = 1
-        vertical resize 120 
+function! BottomBuffer(...)
+        execute "rightbelow new " . a:1
         call cursor(1, 1)
 endfunction
 function! LeftWindowBuffer(...)
