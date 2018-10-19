@@ -27,7 +27,7 @@
 set nowrap
 set nocompatible
 set relativenumber
-set hidden
+set hidden                        " Will switch to next buffer without raising an error
 set foldcolumn=3
 set foldmethod=marker
 set foldlevelstart=20
@@ -124,6 +124,33 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 " *****************************************************************************************************
                                   " Utilities 
                                   " *******************************************************************
+function! DeSpace()
+     execute "%s/^     / /ge"
+     execute "%s/^     / /ge"
+     execute "%s/^     / /ge"
+     execute "%s/^     / /ge"
+     execute "%s/^     / /ge"
+
+     execute "%s/^    / /ge"
+     execute "%s/^    / /ge"
+     execute "%s/^    / /ge"
+     execute "%s/^    / /ge"
+     execute "%s/^    / /ge"
+
+     execute "%s/^   / /ge"
+     execute "%s/^   / /ge"
+     execute "%s/^   / /ge"
+     execute "%s/^   / /ge"
+     execute "%s/^   / /ge"
+
+     execute "%s/^  / /ge"
+     execute "%s/^  / /ge"
+     execute "%s/^  / /ge"
+     execute "%s/^  / /ge"
+     execute "%s/^  / /ge"
+
+     execute "%s/^ //ge"
+endfunction
 function! TrimLeft(s1)
      let l:szPart = substitute(a:s1, "^ *", "", "")
      return l:szPart
@@ -154,6 +181,17 @@ function! PrePad(s,amt,...)
         endif
         return repeat(char,a:amt - len(a:s)) . a:s
 endfunction
+
+
+function! Test()
+     call SetArgs("A","B","D")
+endfunction
+function! SetArgs(...)
+        for i in a:000
+            echom i
+        endfor
+endfunction
+
 " stringToCenter.PadLeft(((totalLength - stringToCenter.Length) / 2) + stringToCenter.Length)
 
 
@@ -185,11 +223,11 @@ function! g:MyKeyMapper(...)
      let l:szKey = substitute(a:1, "<silent> ", "", "")
      let l:szKey = substitute(l:szKey, "nnoremap ", "", "")
      let l:szKey = substitute(l:szKey, "vnoremap ", "", "")
+     let l:szKey = substitute(l:szKey, "inoremap ", "", "")
      let l:szKey = substitute(l:szKey, " .*$", "", "g")
 
      let l:prefix = g:MyKeyMapperMode . " " . g:MyKeyDictCT 
      let g:MyKeyDictCT = g:MyKeyDictCT +1
-
      let g:MyKeyDict[l:prefix . " " . l:szKey] = a:2
      execute a:1
 endfunction
@@ -343,6 +381,22 @@ function! Greppyoff()
     let g:greppy_mode_active = 0
 endfunction
 " *****************************************************************************************************
+                                  " Things To Learn (TTL)  
+                                  " *******************************************************************
+let g:MyTTLList = []
+function! MyTTLDump()
+        call LeftWindowBuffer()
+        nnoremap <silent> <buffer> q :close<cr>
+        let l:nn=1
+        call setline(l:nn, CenterPad("Things to Learn"))
+        let l:nn=2
+	for l:item in g:MyTTLList
+          call setline(l:nn, l:item)
+          let l:nn= l:nn + 1
+	endfor
+        vertical resize 120 
+endfunction
+" *****************************************************************************************************
                                   " MyCommandsheet 
                                   " *******************************************************************
 let g:MyCommandsheetList = []
@@ -421,6 +475,62 @@ endfunction
 function! g:QuickListAdd(...)
            call add(g:MyQuickList, a:1)
 endfunction
+
+
+function! g:CS(...)
+     if ( a:0 == 1)
+          let l:a2 = ""
+     endif
+     if ( a:0 == 2)
+          let l:a2 = a:2
+     endif
+     let l:line =  a:1 . " ,,, " . l:a2 . "!!!!@@@@"
+     call add(g:MyCheatsheetList, l:line)
+endfunction
+
+function! g:TTL(...)
+     if ( a:0 == 1)
+          call add(g:MyTTLList, a:1)
+     endif
+endfunction
+
+function! g:TTL2(...)
+     if ( a:0 == 1)
+          let l:a2 = ""
+     endif
+     if ( a:0 == 2)
+          let l:a2 = a:2
+     endif
+     let l:line =  a:1 . " ,,, " . l:a2 . "!!!!@@@@"
+     call add(g:MyCheatsheetList, l:line)
+     call add(g:MyTTLList, l:line)
+endfunction
+
+
+" function! g:CS(...)
+"      if ( a:0 == 1)
+"           let l:a2 = ""
+"      endif
+"      if ( a:0 == 2)
+"           let l:a2 = a:2
+"      endif
+"      let l:line =  a:1 . " ,,, " . l:a2 . "!!!!@@@@"
+"      call add(g:MyCheatsheetList, l:line)
+" endfunction
+function! g:CS1(...)
+     for i in a:000
+          let l:line =  i . "!!!!@@@@"
+          call add(g:MyCheatsheetList, l:line)
+     endfor
+endfunction
+function! g:CS2(p1,p2)
+     let l:line =  a:p1 . "!!!!" . a:p2 ."@@@@"
+     call add(g:MyCheatsheetList, l:line)
+endfunction
+function! g:CS3(p1,p2,p3)
+     let l:line =  a:p1 . "!!!!" . a:p2 . "@@@@>>" . a:p3
+     call add(g:MyCheatsheetList, l:line)
+endfunction
 function! g:MyCheatsheet(...)
      if ( a:0 == 3)
            let l:line =  a:1 . "!!!!" . a:2 . "@@@@>>" . a:3
@@ -463,12 +573,12 @@ function! MyCheatsheetDump()
                     let l:szPart2 = strpart(l:szKey, n)
                     let l:szPart1 = Trimmer(l:szPart1, ",,," )
                     let l:szPart2 = Trimmer(l:szPart2, ",,," )
-                    let l:line=Pad(l:szPart1,s:LW/2) . " | " . l:szPart2
+                    let l:line=Pad(l:szPart1,(s:LW/2)-3) . " | " . l:szPart2
                else
                     let l:line=l:szKey
                endif
           else
-               let l:line=l:szKey . repeat(' ', 6-len(l:szKey)) . l:szValue . repeat(' ', 52-len(l:szValue)) . l:szDesc
+               let l:line=l:szKey . repeat(' ', 6-len(l:szKey)) . l:szValue . repeat('%', 52-len(l:szValue)) . l:szDesc
           endif
           let l:n = match(l:line,'-------')
           if (l:n == -1 )
@@ -484,27 +594,34 @@ endfunction
 let s:LW = 110
 let s:barline = repeat('-', s:LW)
 " *****************************************************************************************************
+                                  " TTL Items
+                                  " *******************************************************************
+call g:TTL("zt   puts current line to top of screen")
+call g:TTL("z.   puts current line to center of screen ")
+call g:TTL("zz   puts current line to center of screen ")
+call g:TTL("zb   puts current line to bottom of screen")
+call g:TTL("y$   yank till the end of line")
+" *****************************************************************************************************
                                   " My Cheat Sheet Items
                                   " *******************************************************************
 call g:MyCheatsheet(CenterPad(""))
 call g:MyCheatsheet(CenterPad("My Cheat Sheet"))
-call g:MyCheatsheet(CenterPad("Things to Learn"))
-call g:MyCheatsheet("zt puts current line to top of screen ,,,  z. or zz puts current line to center of screen ")
-" call g:QLA("zt puts current line to top of screen")
-" call g:QLA("z. or zz puts current line to center of screen")
-call g:MyCheatsheet("zb puts current line to bottom of screen")
+call g:MyCheatsheet(CenterPad(" "))
 call g:MyCheatsheet(s:barline)
 
-call g:MyCheatsheet(CenterPad("Variable Scope"))
-call g:MyCheatsheet("nothing      In a function: local to a function; otherwise: global")
-call g:MyCheatsheet("buffer  b:   Local to the current buffer           ,,,window   w:   Local to the current window")
-call g:MyCheatsheet("vim     v:   Global, predefined by Vim             ,,,tabpage  t:   Local to the current tab page")
-call g:MyCheatsheet("global  g:   Global                                ,,,local    l:   Local to a function")
-call g:MyCheatsheet("script  s:   Local to |:src|'ed Vim script         ,,,fun-arg  a:   Function argument (inside a function)")
-call g:MyCheatsheet(s:barline)
 
 call g:MyCheatsheet(CenterPad("Plaintext Text Objects - Words"))
-call g:MyCheatsheet("aw  a word (includes surrounding white space)     ,,, iw  inner word (does not include surrounding white space)")
+call g:MyCheatsheet(CenterPad("<number><command><text object or motion>"))
+call g:CS("aw   a word (with white space)",           "iw   inner word")
+call g:CS("ab   a block from [( to ]) (with braces)", "ib   inner block")
+call g:CS("ap   a paragraph (with white space)",      "ip   inner paragraph")
+call g:CS("as   a sentence (with white space)",       "is   inner sentance")
+call g:CS("at   a tag block (with white space)",      "it   inner tag")
+
+call g:CS("a\"   double quoted string",               "i\"   double quoted string without the quotes")
+call g:CS("a\'   single quoted string",                "i\'   single quoted string without the quotes")
+
+
 call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet("zt  puts current line to top of screen             ,,,    z. or zz puts current line to center of screen")
 call g:MyCheatsheet("zb  puts current line to bottom of screen          ,,,")
@@ -533,6 +650,13 @@ call g:MyCheatsheet("]]    Next section                                 ,,, [[  
 call g:MyCheatsheet("0     Front of line                                ,,, ^    Front of line (first non-blank)")
 call g:MyCheatsheet("%     Matching brace/bracket/paren/tag             ,,, $    End of line")
 
+call g:MyCheatsheet(CenterPad("Variable Scope"))
+call g:MyCheatsheet("nothing      In a function: local to a function; otherwise: global")
+call g:MyCheatsheet("buffer  b:   Local to the current buffer           ,,,window   w:   Local to the current window")
+call g:MyCheatsheet("vim     v:   Global, predefined by Vim             ,,,tabpage  t:   Local to the current tab page")
+call g:MyCheatsheet("global  g:   Global                                ,,,local    l:   Local to a function")
+call g:MyCheatsheet("script  s:   Local to |:src|'ed Vim script         ,,,fun-arg  a:   Function argument (inside a function)")
+call g:MyCheatsheet(s:barline)
 
 call g:MyCheatsheet(CenterPad("Commands"))
 call g:MyCheatsheet("COM", "call CommanderList()")
@@ -633,7 +757,9 @@ function! PolyModeMapReset()
           let g:help1 = ""
           let g:help2 = ""
           let g:MyKeyMapperMode = "STD " 
+          call g:MyKeyMapper("inoremap jj <esc>",                                 "Escape ReMapped",1)
           call g:MyKeyMapper("nnoremap <F1> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
+          call g:MyKeyMapper("nnoremap <leader><F1> :call MyTTLDump()<cr>",       "My Help",1)
           call g:MyKeyMapper("nnoremap <F2> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
           call g:MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>:call BufferLocalF3Quit()<cr>",   "MRU")
           call g:MyKeyMapper("nnoremap <F4> :C<cr>",                              "Commander")
