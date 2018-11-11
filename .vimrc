@@ -601,6 +601,13 @@ call g:TTL("z.   puts current line to center of screen ")
 call g:TTL("zz   puts current line to center of screen ")
 call g:TTL("zb   puts current line to bottom of screen")
 call g:TTL("y$   yank till the end of line")
+call g:TTL("ys<motion><char>   Surround")
+call g:TTL("yss<char>          Surround current line")
+call g:TTL("VMODE S<char>      Surround current selection")
+
+
+
+
 " *****************************************************************************************************
                                   " My Cheat Sheet Items
                                   " *******************************************************************
@@ -753,10 +760,15 @@ let g:MyKeyMapperMode = "STD "
 call g:MyKeyMapper("nnoremap <Home> :call PolyMode(-1)<cr>",       "PolyMode On")
 call g:MyKeyMapper("nnoremap <End>  :call PolyModeReset()<cr>",    "PolyMode Off")
 function! PolyModeMapReset()
-          let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> Commander <F5> Cmd <F6> Grep   <F9> PasteMode <F10> Cheat/Doc <F12> Build"
+          let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> Commander <F5> Cmd <F6> Grep <F9> PasteMode <F10> Cheat/Doc <F12> Build -- <S-F1> TTL"
           let g:help1 = ""
           let g:help2 = ""
           let g:MyKeyMapperMode = "STD " 
+"           TEST     TEST      TEST
+"           TEST     TEST      TEST
+"           TEST     TEST      TEST
+"           TEST     'TEST      TEST'
+"           TEST     TEST      TEST
           call g:MyKeyMapper("inoremap jj <esc>",                                 "Escape ReMapped",1)
           call g:MyKeyMapper("nnoremap <F1> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
           call g:MyKeyMapper("nnoremap <leader><F1> :call MyTTLDump()<cr>",       "My Help",1)
@@ -775,6 +787,7 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
           " call g:MyKeyMapper("nnoremap <leader><F12> lmaj0d$`ahp`ah",             "grabandtuck")
           call g:MyKeyMapper("nnoremap <leader><F12> lmaj0:s/^ *//<cr>0:s/ *$//<cr>0d$`ahpj0dd",            "grabandtuck")
+          call g:MyKeyMapper("nnoremap <leader>` ys$\`",               "surround till EOL")
           call g:MyKeyMapper("nnoremap <silent> <End>  :call PolyModeReset()<cr>","PolyMode Off")
           " Window
           call g:MyKeyMapper("nnoremap <leader>sw<left>  :topleft  vnew<CR>","Split Window Left")
