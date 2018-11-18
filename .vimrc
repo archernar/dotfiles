@@ -708,12 +708,9 @@ call g:MyCommandMapper("command! U27     :e /usr/share/vim/vim74/doc/usr_27.txt"
 call g:MyCommandMapper("command! S3PUT :call S3put()")
 call g:MyCommandMapper("command! C       :call CommanderList()")
 call g:MyCommandMapper("command! CE      :call CommanderListEdit()")
-
 call g:MyCommandMapper("command! TEST    :echom Trim('    Hello Jane  3  ,,,  eee    ')")
-
 call g:MyCommandMapper("command! XXCSD   :call CallMan('LeftWindowBuffer()', 'MyCommandsheetDump()')")
 call g:MyCommandMapper("command! CSD     :call XMan('botright new', 'MyCommandsheetDump()')")
-
 call g:MyCommandMapper("command! SNIPS   :topleft vnew ~/snips.java")
 call g:MyCommandMapper("command! REPOS   :call RepoList()")
 call g:MyCommandMapper("command! FOUR    :call Four()")
@@ -725,7 +722,6 @@ call g:MyCommandMapper("command! KSH     :call KshTop()")
 call g:MyCommandMapper("command! GAWK    :call SaveAndExecuteGawk()")
 call g:MyCommandMapper("command! COLORLET :call Colorlet(-1)")
 call g:MyCommandMapper("command! BE :call SetRegistersBE()")
-
 call g:MyCommandMapper("command! KALL     :call MyKeyMapperDump()")
 call g:MyCommandMapper("command! KSTD     :call MyKeyMapperDump('STD')")
 call g:MyCommandMapper("command! KCOM     :call MyKeyMapperDump('COM')")
@@ -761,7 +757,7 @@ let g:MyKeyMapperMode = "STD "
 call g:MyKeyMapper("nnoremap <Home> :call PolyMode(-1)<cr>",       "PolyMode On")
 call g:MyKeyMapper("nnoremap <End>  :call PolyModeReset()<cr>",    "PolyMode Off")
 function! PolyModeMapReset()
-          let g:help0 = "<F1> NxtWin <F2> NxtBuf <F3> MRU <F4> Commander <F5> Cmd <F6> Grep <F9> PasteMode <F10> Cheat/Doc <F12> Build -- <S-F1> TTL"
+          let g:help0 = "<F1> NxtBuf <F2> NxtWin <F3> MRU <F4> Commander <F5> Cmd <F6> Grep <F9> PasteMode <F10> Cheat/Doc <F12> Build -- <S-F1> TTL"
           let g:help1 = ""
           let g:help2 = ""
           let g:MyKeyMapperMode = "STD " 
@@ -771,9 +767,9 @@ function! PolyModeMapReset()
 "           TEST     'TEST      TEST'
 "           TEST     TEST      TEST
           call g:MyKeyMapper("inoremap jj <esc>",                                 "Escape ReMapped",1)
-          call g:MyKeyMapper("nnoremap <F1> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
+          call g:MyKeyMapper("nnoremap <F1> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
           call g:MyKeyMapper("nnoremap <leader><F1> :call MyTTLDump()<cr>",       "My Help",1)
-          call g:MyKeyMapper("nnoremap <F2> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
+          call g:MyKeyMapper("nnoremap <F2> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
           call g:MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>:call BufferLocalF3Quit()<cr>",   "MRU")
           call g:MyKeyMapper("nnoremap <F4> :C<cr>",                              "Commander")
           call g:MyKeyMapper("nnoremap <F5> :call Tcmd()<cr>",                    "TCmd")
@@ -1180,13 +1176,32 @@ endfunction
 function! TopPut(...)
     call append(line('0'), a:1)
 endfunction
+function! BotPut(...)
+    call append(line('$'), a:1)
+endfunction
 function! KshTop()
-    call TopPut("")
-    call TopPut("trap \"exit 2\" 1 2 3 13 15")
-    call TopPut("trap 'rm -f \"$Tmp\" >/dev/null 2>&1' 0")
-    call TopPut("TmpDir=\"/tmp/dir$$\"")
-    call TopPut("Tmp=\"/tmp/$$\"")
-    call TopPut("#!/usr/bin/ksh")
+     call BotPut("#!/usr/bin/ksh")
+     call BotPut("Tmp=\"/tmp/$$\"")
+     call BotPut("TmpDir=\"/tmp/dir$$\"")
+     call BotPut("trap 'rm -f \"$Tmp\" >/dev/null 2>&1' 0")
+     call BotPut("trap \"exit 2\" 1 2 3 13 15")
+
+     call BotPut("")
+     call BotPut("")
+     call BotPut("while getopts \"a:r:\" arg")
+     call BotPut("do")
+     call BotPut("	case $arg in")
+     call BotPut("            a) ACCOUNT=$OPTARG ;;")
+     call BotPut("            r) REGION=$OPTARG ;;")
+     call BotPut("	    *) exit 0 ;;")
+     call BotPut("	esac")
+     call BotPut("done")
+     call BotPut("shift $(($OPTIND - 1))")
+     call BotPut("")
+     call BotPut("")
+
+
+
 endfunction
 
 function! S3put()
