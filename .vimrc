@@ -761,11 +761,6 @@ function! PolyModeMapReset()
           let g:help1 = ""
           let g:help2 = ""
           let g:MyKeyMapperMode = "STD " 
-"           TEST     TEST      TEST
-"           TEST     TEST      TEST
-"           TEST     TEST      TEST
-"           TEST     'TEST      TEST'
-"           TEST     TEST      TEST
           call g:MyKeyMapper("inoremap jj <esc>",                                 "Escape ReMapped",1)
           call g:MyKeyMapper("nnoremap <F1> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
           call g:MyKeyMapper("nnoremap <leader><F1> :call MyTTLDump()<cr>",       "My Help",1)
@@ -775,7 +770,7 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <F5> :call Tcmd()<cr>",                    "TCmd")
           call g:MyKeyMapper("nnoremap <F6> :call Greppyon()<cr>",                "Greppy First Form, word under cursor")
           call g:MyKeyMapper("nnoremap <F7> :call Greppyon(1)<cr>",               "Greppy Second Form, prompt for word")
-          call g:MyKeyMapper("nnoremap <F8> :call MyKeyMapperDump()<cr>",         "MyKeyMapper Help")
+          call g:MyKeyMapper("nnoremap <F8> :call MyKeyMapperDump()<cr>/^STD<cr>zt","MyKeyMapper Help")
           call g:MyKeyMapper("nnoremap <leader><F8> :call MyCheatsheetDump()<cr>","My Cheatsheet")
           call g:MyKeyMapper("nnoremap <F9> :set paste!<cr>",                     "Toggle Paste Setting")
           call g:MyKeyMapper("nnoremap <leader><F9> :call MyQuickListDump()<cr>", "My QuickList")
