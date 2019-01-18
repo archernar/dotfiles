@@ -7,5 +7,8 @@ tonto() {
      gnome-terminal  --title=$1 --geometry $2x$3+$4+$5 &
 }
 
-tonto five  195 50 25 25 
+# tonto five  185 33 35 35
+
+
+gnome-terminal --title=Screen --geometry 144x44+24+24 &
 

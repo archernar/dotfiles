@@ -26,7 +26,7 @@
 
 set nowrap
 set nocompatible
-set relativenumber
+" set relativenumber
 set hidden                        " Will switch to next buffer without raising an error
 set foldcolumn=3
 set foldmethod=marker
@@ -71,7 +71,7 @@ command! -nargs=1 P !xdg-open "<f-args>" >/dev/null 2>&1
 " *****************************************************************************************************
                                   " Compete Pre Vundle Setup
                                   " *******************************************************************
-syntax off                        " Enable syntax highlighting
+syntax on                        " Enable syntax highlighting
 filetype off
 
 " let NOVUNDLE = 1
@@ -98,6 +98,9 @@ Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'jeetsukumaran/vim-buffergator'
 Plugin 'vim-scripts/grep.vim'      " https://github.com/vim-scripts/grep.vim
 Plugin 'tpope/vim-surround'
+Plugin 'altercation/vim-colors-solarized'
+
+
 "Plugin 'vim-airline/vim-airline'
 "Plugin 'vim-airline/vim-airline-themes'
 "Plugin 'kristijanhusak/vim-carbon-now-sh'
@@ -125,6 +128,14 @@ filetype plugin indent on         " required, to ignore plugin indent changes, i
 " *****************************************************************************************************
                                   " Utilities 
                                   " *******************************************************************
+function! SaveQuitAll()
+     execute "w"
+     execute "qall!"
+endfunction
+function! QuitAll()
+     execute "qall!"
+endfunction
+
 function! DeSpace()
      execute "%s/^     / /ge"
      execute "%s/^     / /ge"
@@ -239,13 +250,14 @@ function! g:MyCommandMapper(...)
      let l:szKey = substitute(l:szKey, " .*$", "", "g")
 
      let l:prefix = g:MyKeyMapperMode . " " . g:MyKeyDictCT 
-     let g:MyKeyDictCT = g:MyKeyDictCT +1
+     let g:MyKeyDictCT = g:MyKeyDictCT + 1
 
      let g:MyKeyDict[l:prefix . " " . l:szKey] = l:szCommand 
 
-     " Insert Command Info into Cheatsheet
-     call g:MyCheatsheet(Pad(l:szKey,16)  . "" . l:szCommand)
-     call g:MyCommandsheet(Pad(l:szKey,16)  . "" . l:szCommand)
+     " Insert Formatted Entry into Cheatsheet(s)
+     let l:szFormatted = Pad(l:szKey,16) . "" . l:szCommand
+"      call g:MyCheatsheet(l:szFormatted)
+"      call g:MyCommandsheet(l:szFormatted)
 
      execute a:1
 endfunction
@@ -616,7 +628,43 @@ call g:MyCheatsheet(CenterPad(""))
 call g:MyCheatsheet(CenterPad("My Cheat Sheet"))
 call g:MyCheatsheet(CenterPad(" "))
 call g:MyCheatsheet(s:barline)
+call g:MyCheatsheet(CenterPad("i3wm"))
+call g:MyCheatsheet(CenterPad(" "))
+call g:MyCheatsheet("Controlling i3")
+call g:MyCheatsheet("$mod+Shift+r            Reload i3")
+call g:MyCheatsheet("$mod+Shift+e            Exit i3")
+call g:MyCheatsheet("-")
+call g:MyCheatsheet("Manage Windows")
+call g:MyCheatsheet("$mod+Shift+q            Kill current window")
+call g:MyCheatsheet("$mod+Shift+num          Move current window to workspace number num")
+call g:MyCheatsheet("$mod+Shift+f            Set window to floating mode")
+call g:MyCheatsheet("$mod+j                  Focus on window to the left")
+call g:MyCheatsheet("$mod+k                  Focus on window above")
+call g:MyCheatsheet("$mod+l                  Focus on window below")
+call g:MyCheatsheet("$mod+;                  Focus on window to the right")
+call g:MyCheatsheet("$mod+Shift+j            Move window left")
+call g:MyCheatsheet("$mod+Shift+k            Move window up")
+call g:MyCheatsheet("$mod+Shift+l            Move window down")
+call g:MyCheatsheet("$mod+Shift+;            Move window right")
+call g:MyCheatsheet("-")
+call g:MyCheatsheet("Workspaces")
+call g:MyCheatsheet("$mod+num                Switch to workspace num")
+call g:MyCheatsheet("$mod+Shift+num          Move current window to workspace number num")
+call g:MyCheatsheet("-")
+call g:MyCheatsheet("Containers")
+call g:MyCheatsheet("$mod+e                  Default container")
+call g:MyCheatsheet("$mod+h                  Horizontal split container")
+call g:MyCheatsheet("$mod+v                  Vertical split container")
+call g:MyCheatsheet("$mod+w                  Tabbed container")
+call g:MyCheatsheet("$mod+f                  Toggle fullscreen mode")
+call g:MyCheatsheet("$mod+s                  Toggle stacking mode")
+call g:MyCheatsheet("$mod+Shift+Space        Toggle floating mode")
+call g:MyCheatsheet("-")
+call g:MyCheatsheet("Applications")
+call g:MyCheatsheet("$mod+enter              Open new terminal window")
+call g:MyCheatsheet("$mod+d                  Open dmenu")
 
+call g:MyCheatsheet(s:barline)
 
 call g:MyCheatsheet(CenterPad("Plaintext Text Objects - Words"))
 call g:MyCheatsheet(CenterPad("<number><command><text object or motion>"))
@@ -685,6 +733,7 @@ call g:MyCheatsheet("URL","https://devhints.io/vimscript-functions","VimScript F
 call g:MyCheatsheet("URL","https://technotales.wordpress.com/2010/04/29/vim-splits-a-guide-to-doing-exactly-what-you-want/","spliting the way you want")
 
 call g:MyCheatsheet(s:barline)
+ 
 
 " *****************************************************************************************************
                                   " Command Words/Aliases
@@ -719,6 +768,7 @@ call g:MyCommandMapper("command! TIPS    :call Vimtips()")
 call g:MyCommandMapper("command! VT      :call Vimtips()")
 call g:MyCommandMapper("command! TERM    :call Terminal()")
 call g:MyCommandMapper("command! KSH     :call KshTop()")
+call g:MyCommandMapper("command! JAVAMAIN :call JavaMain()")
 call g:MyCommandMapper("command! GAWK    :call SaveAndExecuteGawk()")
 call g:MyCommandMapper("command! COLORLET :call Colorlet(-1)")
 call g:MyCommandMapper("command! BE :call SetRegistersBE()")
@@ -736,6 +786,7 @@ call g:MyCommandMapper("command! RON      :colorscheme ron")
 call g:MyCommandMapper("command! DESERT   :colorscheme desert")
 call g:MyCommandMapper("command! SHINE    :colorscheme shine")
 call g:MyCommandMapper("command! EVENING  :colorscheme evening")
+call g:MyCommandMapper("command! SOLAR    :colorscheme solarized")
 
 " Do the static entries here
 call g:MyStaticMapper("R", "Execute command, output horozontal")
@@ -757,7 +808,7 @@ let g:MyKeyMapperMode = "STD "
 call g:MyKeyMapper("nnoremap <Home> :call PolyMode(-1)<cr>",       "PolyMode On")
 call g:MyKeyMapper("nnoremap <End>  :call PolyModeReset()<cr>",    "PolyMode Off")
 function! PolyModeMapReset()
-          let g:help0 = "<F1> NxtBuf <F2> NxtWin <F3> MRU <F4> Commander <F5> Cmd <F6> Grep <F9> PasteMode <F10> Cheat/Doc <F12> Build -- <S-F1> TTL"
+          let g:help0 = "<F1> NxB <F2> NxW <F3> SvQt <F4> Cmdr <F5> Cmd <F6> Grep <F9> PasteM <F10> Cht <F12> Bld <S-F1> TTL"
           let g:help1 = ""
           let g:help2 = ""
           let g:MyKeyMapperMode = "STD " 
@@ -765,7 +816,9 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <F1> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
           call g:MyKeyMapper("nnoremap <leader><F1> :call MyTTLDump()<cr>",       "My Help",1)
           call g:MyKeyMapper("nnoremap <F2> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
-          call g:MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>:call BufferLocalF3Quit()<cr>",   "MRU")
+          "  call g:MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>:call BufferLocalF3Quit()<cr>",   "MRU")
+          call g:MyKeyMapper("nnoremap <F3> :call SaveQuitAll()<cr>",             "Save and Quit All")
+          call g:MyKeyMapper("nnoremap <leader><F3> :call QuitAll()<cr>",         "Quit All")
           call g:MyKeyMapper("nnoremap <F4> :C<cr>",                              "Commander")
           call g:MyKeyMapper("nnoremap <F5> :call Tcmd()<cr>",                    "TCmd")
           call g:MyKeyMapper("nnoremap <F6> :call Greppyon()<cr>",                "Greppy First Form, word under cursor")
@@ -873,6 +926,14 @@ if !exists("myautocommands_loaded")
      au BufNewFile,BufRead .vimrc vnoremap <silent> <leader><PageUp> o<esc>^i" ------------------------------------------------------------------<cr>"  <cr><esc>kll
      au BufNewFile,BufRead *.vim vnoremap <silent> <Home> :s/^/" /<cr>gv
      au BufNewFile,BufRead *.vim vnoremap <silent> <leader><Home> :s/^["] //<cr>
+     
+     
+     
+     au BufNewFile,BufRead *.lst nnoremap <silent> <buffer> q :quit<cr>
+
+
+
+
 endif
 " *****************************************************************************************************
                                   " Powerline
@@ -888,12 +949,6 @@ endif
                                   " *******************************************************************
 set laststatus=2
 set t_Co=256
-" *****************************************************************************************************
-                                  " Set Color Scheme
-                                  " *******************************************************************
-colorscheme darkblue
-colorscheme pablo
-hi Visual   cterm=reverse
 
                                   " *******************************************************************
                                   " Quick Customizations
@@ -1165,11 +1220,20 @@ function! Terminal()
     redraw!
 endfunction
 
+function! JavaMain()
+     call BotPut("public static void main(String[] args) {")
+     call BotPut("     System.out.println( \"Hello World!\" );")
+     call BotPut("}")
+endfunction
+
 " *****************************************************************************************************
                                   " KSH Topper Functions
                                   " *******************************************************************
 function! TopPut(...)
     call append(line('0'), a:1)
+endfunction
+function! Bp(...)
+    call append(line('$'), a:1)
 endfunction
 function! BotPut(...)
     call append(line('$'), a:1)
@@ -1180,15 +1244,20 @@ function! KshTop()
      call BotPut("TmpDir=\"/tmp/dir$$\"")
      call BotPut("trap 'rm -f \"$Tmp\" >/dev/null 2>&1' 0")
      call BotPut("trap \"exit 2\" 1 2 3 13 15")
+     call BotPut("rm -f \"$Tmp\" >/dev/null 2>&1")
+     call Bp("N=`gawk -v w=N -v v=0 -F= '{gsub(/[;].*$/,\"\",$0);gsub(/[ ]*$/,\"\",$0);if ($1==w){v=$2;exit;}}END{print v}' FILE`")
 
      call BotPut("")
      call BotPut("")
      call BotPut("while getopts \"a:r:\" arg")
      call BotPut("do")
      call BotPut("	case $arg in")
-     call BotPut("            a) ACCOUNT=$OPTARG ;;")
-     call BotPut("            r) REGION=$OPTARG ;;")
-     call BotPut("	    *) exit 0 ;;")
+     call BotPut("            a) ACCOUNT=$OPTARG")
+     call BotPut("               ;;")
+     call BotPut("            r) REGION=$OPTARG")
+     call BotPut("               ;;")
+     call BotPut("	      *) exit 0")
+     call BotPut("               ;;")
      call BotPut("	esac")
      call BotPut("done")
      call BotPut("shift $(($OPTIND - 1))")
@@ -1282,3 +1351,49 @@ endfunction
 " endfunction
 " 
 " noremap <F10> :call SwapWindowBuffers()<CR>
+"
+"
+"
+"
+function! s:GetBufferList() 
+  redir =>buflist 
+  silent! ls 
+  redir END 
+  return buflist 
+endfunction
+
+function! ToggleQuickFixList()
+  " SOURCE: https://github.com/milkypostman/vim-togglelist/blob/master/plugin/togglelist.vim
+  for bufnum in map(filter(split(s:GetBufferList(), '\n'), 'v:val =~ "Quickfix List"'), 'str2nr(matchstr(v:val, "\\d\\+"))') 
+    if bufwinnr(bufnum) != -1
+      cclose
+      return
+    endif
+  endfor
+  let winnr = winnr()
+  copen 
+  resize 10
+"   if winnr() != winnr
+"     wincmd p
+"   endif
+endfunction
+
+
+
+" colorscheme onehalflight
+" let g:airline_theme='onehalfdark'
+"let g:gruvbox_italic=1
+"colorscheme gruvbox
+"
+" *****************************************************************************************************
+                                  " Set Color Scheme
+                                  " *******************************************************************
+"colorscheme darkblue
+colorscheme pablo
+hi Visual   cterm=reverse
+set bg=dark
+" let g:solarized_termcolors=256 
+" syntax enable
+" set background=light
+" colorscheme solarized
+
