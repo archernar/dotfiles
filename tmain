@@ -10,5 +10,5 @@ tonto() {
 # tonto five  185 33 35 35
 
 
-gnome-terminal --title=Screen --geometry 144x44+24+24 &
+gnome-terminal --title=Screen --geometry 164x44+24+24 &
 

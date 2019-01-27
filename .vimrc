@@ -41,7 +41,31 @@ set smartcase
 set backspace=indent,eol,start    " Allow backspacing over autoindent, line breaks and start of insert action
 set nostartofline                 " Stop certain movements from always going to the first character of a line.
 set laststatus=2                  " Always display the status line, even if only one window is displayed
-set autoindent                    " When opening a new line and no filetype-specific indenting is enabled, keep same indent as line currently on.
+
+" *****************************************************************************************************
+                                  " Indent and Tab  Setup
+                                  " *******************************************************************
+" There are in fact four main methods available for indentation, each one
+" overrides the previous if it is enabled, or non-empty for 'indentexpr':
+" 'autoindent'	uses the indent from the previous line.
+"               When opening a new line and no filetype-specific indenting is enabled, keep same indent as line currently on.
+" 'smartindent'	is like 'autoindent' but also recognizes some C syntax to
+" 		increase/reduce the indent where appropriate.
+" 'cindent'	Works more cleverly than the other two and is configurable to
+" 		different indenting styles.
+" 'indentexpr'	The most flexible of all: Evaluates an expression to compute
+" 		the indent of a line.  When non-empty this method overrides
+" 		the other ones.  See |indent-expression|.
+set cindent                       
+set shiftwidth=4                  " Indent settings for using 4 spaces instead of tabs.  Do not change 'tabstop' from its default value of 8 
+set softtabstop=4                 " with this setup.
+set expandtab
+" *****************************************************************************************************
+                                  " Syntax Highlighting
+                                  " *******************************************************************
+let g:SYNTAX_TOGGLE = "1"
+syntax enable
+
 set confirm                       " Instead of failing a command because of unsaved changes, raise a dialogue asking to save changed files.
 set visualbell                    " Use visual bell instead of beeping when doing something wrong
 set t_vb=
@@ -49,9 +73,6 @@ set t_vb=
                                   " If visualbell is set, and this line is also included, vim will neither flash nor beep.
                                   " If visualbell is unset, this does nothing.
 set cmdheight=2                   " Set the command window height to 2 lines, to avoid many cases of having to  press <Enter> to continue
-set shiftwidth=4                  " Indent settings for using 4 spaces instead of tabs.  Do not change 'tabstop' from its default value of 8 
-set softtabstop=4                 " with this setup.
-set expandtab
 let mapleader = " "               " Leader - ( Spacebar )
 let MRU_Auto_Close = 1            " Set MRU window to close after selection
 set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, but never time out on mappings
@@ -71,7 +92,6 @@ command! -nargs=1 P !xdg-open "<f-args>" >/dev/null 2>&1
 " *****************************************************************************************************
                                   " Compete Pre Vundle Setup
                                   " *******************************************************************
-syntax on                        " Enable syntax highlighting
 filetype off
 
 " let NOVUNDLE = 1
@@ -777,6 +797,10 @@ call g:MyCommandMapper("command! KSTD     :call MyKeyMapperDump('STD')")
 call g:MyCommandMapper("command! KCOM     :call MyKeyMapperDump('COM')")
 call g:MyCommandMapper("command! KMRU     :call MyKeyMapperDump('MRU')")
 call g:MyCommandMapper("command! KPOLY    :call MyKeyMapperDump('POLY')")
+" blue.vim      default.vim  desert.vim evening.vim  morning.vim  pablo.vim
+" README.txt  shine.vim torte.vim
+" darkblue.vim  delek.vim    elflord.vim    koehler.vim  murphy.vim
+" peachpuff.vim  ron.vim     slate.vim  zellner.vim
 call g:MyCommandMapper("command! DARKBLUE :colorscheme darkblue")
 call g:MyCommandMapper("command! MYCOLOR  :colorscheme pablo")
 call g:MyCommandMapper("command! PABLO    :colorscheme pablo")
@@ -855,6 +879,7 @@ function! PolyModeMapReset()
           nnoremap <silent> 3 3
           nnoremap <silent> a a
           nnoremap <silent> b b
+          nnoremap <silent> c c
           nnoremap <silent> d d
           nnoremap <silent> e e
           nnoremap <silent> f f
@@ -1262,8 +1287,11 @@ function! KshTop()
      call BotPut("done")
      call BotPut("shift $(($OPTIND - 1))")
      call BotPut("")
-     call BotPut("")
 
+     call Bp("if [ $# -eq 0 ]; then")
+     call Bp("     exit 1")
+     call Bp("fi")
+     call BotPut("")
 
 
 endfunction
@@ -1378,6 +1406,15 @@ function! ToggleQuickFixList()
 "   endif
 endfunction
 
+function! ToggleSyntax()
+     if ( g:SYNTAX_TOGGLE == "1")
+         let g:SYNTAX_TOGGLE = "0"
+         syntax off
+     else
+         let g:SYNTAX_TOGGLE = "1"
+         syntax enable
+     endif
+endfunction
 
 
 " colorscheme onehalflight
@@ -1388,12 +1425,20 @@ endfunction
 " *****************************************************************************************************
                                   " Set Color Scheme
                                   " *******************************************************************
+                                  " https://alvinalexander.com/linux/vi-vim-editor-color-scheme-syntax
+                                  " https://jordanelver.co.uk/blog/2015/05/27/working-with-vim-colorschemes/
 "colorscheme darkblue
 colorscheme pablo
+let g:solarized_termcolors=256 
+colorscheme solarized
+set background=dark
 hi Visual   cterm=reverse
-set bg=dark
-" let g:solarized_termcolors=256 
-" syntax enable
-" set background=light
-" colorscheme solarized
-
+highlight Comment ctermbg=White ctermfg=Black
+"set bg=dark
+nmap <leader>spc :call <SID>SynStack()<CR>
+function! <SID>SynStack()
+  if !exists("*synstack")
+    return
+  endif
+  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+endfunc
