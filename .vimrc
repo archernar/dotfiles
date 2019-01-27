@@ -118,7 +118,6 @@ Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'jeetsukumaran/vim-buffergator'
 Plugin 'vim-scripts/grep.vim'      " https://github.com/vim-scripts/grep.vim
 Plugin 'tpope/vim-surround'
-Plugin 'altercation/vim-colors-solarized'
 
 
 "Plugin 'vim-airline/vim-airline'
@@ -810,7 +809,6 @@ call g:MyCommandMapper("command! RON      :colorscheme ron")
 call g:MyCommandMapper("command! DESERT   :colorscheme desert")
 call g:MyCommandMapper("command! SHINE    :colorscheme shine")
 call g:MyCommandMapper("command! EVENING  :colorscheme evening")
-call g:MyCommandMapper("command! SOLAR    :colorscheme solarized")
 
 " Do the static entries here
 call g:MyStaticMapper("R", "Execute command, output horozontal")
@@ -1429,12 +1427,9 @@ endfunction
                                   " https://jordanelver.co.uk/blog/2015/05/27/working-with-vim-colorschemes/
 "colorscheme darkblue
 colorscheme pablo
-let g:solarized_termcolors=256 
-colorscheme solarized
 set background=dark
 hi Visual   cterm=reverse
 highlight Comment ctermbg=White ctermfg=Black
-"set bg=dark
 nmap <leader>spc :call <SID>SynStack()<CR>
 function! <SID>SynStack()
   if !exists("*synstack")
