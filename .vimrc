@@ -63,7 +63,6 @@ set expandtab
 " *****************************************************************************************************
                                   " Syntax Highlighting
                                   " *******************************************************************
-let g:SYNTAX_TOGGLE = "1"
 syntax enable
 
 set confirm                       " Instead of failing a command because of unsaved changes, raise a dialogue asking to save changed files.
@@ -787,8 +786,9 @@ call g:MyCommandMapper("command! TIPS    :call Vimtips()")
 call g:MyCommandMapper("command! VT      :call Vimtips()")
 call g:MyCommandMapper("command! TERM    :call Terminal()")
 call g:MyCommandMapper("command! KSH     :call KshTop()")
-call g:MyCommandMapper("command! JAVAMAIN :call JavaMain()")
-call g:MyCommandMapper("command! GAWK    :call SaveAndExecuteGawk()")
+call g:MyCommandMapper("command! STATICMAIN :call StaticMainTop()")
+call g:MyCommandMapper("command! JAVAMAIN   :call JavaMain()")
+call g:MyCommandMapper("command! GAWK       :call SaveAndExecuteGawk()")
 call g:MyCommandMapper("command! COLORLET :call Colorlet(-1)")
 call g:MyCommandMapper("command! BE :call SetRegistersBE()")
 call g:MyCommandMapper("command! KALL     :call MyKeyMapperDump()")
@@ -1261,6 +1261,13 @@ endfunction
 function! BotPut(...)
     call append(line('$'), a:1)
 endfunction
+
+function! StaticMainTop()
+call Bp("public static void main(String[] args) {")
+call Bp("     System.out.println( \"Hello World!\" );")
+call Bp("}")
+endfunction
+
 function! KshTop()
      call BotPut("#!/usr/bin/ksh")
      call BotPut("Tmp=\"/tmp/$$\"")
@@ -1404,16 +1411,6 @@ function! ToggleQuickFixList()
 "   endif
 endfunction
 
-function! ToggleSyntax()
-     if ( g:SYNTAX_TOGGLE == "1")
-         let g:SYNTAX_TOGGLE = "0"
-         syntax off
-     else
-         let g:SYNTAX_TOGGLE = "1"
-         syntax enable
-     endif
-endfunction
-
 
 " colorscheme onehalflight
 " let g:airline_theme='onehalfdark'
@@ -1423,13 +1420,24 @@ endfunction
 " *****************************************************************************************************
                                   " Set Color Scheme
                                   " *******************************************************************
-                                  " https://alvinalexander.com/linux/vi-vim-editor-color-scheme-syntax
-                                  " https://jordanelver.co.uk/blog/2015/05/27/working-with-vim-colorschemes/
+                                  "  https://alvinalexander.com/linux/vi-vim-editor-color-scheme-syntax
+                                  "  https://jordanelver.co.uk/blog/2015/05/27/working-with-vim-colorschemes/
+                                  "  COLOR NAME 
+                                  "  Black, White, Brown
+                                  "  LightGray, LightGrey, Gray, Grey, DarkGray, DarkGrey
+                                  "  Blue, LightBlue, DarkBlue
+                                  "  Green, LightGreen, DarkGreen
+                                  "  Cyan, LightCyan, DarkCyan
+                                  "  Red, LightRed, DarkRed
+                                  "  Magenta, LightMagenta, DarkMagenta
+                                  "  Yellow, LightYellow, DarkYellow
 "colorscheme darkblue
 colorscheme pablo
 set background=dark
 hi Visual   cterm=reverse
-highlight Comment ctermbg=White ctermfg=Black
+highlight Comment ctermbg=Black ctermfg=LightBlue
+
+
 nmap <leader>spc :call <SID>SynStack()<CR>
 function! <SID>SynStack()
   if !exists("*synstack")
@@ -1437,3 +1445,13 @@ function! <SID>SynStack()
   endif
   echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
 endfunc
+
+nnoremap <silent> <Leader>ts
+             \ : if exists("syntax_on") <BAR>
+             \    syntax off <BAR>
+             \ else <BAR>  
+             \    syntax enable <BAR>
+             \    highlight Comment ctermbg=Black ctermfg=LightBlue <BAR>
+             \ endif<CR>   
+
+
