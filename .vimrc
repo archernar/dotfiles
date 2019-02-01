@@ -117,7 +117,9 @@ Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'jeetsukumaran/vim-buffergator'
 Plugin 'vim-scripts/grep.vim'      " https://github.com/vim-scripts/grep.vim
 Plugin 'tpope/vim-surround'
-
+Bundle 'Lokaltog/vim-monotone.git'
+Bundle 'fxn/vim-monochrome'
+Bundle 'owickstrom/vim-colors-paramount'
 
 "Plugin 'vim-airline/vim-airline'
 "Plugin 'vim-airline/vim-airline-themes'
@@ -809,6 +811,8 @@ call g:MyCommandMapper("command! RON      :colorscheme ron")
 call g:MyCommandMapper("command! DESERT   :colorscheme desert")
 call g:MyCommandMapper("command! SHINE    :colorscheme shine")
 call g:MyCommandMapper("command! EVENING  :colorscheme evening")
+call g:MyCommandMapper("command! MONO     :colorscheme monochrome")
+call g:MyCommandMapper("command! PARA     :set background=dark | colorscheme paramount")
 
 " Do the static entries here
 call g:MyStaticMapper("R", "Execute command, output horozontal")
@@ -1432,10 +1436,19 @@ endfunction
                                   "  Magenta, LightMagenta, DarkMagenta
                                   "  Yellow, LightYellow, DarkYellow
 "colorscheme darkblue
-colorscheme pablo
+
+" let g:monotone_color = [120, 100, 70] " Sets theme color to bright green
+" let g:monotone_secondary_hue_offset = 200 " Offset secondary colors by 200 degrees
+" let g:monotone_emphasize_comments = 1 " Emphasize comments
 set background=dark
-hi Visual   cterm=reverse
-highlight Comment ctermbg=Black ctermfg=LightBlue
+"colorscheme monochrome
+colorscheme paramount
+
+
+" colorscheme pablo
+" set background=dark
+" hi Visual   cterm=reverse
+" highlight Comment ctermbg=Black ctermfg=LightBlue
 
 
 nmap <leader>spc :call <SID>SynStack()<CR>
