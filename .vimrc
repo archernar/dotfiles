@@ -24,6 +24,9 @@
 " VIM_PDFLIB                      - Folder name of PDF library
 " VIM_S3                          - S3 bucket
 
+set splitbelow
+set splitright
+
 set nowrap
 set nocompatible
 " set relativenumber
@@ -41,7 +44,8 @@ set smartcase
 set backspace=indent,eol,start    " Allow backspacing over autoindent, line breaks and start of insert action
 set nostartofline                 " Stop certain movements from always going to the first character of a line.
 set laststatus=2                  " Always display the status line, even if only one window is displayed
-
+set undodir=~/.vim/undodir
+set undofile
 " *****************************************************************************************************
                                   " Indent and Tab  Setup
                                   " *******************************************************************
@@ -63,7 +67,7 @@ set expandtab
 " *****************************************************************************************************
                                   " Syntax Highlighting
                                   " *******************************************************************
-syntax enable
+syntax off
 
 set confirm                       " Instead of failing a command because of unsaved changes, raise a dialogue asking to save changed files.
 set visualbell                    " Use visual bell instead of beeping when doing something wrong
@@ -71,7 +75,7 @@ set t_vb=
                                   " reset terminal code for visual bell. 
                                   " If visualbell is set, and this line is also included, vim will neither flash nor beep.
                                   " If visualbell is unset, this does nothing.
-set cmdheight=2                   " Set the command window height to 2 lines, to avoid many cases of having to  press <Enter> to continue
+set cmdheight=1                   " Set the command window height to 2 lines, to avoid many cases of having to  press <Enter> to continue
 let mapleader = " "               " Leader - ( Spacebar )
 let MRU_Auto_Close = 1            " Set MRU window to close after selection
 set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, but never time out on mappings
@@ -80,25 +84,29 @@ set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, b
                                   " The 'External Command' Command Setup
                                   " *******************************************************************
 command! -nargs=* -complete=shellcmd H new  | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
-command! -nargs=* -complete=shellcmd V botright 60vnew | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
+command! -nargs=* -complete=shellcmd BANG botright 60vnew | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
 command! -nargs=1 L silent call Redir(<f-args>)
 command! -nargs=1 P !xdg-open "<f-args>" >/dev/null 2>&1
-
+command! -nargs=1 JDOC !jdoc "<f-args>" >/dev/null 2>&1
+command! -nargs=1 HH vnew <args>
+command! -nargs=1 EE vnew <args>
+command! -nargs=1 E vnew <args>
+command! -nargs=1 VV new <args>
+command! -nargs=1 V new <args>
 " Usage:
 "       :Redir hi ............. show the full output of command ':hi' in a scratch window
 "       :Redir !ls -al ........ show the full output of command ':!ls -al' in a scratch window
 
 " *****************************************************************************************************
-                                  " Compete Pre Vundle Setup
+                                  " Pre Vundle Setup
                                   " *******************************************************************
 filetype off
 
 " let NOVUNDLE = 1
 if !exists("NOVUNDLE")
 " *****************************************************************************************************
-                                  " Vundle
-                                  " *******************************************************************
                                   " Vundle            - see :h vundle for more details or wiki for FAQ
+                                  " *******************************************************************
                                   " git clone  https://github.com/VundleVim/Vundle.vim.git  ~/.vim/bundle/Vundle.vim
                                   " :PluginList       - lists configured plugins
                                   " :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
@@ -111,12 +119,14 @@ call vundle#begin()               " Vundle BEGIN
                                   " *******************************************************************
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'archernar/polymode.vim'
+Plugin 'archernar/vimmap.vim'
 Plugin 'archernar/vimstuff'
 Plugin 'scrooloose/nerdtree.git'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'jeetsukumaran/vim-buffergator'
 Plugin 'vim-scripts/grep.vim'      " https://github.com/vim-scripts/grep.vim
 Plugin 'tpope/vim-surround'
+Plugin 'tpope/vim-obsession'
 Bundle 'Lokaltog/vim-monotone.git'
 Bundle 'fxn/vim-monochrome'
 Bundle 'owickstrom/vim-colors-paramount'
@@ -144,14 +154,27 @@ endif                             " Vundle END
 filetype plugin indent on         " required, to ignore plugin indent changes, instead use: 
                                   " filetype plugin on
                                   " Put non-Plugin stuff after this line
-
+let g:MyKeyDict = {} 
+let g:MyKeyDictCT = 1000 
+let g:MyCommandItemDict = {} 
+let g:MyCommandItemCT = 1000 
+let g:MyKeyMapperMode = "" 
+runtime plugin/vimmap.vim
+call g:SetMyKeyMapperMode("STD")
 " *****************************************************************************************************
-                                  " Utilities 
+                                  " Utility Functions
                                   " *******************************************************************
+function! DQ(...)
+    let l:sz = substitute(a:1, "<cr>", "", "g")
+    let l:sz = substitute(l:sz, ":", "", "g")
+    return "\'" . l:sz . "\'"
+endfunction
+
 function! SaveQuitAll()
      execute "w"
      execute "qall!"
 endfunction
+
 function! QuitAll()
      execute "qall!"
 endfunction
@@ -214,11 +237,210 @@ function! PrePad(s,amt,...)
         return repeat(char,a:amt - len(a:s)) . a:s
 endfunction
 
+function! CenterPad(...)
+        let l:n = (((s:LW-strlen(a:1)) / 2) + strlen(a:1)) - 0
+        return PrePad(a:1, l:n)
+endfunction
 
+function! CallMan(...)
+     execute "call " . a:1
+     execute "call " . a:2
+endfunction
+function! CallMan3(...)
+     execute "call " . a:1
+     execute "call " . a:2
+     execute "call " . a:3
+endfunction
+function! XMan(...)
+     let l:pre = ""
+     let l:x = 1
+     let l:n = match(a:(l:x), '(')
+     if (l:n > 0 )
+          let l:pre = "call "
+     endif
+     execute l:pre . a:1
+
+     let l:pre = ""
+     let l:n = match(a:2, '(')
+     if (l:n > 0 )
+          let l:pre = "call "
+     endif
+     execute l:pre . a:2
+endfunction
+
+function! ExeMan(...)
+     execute "" . a:1
+     execute "" . a:2
+endfunction
+function! ExeMan3(...)
+     execute "" . a:1
+     execute "" . a:2
+     execute "" . a:3
+endfunction
+
+
+function! VimKeyMap()
+     redir! > ~/.vimkeymap.txt
+     silent verbose map
+     redir END
+endfunction
+
+function! RandomString()
+    let l:szAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    let l:c = 1
+    let l:szOut = ""
+    while l:c <= 8
+         let l:rrr = str2nr(matchstr(reltimestr(reltime()), '\v\.@<=\d+')[1:]) % 24 
+         let l:szOut = l:szOut . l:szAlpha[rrr] 
+         let l:c += 1
+    endwhile 
+    return l:szOut
+endfunction
+function! Ls()
+    ls
+endfunction
+function! Four() 
+    new | vnew | wincmd w | wincmd w | vnew 
+endfunction
+                                  " *******************************************************************
+                                  " END: Utility Functions
+" *****************************************************************************************************
+" 
+" CTRL-W r	Rotate windows downwards/rightwards.  The first window becomes
+" 		the second one, the second one becomes the third one, etc.
+" 		The last window becomes the first window.  The cursor remains
+" 		in the same window.
+" 		This only works within the row or column of windows that the
+" 		current window is in.
+" 
+" CTRL-W R	Rotate windows upwards/leftwards.  The second window becomes
+" 		the first one, the third one becomes the second one, etc.  The
+" 		first window becomes the last window.  The cursor remains in
+" 		the same window.
+" 		This only works within the row or column of windows that the
+" 		current window is in.
+" 
+" CTRL-W x	Without count: Exchange current window with next one.  If there
+" 		is no next window, exchange with previous window.
+" 		With count: Exchange current window with Nth window (first
+" 		window is 1).  The cursor is put in the other window.
+" 		When vertical and horizontal window splits are mixed, the
+" 		exchange is only done in the row or column of windows that the
+" 		current window is in.
+" 
+" The following commands can be used to change the window layout.  For example,
+" when there are two vertically split windows, CTRL-W K will change that in
+" horizontally split windows.  CTRL-W H does it the other way around.
+" 
+" 						*CTRL-W_K*
+" CTRL-W K	Move the current window to be at the very top, using the full
+" 		width of the screen.  This works like closing the current
+" 		window and then creating another one with ":topleft split",
+" 		except that the current window contents is used for the new
+" 		window.
+" 
+" 						*CTRL-W_J*
+" CTRL-W J	Move the current window to be at the very bottom, using the
+" 		full width of the screen.  This works like closing the current
+" 		window and then creating another one with ":botright split",
+" 		except that the current window contents is used for the new
+" 		window.
+" 
+" 						*CTRL-W_H*
+" CTRL-W H	Move the current window to be at the far left, using the
+" 		full height of the screen.  This works like closing the
+" 		current window and then creating another one with
+" 		":vert topleft split", except that the current window contents
+" 		is used for the new window.
+" 		{not available when compiled without the |+vertsplit| feature}
+" 
+" 						*CTRL-W_L*
+" CTRL-W L	Move the current window to be at the far right, using the full
+" 		height of the screen.  This works like closing the
+" 		current window and then creating another one with
+" 		":vert botright split", except that the current window
+" 		contents is used for the new window.
+" 		{not available when compiled without the |+vertsplit| feature}
+" 
+" 						*CTRL-W_T*
+" CTRL-W T	Move the current window to a new tab page.  This fails if
+" 		there is only one window in the current tab page.
+" 		When a count is specified the new tab page will be opened
+" 		before the tab page with this index.  Otherwise it comes after
+" 		the current tab page.
+" 
+
+function! NewWindow(...)
+        " H is Left  L is Right  K is Top  J is Bottom
+        vnew
+        let l:sz = tolower(a:1)
+        if (l:sz == "left")
+             wincmd H
+        endif
+        if (l:sz == "right")
+             wincmd L
+        endif
+        if (l:sz == "top")
+             wincmd K
+        endif
+        if (l:sz == "bottom")
+             wincmd J
+        endif
+        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
+        nnoremap <silent> <buffer> q :close<cr>
+        nnoremap <silent> <buffer> = :vertical resize +20<cr>
+        nnoremap <silent> <buffer> + :vertical resize -20<cr>
+        nnoremap <silent> <buffer> b :vertical resize +20<cr>
+        nnoremap <silent> <buffer> s :vertical resize -20<cr>
+        call cursor(1, 1)
+        execute "vertical resize " . a:2
+endfunction
 function! Test()
-     call SetArgs("A","B","D")
+        let l:sz="NO"
+        let l:current_win = winnr()
+        let l:current_buf = bufnr("%")
+        let l:buf = bufname(bufnr("%"))
+        let l:bnum = winbufnr(l:current_win)
+        let l:sz= "NOTHING"
+
+"         if getbufvar(l:bnum, '&buftype') == 'quickfix'
+"             let l:sz="YES"
+"         endif
+"            'buftype' 'bt'          string (default: "")
+"                            local to buffer
+"                            {not in Vi}
+"                            {not available when compiled without the |+quickfix| feature}
+"            The value of this option specifies the type of a buffer:
+"              <empty>       normal buffer
+"              nofile        buffer which is not related to a file and will not be written
+"              nowrite       buffer which will not be written
+"              acwrite       buffer which will always be written with BufWriteCmd
+"                            autocommands. {not available when compiled without the |+autocmd| feature}
+"              quickfix      quickfix buffer, contains list of errors |:cwindow| or list of locations |:lwindow|
+"              help          help buffer (you are not supposed to set this manually)
+" 
+        call NewWindow("Bottom",33)
+        call PutBufferList()
+endfunction
+
+function! PutBufferList(...)
+        let l:nn=1
+        let l:c=1
+        let l:sz=""
+        while l:c <=20 
+            if (bufexists(l:c))
+                let l:btyp = getbufvar(l:c, '&buftype')
+                if (l:btyp == "")
+                    let l:sz = bufname(l:c)
+                    call setline(l:nn, l:sz)
+                    let l:nn= l:nn + 1
+                endif
+            endif
+            let l:c += 1
+        endwhile 
 endfunction
 function! SetArgs(...)
+     " call SetArgs("A","B","D")
         for i in a:000
             echom i
         endfor
@@ -227,10 +449,6 @@ endfunction
 " stringToCenter.PadLeft(((totalLength - stringToCenter.Length) / 2) + stringToCenter.Length)
 
 
-function! CenterPad(...)
-        let l:n = (((s:LW-strlen(a:1)) / 2) + strlen(a:1)) - 0
-        return PrePad(a:1, l:n)
-endfunction
 function! Vimtips()
      call LeftWindowFile($VIM_VIMTIPS)
      nnoremap <silent> <buffer> s /^========<cr>zt
@@ -243,108 +461,16 @@ endfunction
                                   " *******************************************************************
 let g:MyKeyList = []
 let g:MyValueList = []
-let g:MyKeyDict = {} 
-let g:MyKeyDictCT = 1000 
-let g:MyKeyMapperMode = "STD " 
 function! MyTest()
      let l:szKey = "abcd-no"
      let l:szKey = substitute(l:szKey, "^[cga]", "X", "")
      echom l:szKey
 endfunction
-function! g:MyKeyMapper(...)
-     let l:szKey = substitute(a:1, "<silent> ", "", "")
-     let l:szKey = substitute(l:szKey, "nnoremap ", "", "")
-     let l:szKey = substitute(l:szKey, "vnoremap ", "", "")
-     let l:szKey = substitute(l:szKey, "inoremap ", "", "")
-     let l:szKey = substitute(l:szKey, " .*$", "", "g")
 
-     let l:prefix = g:MyKeyMapperMode . " " . g:MyKeyDictCT 
-     let g:MyKeyDictCT = g:MyKeyDictCT +1
-     let g:MyKeyDict[l:prefix . " " . l:szKey] = a:2
-     execute a:1
-endfunction
-function! g:MyCommandMapper(...)
-     let l:szCommand = substitute(a:1, "command! ", "", "")
-     let l:szCommand = substitute(l:szCommand, '^[A-Z,0-9]*[ ]*',"", "")
-     let l:szKey = substitute(a:1, "command! ", "", "")
-     let l:szKey = substitute(l:szKey, " .*$", "", "g")
-
-     let l:prefix = g:MyKeyMapperMode . " " . g:MyKeyDictCT 
-     let g:MyKeyDictCT = g:MyKeyDictCT + 1
-
-     let g:MyKeyDict[l:prefix . " " . l:szKey] = l:szCommand 
-
-     " Insert Formatted Entry into Cheatsheet(s)
-     let l:szFormatted = Pad(l:szKey,16) . "" . l:szCommand
-"      call g:MyCheatsheet(l:szFormatted)
-"      call g:MyCommandsheet(l:szFormatted)
-
-     execute a:1
-endfunction
-function! g:MyStaticMapper(...)
-     let l:prefix = g:MyKeyMapperMode . " " . g:MyKeyDictCT 
-     let g:MyKeyDictCT = g:MyKeyDictCT +1
-
-     let g:MyKeyDict[l:prefix . " " . a:1] = a:2
-endfunction
-function! MyKeyMapperDumpSeek()
-"    zt puts current line to top of screen
-"    z. or zz puts current line to center of screen
-"    zb puts current line to bottom of screen
-     let wuc = expand("<cword>") 
-     let currentLine   = getline(".")
-     let l:nn=0
-     let l:Here = line(".")
-     normal! G
-     let l:There = line(".")
-     call cursor(l:Here, 1)
-     while ( (l:nn < l:There) && (wuc ==  expand("<cword>")) )
-          execute "normal j"
-          let l:nn= l:nn + 1
-          if (l:nn >= l:There) 
-               let l:nn=1
-               call cursor(1, 1)
-          endif
-     endwhile
-     normal! zt 
-endfunction
-function! MyKeyMapperDump(...)
-        call LeftWindowBuffer()
-        setlocal cursorline
-        nnoremap <silent> <buffer> q :close<cr>
-        nnoremap <silent> <buffer> ? :close<cr>
-        nnoremap <silent> <buffer> <F8>  :call MyKeyMapperDumpSeek()<cr>
-        nnoremap <silent> <buffer> <leader><F8>  :close<cr>
-        nnoremap <silent> <buffer> s  :call MyKeyMapperDumpSeek()<cr>
-        let l:nn=1
-"  	for key in sort(keys(g:MyKeyDict))
-"                      call setline(l:nn, g:MyKeyDict[key] . "    [[    |" .  key)
-"                      let l:nn= l:nn + 1
-"  	endfor
-	for key in sort(keys(g:MyKeyDict))
-          let l:list = split(key)
-          let l:section = l:list[0:0]
-          let l:number = l:list[1:1]
-          let l:punch = l:list[2:2]
-          let l:linemod = g:MyKeyDict[key]
-          let l:sz = Pad(join(l:section, ''), 8) .  Pad(join(l:punch, '     '),18) . l:linemod
-
-          if ( a:0 == 1)
-               if ( l:section == a:1)
-                    call setline(l:nn, l:line)
-                    let l:nn= l:nn + 1
-          endif
-          else
-               call setline(l:nn, l:sz)
-               let l:nn= l:nn + 1
-          endif
-	endfor
-        wincmd H
-        vertical resize 80 
-        set nowrap
-"         setlocal readonly nomodifiable
-        echom ""
-endfunction
+" *****************************************************************************************************
+                                  " Fast Quit All
+                                  " *******************************************************************
+nnoremap <silent> zz :wqa<cr>
 " *****************************************************************************************************
                                   " Function Keys
                                   " *******************************************************************
@@ -359,7 +485,7 @@ endfunction
                                   " *******************************************************************
 nnoremap <silent> <leader><F2> :wincmd _<cr>:wincmd \|<cr>
 nnoremap <silent> <leader><F3> :wincmd =<cr>
-nnoremap <silent> <leader><F4> :close<cr>
+nnoremap <silent> <leader><F4> :CtrlPBuffer<cr>
 " *****************************************************************************************************
                                   " Leader Keys
                                   " *******************************************************************
@@ -379,21 +505,6 @@ nnoremap <leader>h  :silent execute "help " . expand("<cWORD>")<cr>
 nnoremap <leader>w :call Smash()<cr>
 
 
-" *****************************************************************************************************
-                                  " Window and Buffer Splitters
-                                  " *******************************************************************
-" Window Splits
-" nmap <leader>sw<left>  :topleft  vnew<CR>
-" nmap <leader>sw<right> :botright vnew<CR>
-" nmap <leader>sw<up>    :topleft  new<CR>
-" nmap <leader>sw<down>  :botright new<CR>
-" Buffer Splits
-" nmap <leader>sb<left>   :leftabove  vnew<CR>
-" nmap <leader>sb<right>  :rightbelow vnew<CR>
-" nmap <leader>sb<up>     :leftabove  new<CR>
-" nmap <leader>sb<down>   :rightbelow new<CR>
-
-
 
 let g:greppy_mode_active = 0
 function! Greppyon(...)
@@ -407,6 +518,8 @@ function! Greppyon(...)
          echom "vimgrep /" . expand("<cword>") . "/ %"
     endif
     execute "cw"
+    execute "resize 10"
+    call BiModeSet(0)
     let g:greppy_mode_active = 1
 endfunction
 function! Greppyoff()
@@ -527,29 +640,6 @@ function! g:TTL(...)
      endif
 endfunction
 
-function! g:TTL2(...)
-     if ( a:0 == 1)
-          let l:a2 = ""
-     endif
-     if ( a:0 == 2)
-          let l:a2 = a:2
-     endif
-     let l:line =  a:1 . " ,,, " . l:a2 . "!!!!@@@@"
-     call add(g:MyCheatsheetList, l:line)
-     call add(g:MyTTLList, l:line)
-endfunction
-
-
-" function! g:CS(...)
-"      if ( a:0 == 1)
-"           let l:a2 = ""
-"      endif
-"      if ( a:0 == 2)
-"           let l:a2 = a:2
-"      endif
-"      let l:line =  a:1 . " ,,, " . l:a2 . "!!!!@@@@"
-"      call add(g:MyCheatsheetList, l:line)
-" endfunction
 function! g:CS1(...)
      for i in a:000
           let l:line =  i . "!!!!@@@@"
@@ -760,7 +850,11 @@ call g:MyCheatsheet(s:barline)
                                   " *******************************************************************
 call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet(CenterPad("My Commands"))
-let g:MyKeyMapperMode = "COM " 
+call g:SetMyKeyMapperMode("SES")
+call g:MyCommandMapper("command! SESSION   :Obsess ./.vimsession")
+
+
+call g:SetMyKeyMapperMode("COM")
 call g:MyCommandMapper("command! CHEAT   :call MyCheatsheetDump()")
 call g:MyCommandMapper("command! MI      :call MyCheatsheetDump()")
 call g:MyCommandMapper("command! RC      :e ~/.vimrc")
@@ -774,34 +868,38 @@ call g:MyCommandMapper("command! U40     :e /usr/share/vim/vim74/doc/usr_40.txt"
 call g:MyCommandMapper("command! USER41  :e /usr/share/vim/vim74/doc/usr_41.txt")
 call g:MyCommandMapper("command! U41     :e /usr/share/vim/vim74/doc/usr_41.txt")
 call g:MyCommandMapper("command! U27     :e /usr/share/vim/vim74/doc/usr_27.txt")
-call g:MyCommandMapper("command! S3PUT :call S3put()")
+call g:MyCommandMapper("command! S3PUT   :call S3put()")
 call g:MyCommandMapper("command! C       :call CommanderList()")
 call g:MyCommandMapper("command! CE      :call CommanderListEdit()")
-call g:MyCommandMapper("command! TEST    :echom Trim('    Hello Jane  3  ,,,  eee    ')")
+call g:MyCommandMapper("command! TEST    :call Test()")
 call g:MyCommandMapper("command! XXCSD   :call CallMan('LeftWindowBuffer()', 'MyCommandsheetDump()')")
 call g:MyCommandMapper("command! CSD     :call XMan('botright new', 'MyCommandsheetDump()')")
 call g:MyCommandMapper("command! SNIPS   :topleft vnew ~/snips.java")
 call g:MyCommandMapper("command! REPOS   :call RepoList()")
 call g:MyCommandMapper("command! FOUR    :call Four()")
+call g:MyCommandMapper("command! LS      :call Ls()")
 call g:MyCommandMapper("command! GETVUNDLE     :!git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
 call g:MyCommandMapper("command! TIPS    :call Vimtips()")
 call g:MyCommandMapper("command! VT      :call Vimtips()")
 call g:MyCommandMapper("command! TERM    :call Terminal()")
-call g:MyCommandMapper("command! KSH     :call KshTop()")
-call g:MyCommandMapper("command! STATICMAIN :call StaticMainTop()")
 call g:MyCommandMapper("command! JAVAMAIN   :call JavaMain()")
-call g:MyCommandMapper("command! GAWK       :call SaveAndExecuteGawk()")
+call g:MyCommandMapper("command! XGAWK    :call SaveAndExecuteGawk()")
 call g:MyCommandMapper("command! COLORLET :call Colorlet(-1)")
 call g:MyCommandMapper("command! BE :call SetRegistersBE()")
-call g:MyCommandMapper("command! KALL     :call MyKeyMapperDump()")
-call g:MyCommandMapper("command! KSTD     :call MyKeyMapperDump('STD')")
-call g:MyCommandMapper("command! KCOM     :call MyKeyMapperDump('COM')")
-call g:MyCommandMapper("command! KMRU     :call MyKeyMapperDump('MRU')")
-call g:MyCommandMapper("command! KPOLY    :call MyKeyMapperDump('POLY')")
+call g:MyCommandMapper("command! KITEM    :call MyDictionaryDump(g:MyCommandItemDict)")
+call g:MyCommandMapper("command! KALL     :call MyKeyMapperDump(g:MyKeyDict)")
+call g:MyCommandMapper("command! KSTD     :call MyKeyMapperDump(g:MyKeyDict,'STD')")
+call g:MyCommandMapper("command! KCOM     :call MyKeyMapperDump(g:MyKeyDict,'COM')")
+call g:MyCommandMapper("command! KMRU     :call MyKeyMapperDump(g:MyKeyDict,'MRU')")
+call g:MyCommandMapper("command! KPOLY    :call MyKeyMapperDump(g:MyKeyDict,'POLY')")
+" Do the static entries here
+call g:MyStaticMapper("R", "Execute command, output horozontal")
+call g:MyStaticMapper("L", "Execute command, output vertical")
 " blue.vim      default.vim  desert.vim evening.vim  morning.vim  pablo.vim
 " README.txt  shine.vim torte.vim
 " darkblue.vim  delek.vim    elflord.vim    koehler.vim  murphy.vim
 " peachpuff.vim  ron.vim     slate.vim  zellner.vim
+call g:SetMyKeyMapperMode("COLOR")
 call g:MyCommandMapper("command! DARKBLUE :colorscheme darkblue")
 call g:MyCommandMapper("command! MYCOLOR  :colorscheme pablo")
 call g:MyCommandMapper("command! PABLO    :colorscheme pablo")
@@ -814,11 +912,7 @@ call g:MyCommandMapper("command! EVENING  :colorscheme evening")
 call g:MyCommandMapper("command! MONO     :colorscheme monochrome")
 call g:MyCommandMapper("command! PARA     :set background=dark | colorscheme paramount")
 
-" Do the static entries here
-call g:MyStaticMapper("R", "Execute command, output horozontal")
-call g:MyStaticMapper("L", "Execute command, output vertical")
-
-let g:MyKeyMapperMode = "MRU " 
+call g:SetMyKeyMapperMode("MRU")
 call g:MyStaticMapper("<Enter>","Select a file name to edit") 
 call g:MyStaticMapper("o",        "Open file under cursor in new win")
 call g:MyStaticMapper("<Sft-Ent>","Open file under cursor in new win")
@@ -827,35 +921,112 @@ call g:MyStaticMapper("t","Open a file in a new tab")
 call g:MyStaticMapper("u","Refresh MRU list")
 call g:MyStaticMapper("q","Close the MRU window")
 call g:MyStaticMapper("<Esc>","Close the MRU window")
-let g:MyKeyMapperMode = "STD " 
+call g:SetMyKeyMapperMode("STD")
+function! Moe()
+    set splitbelow splitright
+    wincmd _ | wincmd |
+    vsplit
+    1wincmd h
+    wincmd w
+    wincmd _ | wincmd |
+    split
+    1wincmd k
+    wincmd w
+    set nosplitbelow
+    set nosplitright
+    wincmd t
+    set winheight=1 winwidth=1
+    exe 'vert 1resize ' . ((&columns * 79 + 79) / 159)
+    exe '2resize ' . ((&lines * 18 + 20) / 41)
+    exe 'vert 2resize ' . ((&columns * 79 + 79) / 159)
+    exe '3resize ' . ((&lines * 18 + 20) / 41)
+    exe 'vert 3resize ' . ((&columns * 79 + 79) / 159)
+endfunction
 " *****************************************************************************************************
                                   " Polymode Keys
                                   " *******************************************************************
 call g:MyKeyMapper("nnoremap <Home> :call PolyMode(-1)<cr>",       "PolyMode On")
 call g:MyKeyMapper("nnoremap <End>  :call PolyModeReset()<cr>",    "PolyMode Off")
+let g:BiWindowMax = -1 
+function! BiWindowMode()
+     if (g:BiWindowMax == -1)
+           let g:BiWindowMax = winwidth(0)
+     endif
+     if (winwidth(0) > g:BiWindowMax)
+         vertical resize g:BiWindowMax
+     else
+         vertical resize 
+     endif
+         echo g:BiWindowMax
+endfunction
+let g:BiModeState = 1 
+function! BiMode()
+     if (g:BiModeState == 0)
+          call BiModeSet(1)
+     else
+          call BiModeSet(0)
+     endif
+endfunction
+function! BiModeSet(...)
+     if (a:1 == 1)
+          echo "BiModeSet(1) to Buffer"
+          let g:BiModeState = 1 
+          call g:MyKeyMapper("nnoremap <F1> :bnext<cr>", "Next Buffer")
+          call g:MyKeyMapper("nnoremap <leader><F1>  <Nop>","Nothing")
+          call g:MyKeyMapper("nnoremap <F2> :bnext<cr>", "Next Buffer")
+          call g:MyKeyMapper("nnoremap <leader><F2>  <Nop>","Nothing")
+          call g:MyKeyMapper("nnoremap <F3> :bnext<cr>", "Next Buffer")
+          call g:MyKeyMapper("nnoremap <leader><F3>  <Nop>","Nothing")
+     endif
+     if (a:1 == 0)
+          echom "BiModeSet(0) to Window"
+          let g:BiModeState = 0 
+          call g:MyKeyMapper("nnoremap <F1> <C-W>w",     "Next Window")
+          call g:MyKeyMapper("nnoremap <leader><F1>  :botright  new<CR>","Split Window Down")
+
+          call g:MyKeyMapper("nnoremap <F2> <C-W>w",     "Next Window")
+          call g:MyKeyMapper("nnoremap <leader><F2>  :botright  new<CR>","Split Window Down")
+
+          call g:MyKeyMapper("nnoremap <F3> <C-W>w",     "Next Window")
+          call g:MyKeyMapper("nnoremap <leader><F3>  :vnew<CR>","Split Window Right")
+
+
+"           call g:MyKeyMapper("nnoremap <leader>sw<left>  :topleft  vnew<CR>","Split Window Left")
+"           call g:MyKeyMapper("nnoremap <leader>sw<right> :botright vnew<CR>","Split Window Right")
+"           call g:MyKeyMapper("nnoremap <leader>sw<up>    :topleft  new<CR>","Split Window Up")
+"           call g:MyKeyMapper("nnoremap <leader>sw<down>  :botright new<CR>","Split Window Down")
+     endif
+endfunction
+
 function! PolyModeMapReset()
+          "  call g:MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>:call BufferLocalF3Quit()<cr>",   "MRU")
+          " call g:MyKeyMapper("nnoremap <F3> :call SaveQuitAll()<cr>",             "Save and Quit All")
           let g:help0 = "<F1> NxB <F2> NxW <F3> SvQt <F4> Cmdr <F5> Cmd <F6> Grep <F9> PasteM <F10> Cht <F12> Bld <S-F1> TTL"
           let g:help1 = ""
           let g:help2 = ""
-          let g:MyKeyMapperMode = "STD " 
+          call g:SetMyKeyMapperMode("STD")
           call g:MyKeyMapper("inoremap jj <esc>",                                 "Escape ReMapped",1)
-          call g:MyKeyMapper("nnoremap <F1> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
-          call g:MyKeyMapper("nnoremap <leader><F1> :call MyTTLDump()<cr>",       "My Help",1)
-          call g:MyKeyMapper("nnoremap <F2> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
-          "  call g:MyKeyMapper("nnoremap <F3> :MRU<cr>:call PolyModeReset()<cr>:call BufferLocalF3Quit()<cr>",   "MRU")
-          call g:MyKeyMapper("nnoremap <F3> :call SaveQuitAll()<cr>",             "Save and Quit All")
-          call g:MyKeyMapper("nnoremap <leader><F3> :call QuitAll()<cr>",         "Quit All")
-          call g:MyKeyMapper("nnoremap <F4> :C<cr>",                              "Commander")
-          call g:MyKeyMapper("nnoremap <F5> :call Tcmd()<cr>",                    "TCmd")
-          call g:MyKeyMapper("nnoremap <F6> :call Greppyon()<cr>",                "Greppy First Form, word under cursor")
-          call g:MyKeyMapper("nnoremap <F7> :call Greppyon(1)<cr>",               "Greppy Second Form, prompt for word")
-          call g:MyKeyMapper("nnoremap <F8> :call MyKeyMapperDump()<cr>/^STD<cr>zt","MyKeyMapper Help")
-          call g:MyKeyMapper("nnoremap <leader><F8> :call MyCheatsheetDump()<cr>","My Cheatsheet")
+"           call g:MyKeyMapper("nnoremap <F1> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
+"           call g:MyKeyMapper("nnoremap <F2> <C-W>w:call PolyModeReset()<cr>",     "Next Window")
+"           call g:MyKeyMapper("nnoremap <F3> :bnext<cr>:call PolyModeReset()<cr>", "Next Buffer")
+
+          call g:MyKeyMapper("nnoremap <F4> :call BiMode()<cr>",                  "Window or Buffer Mode")
+          call g:MyKeyMapper("nnoremap <F5> :CtrlPBuffer<cr>",                    "CtrlP Buffer List/Search")
+
+"           call g:MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
+          call g:MyKeyMapper("nnoremap <F12> :call BiWindowMode()<cr>",               "BiWindowMode")
+
+
+"         call g:MyKeyMapper("nnoremap <F5> :call Tcmd()<cr>",                    "TCmd")
+"         call g:MyKeyMapper("nnoremap <F6> :call Greppyon()<cr>",                "Greppy First Form, word under cursor")
+"         call g:MyKeyMapper("nnoremap <F7> :call Greppyon(1)<cr>",               "Greppy Second Form, prompt for word")
+          call g:MyKeyMapper("nnoremap <F8> :call MyKeyMapperDump(g:MyKeyDict)<cr>/^SNIP<cr>zt","MyKeyMapper Help")
           call g:MyKeyMapper("nnoremap <F9> :set paste!<cr>",                     "Toggle Paste Setting")
-          call g:MyKeyMapper("nnoremap <leader><F9> :call MyQuickListDump()<cr>", "My QuickList")
           call g:MyKeyMapper("nnoremap <F10> :CHEAT<cr>",                         "My Cheat Sheet")
           call g:MyKeyMapper("nnoremap <leader><F10> :DOC<cr>",                   "Vim Doc")
-          call g:MyKeyMapper("nnoremap <F12> :wa<cr>:!build<cr>",                 "!build")
+          call g:MyKeyMapper("nnoremap <leader><F1> :call MyTTLDump()<cr>",       "My Help",1)
+          call g:MyKeyMapper("nnoremap <leader><F8> :call MyCheatsheetDump()<cr>","My Cheatsheet")
+          call g:MyKeyMapper("nnoremap <leader><F9> :call MyQuickListDump()<cr>", "My QuickList")
           " call g:MyKeyMapper("nnoremap <leader><F12> lmaj0d$`ahp`ah",             "grabandtuck")
           call g:MyKeyMapper("nnoremap <leader><F12> lmaj0:s/^ *//<cr>0:s/ *$//<cr>0d$`ahpj0dd",            "grabandtuck")
           call g:MyKeyMapper("nnoremap <leader>` ys$\`",               "surround till EOL")
@@ -948,6 +1119,8 @@ if !exists("myautocommands_loaded")
      " au BufNewFile,BufRead *.awk vnoremap <silent> <leader><Home> :s/^[/][/][ ]//<cr>
      au BufNewFile,BufRead *.java vnoremap <silent> <Home> :s/^/\/\/ /<cr>gv
      au BufNewFile,BufRead *.java vnoremap <silent> <leader><Home> :s/^[/][/][ ]//<cr>
+     au BufNewFile,BufRead *.js vnoremap <silent> <Home> :s/^/\/\/ /<cr>gv
+     au BufNewFile,BufRead *.js vnoremap <silent> <leader><Home> :s/^[/][/][ ]//<cr>
      au BufNewFile,BufRead .vimrc vnoremap <silent> <Home> :s/^/" /<cr>gv
      au BufNewFile,BufRead .vimrc vnoremap <silent> <leader><Home> :s/^["] //<cr>
      au BufNewFile,BufRead .vimrc vnoremap <silent> <leader><PageUp> o<esc>^i" ------------------------------------------------------------------<cr>"  <cr><esc>kll
@@ -988,66 +1161,6 @@ nnoremap <leader>1 "bP<esc>
 nnoremap <leader>2 "ep<esc>
 nnoremap <leader>3 $"tp<esc>0jw
 
-" *****************************************************************************************************
-                                  " Utility Functions
-                                  " *******************************************************************
-function! CallMan(...)
-     execute "call " . a:1
-     execute "call " . a:2
-endfunction
-function! CallMan3(...)
-     execute "call " . a:1
-     execute "call " . a:2
-     execute "call " . a:3
-endfunction
-function! XMan(...)
-     let l:pre = ""
-     let l:x = 1
-     let l:n = match(a:(l:x), '(')
-     if (l:n > 0 )
-          let l:pre = "call "
-     endif
-     execute l:pre . a:1
-
-     let l:pre = ""
-     let l:n = match(a:2, '(')
-     if (l:n > 0 )
-          let l:pre = "call "
-     endif
-     execute l:pre . a:2
-endfunction
-
-function! ExeMan(...)
-     execute "" . a:1
-     execute "" . a:2
-endfunction
-function! ExeMan3(...)
-     execute "" . a:1
-     execute "" . a:2
-     execute "" . a:3
-endfunction
-
-
-function! VimKeyMap()
-     redir! > ~/.vimkeymap.txt
-     silent verbose map
-     redir END
-endfunction
-
-function! RandomString()
-    let l:szAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    let l:c = 1
-    let l:szOut = ""
-    while l:c <= 8
-         let l:rrr = str2nr(matchstr(reltimestr(reltime()), '\v\.@<=\d+')[1:]) % 24 
-         let l:szOut = l:szOut . l:szAlpha[rrr] 
-         let l:c += 1
-    endwhile 
-    return l:szOut
-endfunction
-function! Four() 
-    new | vnew | wincmd w | wincmd w | vnew 
-endfunction
 
 function! SaveAndExecutePython()
     " https://stackoverflow.com/questions/18948491/running-python-code-in-vim
@@ -1126,14 +1239,6 @@ function! MP3List()
 endfunction
 
 " *****************************************************************************************************
-                                  " Utility Functions
-                                  " *******************************************************************
-function! DQ(...)
-    let l:sz = substitute(a:1, "<cr>", "", "g")
-    let l:sz = substitute(l:sz, ":", "", "g")
-    return "\'" . l:sz . "\'"
-endfunction
-" *****************************************************************************************************
                                   " Left Window-Buffer Functions
                                   " *******************************************************************
 function! LeftWindowFile(...)
@@ -1155,7 +1260,7 @@ function! LeftWindowBuffer(...)
     " Reuse existing buffer window if it exists otherwise create a new one
     if !exists("s:buf_nr") || !bufexists(s:buf_nr)
         vnew
-        wincmd H
+        wincmd L
         let s:buf_nr = bufnr('%')
         setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
         nnoremap <silent> <buffer> q :close<cr>
@@ -1266,44 +1371,7 @@ function! BotPut(...)
     call append(line('$'), a:1)
 endfunction
 
-function! StaticMainTop()
-call Bp("public static void main(String[] args) {")
-call Bp("     System.out.println( \"Hello World!\" );")
-call Bp("}")
-endfunction
 
-function! KshTop()
-     call BotPut("#!/usr/bin/ksh")
-     call BotPut("Tmp=\"/tmp/$$\"")
-     call BotPut("TmpDir=\"/tmp/dir$$\"")
-     call BotPut("trap 'rm -f \"$Tmp\" >/dev/null 2>&1' 0")
-     call BotPut("trap \"exit 2\" 1 2 3 13 15")
-     call BotPut("rm -f \"$Tmp\" >/dev/null 2>&1")
-     call Bp("N=`gawk -v w=N -v v=0 -F= '{gsub(/[;].*$/,\"\",$0);gsub(/[ ]*$/,\"\",$0);if ($1==w){v=$2;exit;}}END{print v}' FILE`")
-
-     call BotPut("")
-     call BotPut("")
-     call BotPut("while getopts \"a:r:\" arg")
-     call BotPut("do")
-     call BotPut("	case $arg in")
-     call BotPut("            a) ACCOUNT=$OPTARG")
-     call BotPut("               ;;")
-     call BotPut("            r) REGION=$OPTARG")
-     call BotPut("               ;;")
-     call BotPut("	      *) exit 0")
-     call BotPut("               ;;")
-     call BotPut("	esac")
-     call BotPut("done")
-     call BotPut("shift $(($OPTIND - 1))")
-     call BotPut("")
-
-     call Bp("if [ $# -eq 0 ]; then")
-     call Bp("     exit 1")
-     call Bp("fi")
-     call BotPut("")
-
-
-endfunction
 
 function! S3put()
     echom   "R cuu -a  -b ecd3pub -F -c VIMS3PUT -D " . @%
@@ -1318,13 +1386,6 @@ function! SaveAndExecuteGawk()
     setlocal readonly nomodifiable
 endfunction
 
-" *****************************************************************************************************
-                                  " Jump to Last Position When Reopening a File
-                                  " *******************************************************************
-if has("autocmd")
-   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
-   \| exe "normal! g'\"" | endif
-endif
 
 function! KillScratchWindows()
         for win in range(1, winnr('$'))
@@ -1334,6 +1395,14 @@ function! KillScratchWindows()
         endfor
 endfunction
 
+" winnr([{arg}])  The result is the number of the current window.
+"                 The top window has number 1.
+"                 When the opt-argument is "$", the last window is returned (the window count).  
+" 		  Let window_count = winnr('$')
+"  		  When the optional argument is "#", the number of the last
+" 		  accessed window is returned (where |CTRL-W_p| goes to).
+" 		  If there is no previous window or it is in another tab page 0
+" 		  is returned.
 function! Redir(cmd)
         for win in range(1, winnr('$'))
                 if getwinvar(win, 'scratch')
@@ -1351,6 +1420,9 @@ function! Redir(cmd)
         vnew
         let w:scratch = 1
         setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
+        nnoremap <silent> <buffer> q :close<cr>
+        nnoremap <silent> <buffer> m :vertical resize +20<cr>
+        nnoremap <silent> <buffer> l :vertical resize -20<cr>
         call setline(1, split(output, "\n"))
 endfunction
 
@@ -1416,11 +1488,26 @@ function! ToggleQuickFixList()
 endfunction
 
 
-" colorscheme onehalflight
-" let g:airline_theme='onehalfdark'
-"let g:gruvbox_italic=1
-"colorscheme gruvbox
-"
+
+
+nmap <leader>spc :call <SID>SynStack()<CR>
+function! <SID>SynStack()
+  if !exists("*synstack")
+    return
+  endif
+  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+endfunc
+
+"             \    highlight Comment ctermbg=Black ctermfg=LightBlue <BAR>
+nnoremap <silent> <Leader>ts
+             \ : if exists("syntax_on") <BAR>
+             \    syntax off <BAR>
+             \    set nonumber <BAR>
+             \ else <BAR>  
+             \    syntax enable <BAR>
+             \    set number <BAR>
+             \ endif<CR>   
+
 " *****************************************************************************************************
                                   " Set Color Scheme
                                   " *******************************************************************
@@ -1435,36 +1522,325 @@ endfunction
                                   "  Red, LightRed, DarkRed
                                   "  Magenta, LightMagenta, DarkMagenta
                                   "  Yellow, LightYellow, DarkYellow
-"colorscheme darkblue
-
+" colorscheme darkblue
+" colorscheme onehalflight
+" let g:airline_theme='onehalfdark'
+" let g:gruvbox_italic=1
+" colorscheme gruvbox
 " let g:monotone_color = [120, 100, 70] " Sets theme color to bright green
 " let g:monotone_secondary_hue_offset = 200 " Offset secondary colors by 200 degrees
-" let g:monotone_emphasize_comments = 1 " Emphasize comments
-set background=dark
-"colorscheme monochrome
-colorscheme paramount
-
-
+" let g:monotone_emphasize_comments = 0 " Emphasize comments
+" colorscheme paramount
 " colorscheme pablo
 " set background=dark
 " hi Visual   cterm=reverse
 " highlight Comment ctermbg=Black ctermfg=LightBlue
+set background=dark
+colorscheme monochrome
+let g:loaded_matchparen=1
+
+function! JSnip(t)
+    let s:szIn = input('value >> ')
+    execute "e /home/mestes/scm/figg/templates/" . a:t
+    execute "%s/NNAME/" . s:szIn . "/g"
+    normal ggyG
+    bdelete!
+    normal p
+endfunction
+function! JSnipSimple(t)
+    execute "e /home/mestes/scm/figg/templates/" . a:t
+    normal ggyG
+    bdelete!
+    normal p
+endfunction
+function! Snipper(t)
+    execute "e /home/mestes/scm/figg/templates/" . a:t
+    normal ggyG
+    bdelete!
+    normal p
+endfunction
+
+" *****************************************************************************************************
+                                  " Snipper
+                                  " *******************************************************************
+let g:SnipperEdit = 0 
+let g:SnipperHome =  "~/.vim/Snips/"
+function! SnipperEditOn()
+    let g:SnipperEdit = 1 
+endfunction
+function! SnipperEditOff()
+    let g:SnipperEdit = 0 
+endfunction
+function! SnipperPromptAndEdit()
+     let szIn = input('Edit New Snip File>> ')
+     execute "edit " . g:SnipperHome . szIn
+endfunction
+function! Snipperls()
+    call LeftWindowBuffer()
+    execute "r !ls -li " . g:SnipperHome 
+endfunction
+call g:SetMyKeyMapperMode("SNIPX")
+call g:MyCommandMapper("command! SNIPEDIT        :call SnipperEditOn()")
+call g:MyCommandMapper("command! SNIPEDITON      :call SnipperEditOn()")
+call g:MyCommandMapper("command! SNIPEDITOFF     :call SnipperEditOff()")
+call g:MyCommandMapper("command! SNIPPEREDITON   :call SnipperEditOn()")
+call g:MyCommandMapper("command! SNIPPEREDITOFF  :call SnipperEditOff()")
+call g:MyCommandMapper("command! SNIPPERNEW      :call SnipperPromptAndEdit()")
+call g:MyCommandMapper("command! SNIPNEW         :call SnipperPromptAndEdit()")
+call g:MyCommandMapper("command! SNIPLS          :call Snipperls()")
+function! Snp(t,c)
+    execute "e " . g:SnipperHome . a:t
+    if g:SnipperEdit == 0 
+        normal ggyG
+        bdelete!
+        normal p
+    endif
+endfunction
+function! SnpFull(t,c)
+    execute "e " . a:t
+    if g:SnipperEdit == 0 
+        normal ggyG
+        bdelete!
+        normal p
+    endif
+endfunction
+function! SnipperStuff(t,c)
+    execute "e " . g:SnipperHome . a:t
+    if g:SnipperEdit == 0 
+        normal ggyG
+        bdelete!
+        normal p
+    endif
+endfunction
 
 
-nmap <leader>spc :call <SID>SynStack()<CR>
-function! <SID>SynStack()
-  if !exists("*synstack")
-    return
-  endif
-  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+
+so ~/.vim/bundle/vimmap.vim/plugin/string.vim
+
+
+" *****************************************************************************************************
+                                  " Command Mapper
+                                  " *******************************************************************
+
+func! s:snipfileItem(...)
+    let l:t = -1
+    let l:l = -1
+    let l:c = 0 
+    call g:SetMyKeyMapperMode(a:1)
+    for l:file in split(glob(a:2),'\n')
+        let c = c + 1
+    endfor
+    if ( c > 0 )
+        for l:file in split(glob(a:2),'\n')
+             let l:l = len(toupper(split(l:file,"/")[-1]))
+             if (l:l > l:t) 
+                 let l:t = l:l
+             endif
+        endfor
+        let l:t = l:t + 2
+        for l:file in split(glob(a:2),'\n')
+             let l:f1 = l:file
+             let l:f2 = split(l:file,"/")[-1]
+             let l:f2 = l:file
+             let l:f1 = g:strreplace(l:f1,'xxxxxxxxxwdd.','XX')
+             "call g:MyCommandItemMapper(Pad(a:1,6) . " " . Pad(toupper(split(l:f1,"/")[-1]),l:t) . " :e " . l:f2 )
+             call g:MyCommandItemMapper(Pad(a:1,6) . " :e " . l:f2 )
+        endfor
+    endif
 endfunc
 
-nnoremap <silent> <Leader>ts
-             \ : if exists("syntax_on") <BAR>
-             \    syntax off <BAR>
-             \ else <BAR>  
-             \    syntax enable <BAR>
-             \    highlight Comment ctermbg=Black ctermfg=LightBlue <BAR>
-             \ endif<CR>   
+func! g:setupsniplocal(...)
+    call  g:MyCommandItemMapperReset()
+    call  s:snipfileItem("FILE", a:1)
+endfunc
+func! g:setupsnip()
+    call  g:MyCommandItemMapperReset()
+    call  s:snipfileItem("FILE", "./*.java")
+    call  s:snipfileItem("FILE", "~/.vim/Snips/*.java")
+    call  s:snipfileItem("FILE", "~/.vim/Snips/*.txt")
+    call g:SetMyKeyMapperMode("SNIPTXT")
+     for l:file in split(glob('~/.vim/Snips/*.txt'), '\n')
+          let l:f1 = l:file
+          let l:f1 = g:strreplace(l:f1,'.','')
+          let l:f2 = split(l:file,"/")[-1]
+          call g:MyCommandMapper("command! " . toupper(split(l:f1,"/")[-1]) . " :call Snp('" . l:f2 .    "','')")
+     endfor
+endfunc
+
+func! s:setupsnip2()
+    call g:SetMyKeyMapperMode("SNIP")
+    for l:file in split(glob('~/.vim/Snips/*.java'), '\n')
+         let l:f1 = l:file
+         let l:f1 = g:strreplace(l:f1,'.','')
+         let l:f2 = split(l:file,"/")[-1]
+         call g:MyCommandMapper("command! " . toupper(split(l:f1,"/")[-1]) . " :call Snp('" . l:f2 .    "','')")
+    endfor
+    call g:SetMyKeyMapperMode("SNIPTXT")
+    for l:file in split(glob('~/.vim/Snips/*.txt'), '\n')
+         let l:f1 = l:file
+         let l:f1 = g:strreplace(l:f1,'.','')
+         let l:f2 = split(l:file,"/")[-1]
+         call g:MyCommandMapper("command! " . toupper(split(l:f1,"/")[-1]) . " :call Snp('" . l:f2 .    "','')")
+    endfor
+    call g:SetMyKeyMapperMode("SNIPEJ")
+    for l:file in split(glob('./*.java'), '\n')
+         let l:f1 = l:file
+         let l:f1 = g:strreplace(l:f1,'.','')
+         let l:f2 = split(l:file,"/")[-1]
+         call g:MyCommandMapper("command! " . toupper(split(l:f1,"/")[-1]) . " :e " . "./" . l:f2 )
+    endfor
+    call g:SetMyKeyMapperMode("SNIPET")
+    for l:file in split(glob('./*.txt'), '\n')
+         let l:f1 = l:file
+         let l:f1 = g:strreplace(l:f1,'.','')
+         let l:f2 = split(l:file,"/")[-1]
+         call g:MyCommandMapper("command! " . toupper(split(l:f1,"/")[-1]) . " :e " . "./" . l:f2 )
+    endfor
+    call g:SetMyKeyMapperMode("SNIPJJJ")
+    for l:file in split(glob('~/.vim/Snips/*.java'), '\n')
+         let l:f1 = l:file
+         let l:f2 = l:file
+         let l:f1 = g:strreplace(l:f1,'.','XX')
+         call g:MyCommandNoMap("command! " . toupper(split(l:f1,"/")[-1]) . " :e " . l:f2 )
+    endfor
+endfunc
+
+call g:setupsnip()
+call g:MyCommandMapper("command! PWD     :!pwd")
+" call g:MyCommandMapper("command! KSH     :call  SnipperStuff('KSH.txt','')")
+" call g:MyCommandMapper("command! PSETONE :call  SnipperStuff('PSetOne.txt','')")
+" call g:MyCommandMapper("command! APPL    :call  SnipperStuff('Appl.txt','')")
+" call g:MyCommandMapper("command! GAWK    :call  SnipperStuff('Gawk.txt','')")
+" call g:MyCommandMapper("command! GSPLIT  :call  SnipperStuff('GSplit.txt','')")
+" call g:MyCommandMapper("command! SPLIT   :call  SnipperStuff('GSplit.txt','')")
+" call g:MyCommandMapper("command! QCLASS  :call  SnipperStuff('QuickClass.txt','')")
+" call g:MyCommandMapper("command! PCLASS  :call  SnipperStuff('PrivateClass.java','')")
+" call g:MyCommandMapper("command! CLASS   :call  SnipperStuff('Class.java','')")
+" call g:MyCommandMapper("command! RUNNER  :call  SnipperStuff('Runner.txt','')")
+" call g:MyCommandMapper("command! FOREX   :call  SnipperStuff('forexamples.java','')")
+" call g:MyCommandMapper("command! SB      :call  SnipperStuff('Sb.txt','')")
+" call g:MyCommandMapper("command! SCANNER :call  SnipperStuff('Scanner.txt','')")
+" call g:MyCommandMapper("command! SVM     :call  SnipperStuff('StaticVoidMain.txt','')")
+" call g:MyCommandMapper("command! SWITCH  :call  SnipperStuff('Switch.txt','')")
+" call g:MyCommandMapper("command! SYSOUT  :call  SnipperStuff('SysOut.txt','')")
+" call g:MyCommandMapper("command! STRING  :call  SnipperStuff('VarString.txt','')")
+" call g:MyCommandMapper("command! DOUBLE  :call  SnipperStuff('VarDouble.txt','')")
+" call g:MyCommandMapper("command! INT     :call  SnipperStuff('Varint.txt','')")
+" call g:MyCommandMapper("command! INTCIRCLE :call  SnipperStuff('IntCircle.txt','')")
+" call g:MyCommandMapper("command! SCORES  :call  SnipperStuff('Scores.txt','')")
+" call g:MyCommandMapper("command! FLOAT   :call  SnipperStuff('VarFloat.txt','')")
+" call g:MyCommandMapper("command! PRIM    :call  SnipperStuff('Prim.txt','')")
+" call g:MyCommandMapper("command! VAR     :call  SnipperStuff('Var.txt','')")
+" call g:MyCommandMapper("command! TRY     :call  SnipperStuff('Try.txt','')")
+" call g:MyCommandMapper("command! EX1     :call  SnipperStuff('ex1.java','')")
+" call g:MyCommandMapper("command! EX2     :call  SnipperStuff('ex2.java','')")
+" call g:MyCommandMapper("command! EX3     :call  SnipperStuff('ex3.java','')")
+" call g:MyCommandMapper("command! EX4     :call  SnipperStuff('ex4.java','')")
+" call g:MyCommandMapper("command! EX5     :call  SnipperStuff('ex5.java','')")
+" call g:MyCommandMapper("command! EX5A    :call  SnipperStuff('ex5a.java','')")
+" call g:MyCommandMapper("command! EX5B    :call  SnipperStuff('ex5b.java','')")
+" call g:MyCommandMapper("command! EX5C    :call  SnipperStuff('ex5c.java','')")
+" call g:MyCommandMapper("command! EX5D    :call  SnipperStuff('ex5d.java','')")
+" call g:MyCommandMapper("command! EX6     :call  SnipperStuff('ex6.java','')")
+" call g:MyCommandMapper("command! EX8     :call  SnipperStuff('ex8.java','')")
+" call g:MyCommandMapper("command! EX9     :call  SnipperStuff('ex9.java','')")
+" call g:MyCommandMapper("command! EX10    :call  SnipperStuff('ex10.java','')")
+" call g:MyCommandMapper("command! EX11    :call  SnipperStuff('ex11.java','')")
+" call g:MyCommandMapper("command! EX12A   :call  SnipperStuff('ex12a.java','')")
+" call g:MyCommandMapper("command! EX12B   :call  SnipperStuff('ex12b.java','')")
+
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('IntCircle.java','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('ex5bnew.java','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('ex6b.java','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('FileTest2.java','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('FileTest.java','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('PlayList.java','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('PlayListTest.java','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('Scores.java','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('Song.java','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('songs.txt','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('Template.txt','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('Uni.txt','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('VarChar.txt','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('VarDouble.txt','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('VarFloat.txt','')")
+" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('Varint.txt','')")
+
+
+call g:SetMyKeyMapperMode("JAVA")
+call g:MyCommandMapper("command! JDDATE   :silent !jdoc java.util.Date")
+call g:MyCommandMapper("command! DIC      :call MyDictionaryDump(g:MyCommandItemDict)")
+call g:MyCommandMapper("command! JJ       :call JavaRun()")
+call g:MyCommandMapper("command! CC       :call JavaCompile()")
+call g:MyCommandMapper("command! QQ       :call ToggleQuickFixList()")
+call g:MyCommandMapper("command! JTRY     :call JSnipSimple('Try.txt')")
+call g:MyCommandMapper("command! JDOUBLE  :call JSnip('VarDouble.txt')")
+call g:MyCommandMapper("command! JCHAR    :call JSnip('VarChar.txt')")
+call g:MyCommandMapper("command! JSTRING  :call JSnip('VarString.txt')")
+call g:MyCommandMapper("command! JSTR     :call JSnip('VarString.txt')")
+call g:MyCommandMapper("command! JSCAN    :call JSnipSimple('Scanner.txt')")
+call g:MyCommandMapper("command! JMAIN    :call JSnipSimple('StaticVoidMain.txt')")
+call g:MyCommandMapper("command! JAPPL    :call JSnip('Appl.txt')")
+call g:MyCommandMapper("command! JAPP     :call JSnip('Appl.txt')")
+call g:MyCommandMapper("command! JPRIM    :call JSnipSimple('Prim.txt')")
+call g:MyCommandMapper("command! JSWICH   :call JSnipSimple('Switch.txt')")
+call g:MyCommandMapper("command! JSYSOUT  :call JSnipSimple('SysOut.txt')")
+
+nnoremap <silent> <leader>n  i<cr><esc>
+" au BufAdd,BufNewFile * nested tab sball
+
+silent call BiModeSet(1)
+
+set makeprg=javac\ %
+set errorformat=%A%f:%l:\ %m,%-Z%p^,%-C%.%#
+" setl        efm=%A%f:%l:\ %m,%-Z%p^,%-C%.%#
+" setl        efm=%A%f:%l:\ %m,%+Z%p^,%+C%.%#,%-G%.%#
+"  vim quickfix stuff
+"  :copen " Open the quickfix window
+"  :ccl   " Close it
+"  :cw    " Open it if there are "errors", close it otherwise (some people prefer this)
+"  :cn    " Go to the next error in the window
+"  :cnf   " Go to the first error in the next file
+"
+"
+" setl        efm=%A%f:%l:\ %m,%-Z%p^,%-C%.%#
+" setl        efm=%A%f:%l:\ %m,%+Z%p^,%+C%.%#,%-G%.%#
+" set makeprg=javac\ %
+
+function! IsQuickFixOpen()
+        let l:n=0
+        let l:bnum = winbufnr(winnr())
+        if getbufvar(l:bnum, '&buftype') == 'quickfix'
+            let l:n=1
+        endif
+        return l:n
+endfunction
+
+" cexpr system('javac -nowarn -cp ~/classes -d ~/classes ' . shellescape(expand('%:p')))
+" Set desired java options below
+" silent let l:cmd = "java -d64  " . "" . g:strreplace(expand("%:r"),"./","") . " " . arg
+
+so ~/.vim/bundle/vimmap.vim/plugin/program.vim
+
+nnoremap <F5> :call ProgramCompile()<cr>
+nnoremap <F6> :call ProgramRun()<cr>
+nnoremap <leader><F6> <esc>:e out<cr>
+nnoremap <F7> :call g:setupsnip()<cr>:call MyDictionaryDump(g:MyCommandItemDict)<cr>
+nnoremap <leader><F7> :call g:setupsniplocal("./*.java")<cr>:call MyDictionaryDump(g:MyCommandItemDict)<cr>
+call g:MyCommandMapper("command! GREP   :call Greppyon(1)")
+
+
+
+
+" *****************************************************************************************************
+                                  " Jump to Last Position When Reopening a File
+                                  " *******************************************************************
+if has("autocmd")
+   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+   \| exe "normal! g'\"" | endif
+endif
+
+
+
 
 
