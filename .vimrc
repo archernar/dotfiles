@@ -1,6 +1,6 @@
-"=============================================================================
-"=    W e l c o m e   t o   m y  V I M R C                                   =
-"=============================================================================
+" *****************************************************************************************************
+                "  W e l c o m e   t o   m y  V I M R C
+                " *************************************************************************************
 " Notes
 " There are several name spaces for variables.
 " 
@@ -14,11 +14,21 @@
 " |function-argument|  a:	  Function argument (only inside a function).
 " |vim-variable|       v:	  Global, predefined by Vim.
 " nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
-"=============================================================================
-
 " *****************************************************************************************************
-                                  " External Environments Variables
-                                  " *******************************************************************
+function! Head()
+   let l:one="\" ***************************************************************************************************"
+   let l:two="\"               * "
+   let l:three="\"               *************************************************************************************"
+   let l:szIn = input('header text >> ')
+   let l:currentLine   = getline(".")
+   echom l:szIn
+   call setline(l:currentLine+1, l:one)
+   call setline(l:currentLine+2, l:two . l:szIn)
+   call setline(l:currentLine+3, l:three)
+endfunction
+" *****************************************************************************************************
+                " External Environments Variables
+                " *************************************************************************************
 " VIM_VIMTIPS                     - Full pathname of the vimtips file
 " VIM_COMMANDER                   - Full pathname of the vim commander file
 " VIM_PDFLIB                      - Folder name of PDF library
@@ -27,6 +37,7 @@
 set splitbelow
 set splitright
 
+set cmdheight=3                   " Set the command window height to 2 lines, to avoid many cases of having to  press <Enter> to continue
 set nowrap
 set nocompatible
 " set relativenumber
@@ -47,8 +58,8 @@ set laststatus=2                  " Always display the status line, even if only
 set undodir=~/.vim/undodir
 set undofile
 " *****************************************************************************************************
-                                  " Indent and Tab  Setup
-                                  " *******************************************************************
+                " Indent and Tab  Setup
+                " *************************************************************************************
 " There are in fact four main methods available for indentation, each one
 " overrides the previous if it is enabled, or non-empty for 'indentexpr':
 " 'autoindent'	uses the indent from the previous line.
@@ -65,8 +76,8 @@ set shiftwidth=4                  " Indent settings for using 4 spaces instead o
 set softtabstop=4                 " with this setup.
 set expandtab
 " *****************************************************************************************************
-                                  " Syntax Highlighting
-                                  " *******************************************************************
+                " Syntax Highlighting
+                " *************************************************************************************
 syntax off
 
 set confirm                       " Instead of failing a command because of unsaved changes, raise a dialogue asking to save changed files.
@@ -75,7 +86,6 @@ set t_vb=
                                   " reset terminal code for visual bell. 
                                   " If visualbell is set, and this line is also included, vim will neither flash nor beep.
                                   " If visualbell is unset, this does nothing.
-set cmdheight=1                   " Set the command window height to 2 lines, to avoid many cases of having to  press <Enter> to continue
 let mapleader = " "               " Leader - ( Spacebar )
 let MRU_Auto_Close = 1            " Set MRU window to close after selection
 set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, but never time out on mappings
@@ -113,24 +123,32 @@ if !exists("NOVUNDLE")
                                   " :PluginUpdate     - <leader>p
                                   " :PluginSearch foo - searches for foo; append `!` to refresh local cache
                                   " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+"         Bundle 'fxn/vim-monochrome'
                                   " *******************************************************************
 set rtp+=~/.vim/bundle/Vundle.vim " Vundle BEGIN
 call vundle#begin()               " Vundle BEGIN
                                   " *******************************************************************
 Plugin 'VundleVim/Vundle.vim'
-Plugin 'archernar/polymode.vim'
-Plugin 'archernar/vimmap.vim'
+Plugin 'archernar/vim-map'
+Plugin 'archernar/vim-utils'
+Plugin 'archernar/vim-session'
+Plugin 'archernar/vim-program'
+Plugin 'archernar/vim-monochrome'
+Plugin 'archernar/vim-mru'
+Plugin 'archernar/vim-polymode'
+Plugin 'archernar/vim-progsnips'
 Plugin 'archernar/vimstuff'
-Plugin 'scrooloose/nerdtree.git'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'jeetsukumaran/vim-buffergator'
 Plugin 'vim-scripts/grep.vim'      " https://github.com/vim-scripts/grep.vim
 Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-obsession'
 Bundle 'Lokaltog/vim-monotone.git'
-Bundle 'fxn/vim-monochrome'
 Bundle 'owickstrom/vim-colors-paramount'
 
+"Plugin 'scrooloose/nerdtree.git'
+"let g:NERDTreeNodeDelimiter = "\u00a0"
+"call g:MyKeyMapper("nnoremap <Leader>nt :NERDTreeToggle<cr>","NERDTree Toggle")
+"call g:MyCommandMapper("command! DOC     :NERDTree /usr/share/vim/vim74/doc")
 "Plugin 'vim-airline/vim-airline'
 "Plugin 'vim-airline/vim-airline-themes'
 "Plugin 'kristijanhusak/vim-carbon-now-sh'
@@ -145,10 +163,13 @@ Bundle 'owickstrom/vim-colors-paramount'
 "Plugin 'mhinz/vim-startify'
 "Plugin 'yegappan/mru'
                                   " *******************************************************************
+                                  " *******************************************************************
+                                  " *******************************************************************
 call vundle#end()                 " Vundle END 
 endif                             " Vundle END
                                   " *******************************************************************
-
+source ~/.vim/bundle/vim-utils/plugin/string.vim
+source ~/.vim/bundle/vim-map/plugin/map.vim
                                   
                                   " *******************************************************************
 filetype plugin indent on         " required, to ignore plugin indent changes, instead use: 
@@ -159,16 +180,11 @@ let g:MyKeyDictCT = 1000
 let g:MyCommandItemDict = {} 
 let g:MyCommandItemCT = 1000 
 let g:MyKeyMapperMode = "" 
-runtime plugin/vimmap.vim
+"runtime plugin/vimmap.vim
 call g:SetMyKeyMapperMode("STD")
 " *****************************************************************************************************
                                   " Utility Functions
                                   " *******************************************************************
-function! DQ(...)
-    let l:sz = substitute(a:1, "<cr>", "", "g")
-    let l:sz = substitute(l:sz, ":", "", "g")
-    return "\'" . l:sz . "\'"
-endfunction
 
 function! SaveQuitAll()
      execute "w"
@@ -177,69 +193,6 @@ endfunction
 
 function! QuitAll()
      execute "qall!"
-endfunction
-
-function! DeSpace()
-     execute "%s/^     / /ge"
-     execute "%s/^     / /ge"
-     execute "%s/^     / /ge"
-     execute "%s/^     / /ge"
-     execute "%s/^     / /ge"
-
-     execute "%s/^    / /ge"
-     execute "%s/^    / /ge"
-     execute "%s/^    / /ge"
-     execute "%s/^    / /ge"
-     execute "%s/^    / /ge"
-
-     execute "%s/^   / /ge"
-     execute "%s/^   / /ge"
-     execute "%s/^   / /ge"
-     execute "%s/^   / /ge"
-     execute "%s/^   / /ge"
-
-     execute "%s/^  / /ge"
-     execute "%s/^  / /ge"
-     execute "%s/^  / /ge"
-     execute "%s/^  / /ge"
-     execute "%s/^  / /ge"
-
-     execute "%s/^ //ge"
-endfunction
-function! TrimLeft(s1)
-     let l:szPart = substitute(a:s1, "^ *", "", "")
-     return l:szPart
-endfunction
-function! TrimRight(s1)
-     let l:szPart = substitute(l:szPart, " *$", "", "")
-     return l:szPart
-endfunction
-function! Trim(s1)
-     let l:szPart = substitute(a:s1, "^ *", "", "")
-     let l:szPart = substitute(l:szPart, " *$", "", "")
-     return l:szPart
-endfunction
-function! Trimmer(s1,s2)
-     let l:szPart = substitute(a:s1,     a:s2,  "", "")
-     let l:szPart = substitute(l:szPart, "^ *", "", "")
-     let l:szPart = substitute(l:szPart, " *$", "", "")
-     return l:szPart
-endfunction
-function! Pad(s,amt)
-        return a:s . repeat(' ',a:amt - len(a:s))
-endfunction
-function! PrePad(s,amt,...)
-        if a:0 > 0
-             let char = a:1
-        else
-             let char = ' '
-        endif
-        return repeat(char,a:amt - len(a:s)) . a:s
-endfunction
-
-function! CenterPad(...)
-        let l:n = (((s:LW-strlen(a:1)) / 2) + strlen(a:1)) - 0
-        return PrePad(a:1, l:n)
 endfunction
 
 function! CallMan(...)
@@ -285,116 +238,48 @@ function! VimKeyMap()
      redir END
 endfunction
 
-function! RandomString()
-    let l:szAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    let l:c = 1
-    let l:szOut = ""
-    while l:c <= 8
-         let l:rrr = str2nr(matchstr(reltimestr(reltime()), '\v\.@<=\d+')[1:]) % 24 
-         let l:szOut = l:szOut . l:szAlpha[rrr] 
-         let l:c += 1
-    endwhile 
-    return l:szOut
-endfunction
 function! Ls()
     ls
+endfunction
+function! Two() 
+    vsplit 
+endfunction
+function! Tee() 
+    split | vsplit | exe "1" . "wincmd w"
+endfunction
+function! TeeLeft() 
+    vsplit | split | vertical resize 56 | exe "1" . "wincmd w"
+endfunction
+
+function! TwoTwo() 
+    split 
+endfunction
+function! Three() 
+    vsplit | vsplit
 endfunction
 function! Four() 
     new | vnew | wincmd w | wincmd w | vnew 
 endfunction
                                   " *******************************************************************
                                   " END: Utility Functions
-" *****************************************************************************************************
-" 
-" CTRL-W r	Rotate windows downwards/rightwards.  The first window becomes
-" 		the second one, the second one becomes the third one, etc.
-" 		The last window becomes the first window.  The cursor remains
-" 		in the same window.
-" 		This only works within the row or column of windows that the
-" 		current window is in.
-" 
-" CTRL-W R	Rotate windows upwards/leftwards.  The second window becomes
-" 		the first one, the third one becomes the second one, etc.  The
-" 		first window becomes the last window.  The cursor remains in
-" 		the same window.
-" 		This only works within the row or column of windows that the
-" 		current window is in.
-" 
-" CTRL-W x	Without count: Exchange current window with next one.  If there
-" 		is no next window, exchange with previous window.
-" 		With count: Exchange current window with Nth window (first
-" 		window is 1).  The cursor is put in the other window.
-" 		When vertical and horizontal window splits are mixed, the
-" 		exchange is only done in the row or column of windows that the
-" 		current window is in.
-" 
-" The following commands can be used to change the window layout.  For example,
-" when there are two vertically split windows, CTRL-W K will change that in
-" horizontally split windows.  CTRL-W H does it the other way around.
-" 
-" 						*CTRL-W_K*
-" CTRL-W K	Move the current window to be at the very top, using the full
-" 		width of the screen.  This works like closing the current
-" 		window and then creating another one with ":topleft split",
-" 		except that the current window contents is used for the new
-" 		window.
-" 
-" 						*CTRL-W_J*
-" CTRL-W J	Move the current window to be at the very bottom, using the
-" 		full width of the screen.  This works like closing the current
-" 		window and then creating another one with ":botright split",
-" 		except that the current window contents is used for the new
-" 		window.
-" 
-" 						*CTRL-W_H*
-" CTRL-W H	Move the current window to be at the far left, using the
-" 		full height of the screen.  This works like closing the
-" 		current window and then creating another one with
-" 		":vert topleft split", except that the current window contents
-" 		is used for the new window.
-" 		{not available when compiled without the |+vertsplit| feature}
-" 
-" 						*CTRL-W_L*
-" CTRL-W L	Move the current window to be at the far right, using the full
-" 		height of the screen.  This works like closing the
-" 		current window and then creating another one with
-" 		":vert botright split", except that the current window
-" 		contents is used for the new window.
-" 		{not available when compiled without the |+vertsplit| feature}
-" 
-" 						*CTRL-W_T*
-" CTRL-W T	Move the current window to a new tab page.  This fails if
-" 		there is only one window in the current tab page.
-" 		When a count is specified the new tab page will be opened
-" 		before the tab page with this index.  Otherwise it comes after
-" 		the current tab page.
-" 
 
-function! NewWindow(...)
-        " H is Left  L is Right  K is Top  J is Bottom
-        vnew
-        let l:sz = tolower(a:1)
-        if (l:sz == "left")
-             wincmd H
-        endif
-        if (l:sz == "right")
-             wincmd L
-        endif
-        if (l:sz == "top")
-             wincmd K
-        endif
-        if (l:sz == "bottom")
-             wincmd J
-        endif
-        setlocal nobuflisted buftype=nofile bufhidden=wipe noswapfile
-        nnoremap <silent> <buffer> q :close<cr>
-        nnoremap <silent> <buffer> = :vertical resize +20<cr>
-        nnoremap <silent> <buffer> + :vertical resize -20<cr>
-        nnoremap <silent> <buffer> b :vertical resize +20<cr>
-        nnoremap <silent> <buffer> s :vertical resize -20<cr>
-        call cursor(1, 1)
-        execute "vertical resize " . a:2
-endfunction
+" :echo ['a', 'b', 'c', 'd', 'e'][0:2]
+" Vim displays ['a', 'b', 'c'] (elements 0, 1 and 2). You can safely exceed the upper bound as well. Try this command:
+" 
+" :echo ['a', 'b', 'c', 'd', 'e'][0:100000]
+" Vim simply displays the entire list.
+" 
+" Slice indexes can be negative. Try this command:
+" 
+" :echo ['a', 'b', 'c', 'd', 'e'][-2:-1]
+" Vim displays ['d', 'e'] (elements -2 and -1).
+" 
+" When slicing lists you can leave off the first index to mean "the beginning" and/or the last index to mean "the end". Run the following commands:
+" 
+" :echo ['a', 'b', 'c', 'd', 'e'][:1]
+" :echo ['a', 'b', 'c', 'd', 'e'][3:]
+"  len(list)
+
 function! Test()
         let l:sz="NO"
         let l:current_win = winnr()
@@ -419,25 +304,36 @@ function! Test()
 "              quickfix      quickfix buffer, contains list of errors |:cwindow| or list of locations |:lwindow|
 "              help          help buffer (you are not supposed to set this manually)
 " 
-        call NewWindow("Bottom",33)
+        call g:NewWindow("Bottom",33)
         call PutBufferList()
 endfunction
+
+" function! Funcky()
+"         call g:NewWindow("Right",33)
+"         exe !gawk "'/^function/{$1="";sub(/^ /,\"\", $0);print "\" " $0}' %"
+" endfunction
+
+
+
 
 function! PutBufferList(...)
         let l:nn=1
         let l:c=1
         let l:sz=""
+        let body=[]
         while l:c <=20 
             if (bufexists(l:c))
                 let l:btyp = getbufvar(l:c, '&buftype')
                 if (l:btyp == "")
                     let l:sz = bufname(l:c)
+                    call add(body, l:sz)
                     call setline(l:nn, l:sz)
                     let l:nn= l:nn + 1
                 endif
             endif
             let l:c += 1
         endwhile 
+        call writefile(body, 'momo')
 endfunction
 function! SetArgs(...)
      " call SetArgs("A","B","D")
@@ -491,7 +387,6 @@ nnoremap <silent> <leader><F4> :CtrlPBuffer<cr>
                                   " *******************************************************************
 nnoremap <leader>] *
 nnoremap <Leader>' diwi""<ESC>hp<ESC>
-call g:MyKeyMapper("nnoremap <Leader>nt :NERDTreeToggle<cr>","NERDTree Toggle")
 call g:MyKeyMapper("nnoremap <Leader>p  :PluginUpdate<cr>","Vundle Update")
 call g:MyKeyMapper("nnoremap <Leader>d  :! rm -rf /tmp/dotfiles;git clone http://github.com/archernar/dotfiles.git /tmp/dotfiles;<cr>","fetch .vimrc update")
 
@@ -534,7 +429,7 @@ function! MyTTLDump()
         call LeftWindowBuffer()
         nnoremap <silent> <buffer> q :close<cr>
         let l:nn=1
-        call setline(l:nn, CenterPad("Things to Learn"))
+        call setline(l:nn, g:CenterPad("Things to Learn"))
         let l:nn=2
 	for l:item in g:MyTTLList
           call setline(l:nn, l:item)
@@ -696,7 +591,7 @@ function! MyCheatsheetDump()
                     let l:szPart2 = strpart(l:szKey, n)
                     let l:szPart1 = Trimmer(l:szPart1, ",,," )
                     let l:szPart2 = Trimmer(l:szPart2, ",,," )
-                    let l:line=Pad(l:szPart1,(s:LW/2)-3) . " | " . l:szPart2
+                    let l:line=g:Pad(l:szPart1,(g:LW/2)-3) . " | " . l:szPart2
                else
                     let l:line=l:szKey
                endif
@@ -705,7 +600,7 @@ function! MyCheatsheetDump()
           endif
           let l:n = match(l:line,'-------')
           if (l:n == -1 )
-               let l:line = strpart(l:line, 0, s:LW-2)
+               let l:line = strpart(l:line, 0, g:LW-2)
           endif
           call setline(l:nn, l:line)
           let l:nn= l:nn + 1
@@ -714,8 +609,8 @@ function! MyCheatsheetDump()
         nnoremap <silent> <buffer> <Enter> :call MyCheatsheetEnter()<cr>
 "       setlocal readonly nomodifiable
 endfunction
-let s:LW = 110
-let s:barline = repeat('-', s:LW)
+let g:LW = 110
+let s:barline = repeat('-', g:LW)
 " *****************************************************************************************************
                                   " TTL Items
                                   " *******************************************************************
@@ -734,12 +629,12 @@ call g:TTL("VMODE S<char>      Surround current selection")
 " *****************************************************************************************************
                                   " My Cheat Sheet Items
                                   " *******************************************************************
-call g:MyCheatsheet(CenterPad(""))
-call g:MyCheatsheet(CenterPad("My Cheat Sheet"))
-call g:MyCheatsheet(CenterPad(" "))
+call g:MyCheatsheet(g:CenterPad(""))
+call g:MyCheatsheet(g:CenterPad("My Cheat Sheet"))
+call g:MyCheatsheet(g:CenterPad(" "))
 call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet(CenterPad("i3wm"))
-call g:MyCheatsheet(CenterPad(" "))
+call g:MyCheatsheet(g:CenterPad("i3wm"))
+call g:MyCheatsheet(g:CenterPad(" "))
 call g:MyCheatsheet("Controlling i3")
 call g:MyCheatsheet("$mod+Shift+r            Reload i3")
 call g:MyCheatsheet("$mod+Shift+e            Exit i3")
@@ -776,8 +671,8 @@ call g:MyCheatsheet("$mod+d                  Open dmenu")
 
 call g:MyCheatsheet(s:barline)
 
-call g:MyCheatsheet(CenterPad("Plaintext Text Objects - Words"))
-call g:MyCheatsheet(CenterPad("<number><command><text object or motion>"))
+call g:MyCheatsheet(g:CenterPad("Plaintext Text Objects - Words"))
+call g:MyCheatsheet(g:CenterPad("<number><command><text object or motion>"))
 call g:CS("aw   a word (with white space)",           "iw   inner word")
 call g:CS("ab   a block from [( to ]) (with braces)", "ib   inner block")
 call g:CS("ap   a paragraph (with white space)",      "ip   inner paragraph")
@@ -804,7 +699,7 @@ call g:MyCheatsheet("dj  delete down a line (current and one below      ,,,    d
 call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet("                     d/rails delete up until the first of 'rails'")
 call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet(CenterPad("Motions"))
+call g:MyCheatsheet(g:CenterPad("Motions"))
 call g:MyCheatsheet("h,l  move left/right by character                  ,,,    w   move forward one (w)ord")
 call g:MyCheatsheet("b    move (b)ackward one word                      ,,,    e   move forward to the (e)nd of a word")
 call g:MyCheatsheet("aw   a word (surrounding white space)              ,,,    iw  inner word (not surrounding white space)")
@@ -816,7 +711,7 @@ call g:MyCheatsheet("]]    Next section                                 ,,, [[  
 call g:MyCheatsheet("0     Front of line                                ,,, ^    Front of line (first non-blank)")
 call g:MyCheatsheet("%     Matching brace/bracket/paren/tag             ,,, $    End of line")
 
-call g:MyCheatsheet(CenterPad("Variable Scope"))
+call g:MyCheatsheet(g:CenterPad("Variable Scope"))
 call g:MyCheatsheet("nothing      In a function: local to a function; otherwise: global")
 call g:MyCheatsheet("buffer  b:   Local to the current buffer           ,,,window   w:   Local to the current window")
 call g:MyCheatsheet("vim     v:   Global, predefined by Vim             ,,,tabpage  t:   Local to the current tab page")
@@ -824,11 +719,11 @@ call g:MyCheatsheet("global  g:   Global                                ,,,local
 call g:MyCheatsheet("script  s:   Local to |:src|'ed Vim script         ,,,fun-arg  a:   Function argument (inside a function)")
 call g:MyCheatsheet(s:barline)
 
-call g:MyCheatsheet(CenterPad("Commands"))
+call g:MyCheatsheet(g:CenterPad("Commands"))
 call g:MyCheatsheet("COM", "call CommanderList()")
 call g:MyCheatsheet("COM", "call CommanderListEdit()")
 call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet(CenterPad("Documents"))
+call g:MyCheatsheet(g:CenterPad("Documents"))
 call g:MyCheatsheet("PDF","~/pdfs/vim-sq.pdf", "The Vim Tutorial and Reference")
 call g:MyCheatsheet("PDF","~/vimdocs/gnuplot4_6.pdf", "GnuPlot 4.6 Documentation")
 call g:MyCheatsheet("PDF","~/vimdocs/progit.pdf","Pro Git Book")
@@ -849,16 +744,14 @@ call g:MyCheatsheet(s:barline)
                                   " Command Words/Aliases
                                   " *******************************************************************
 call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet(CenterPad("My Commands"))
+call g:MyCheatsheet(g:CenterPad("My Commands"))
 call g:SetMyKeyMapperMode("SES")
-call g:MyCommandMapper("command! SESSION   :Obsess ./.vimsession")
 
 
 call g:SetMyKeyMapperMode("COM")
 call g:MyCommandMapper("command! CHEAT   :call MyCheatsheetDump()")
 call g:MyCommandMapper("command! MI      :call MyCheatsheetDump()")
 call g:MyCommandMapper("command! RC      :e ~/.vimrc")
-call g:MyCommandMapper("command! DOC     :NERDTree /usr/share/vim/vim74/doc")
 call g:MyCommandMapper("command! LIB     :call PDFList()")
 call g:MyCommandMapper("command! PDF     :call PDFList()")
 call g:MyCommandMapper("command! MP3     :call MP3List()")
@@ -874,8 +767,13 @@ call g:MyCommandMapper("command! CE      :call CommanderListEdit()")
 call g:MyCommandMapper("command! TEST    :call Test()")
 call g:MyCommandMapper("command! XXCSD   :call CallMan('LeftWindowBuffer()', 'MyCommandsheetDump()')")
 call g:MyCommandMapper("command! CSD     :call XMan('botright new', 'MyCommandsheetDump()')")
-call g:MyCommandMapper("command! SNIPS   :topleft vnew ~/snips.java")
+call g:MyCommandMapper("command! SNIPS   :call g:DD0(\"~/.vim/Snips/*\")"          )
 call g:MyCommandMapper("command! REPOS   :call RepoList()")
+call g:MyCommandMapper("command! TEE     :call Tee()")
+call g:MyCommandMapper("command! TEELEFT :call TeeLeft()")
+call g:MyCommandMapper("command! TWO     :call Two()")
+call g:MyCommandMapper("command! TWOTWO  :call TwoTwo()")
+call g:MyCommandMapper("command! THREE   :call Three()")
 call g:MyCommandMapper("command! FOUR    :call Four()")
 call g:MyCommandMapper("command! LS      :call Ls()")
 call g:MyCommandMapper("command! GETVUNDLE     :!git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
@@ -973,9 +871,11 @@ function! BiModeSet(...)
           let g:BiModeState = 1 
           call g:MyKeyMapper("nnoremap <F1> :bnext<cr>", "Next Buffer")
           call g:MyKeyMapper("nnoremap <leader><F1>  <Nop>","Nothing")
-          call g:MyKeyMapper("nnoremap <F2> :bnext<cr>", "Next Buffer")
+
+          call g:MyKeyMapper("nnoremap <F2> :bprev<cr>", "Previous Buffer")
           call g:MyKeyMapper("nnoremap <leader><F2>  <Nop>","Nothing")
-          call g:MyKeyMapper("nnoremap <F3> :bnext<cr>", "Next Buffer")
+
+          call g:MyKeyMapper("nnoremap <F3> <Nop>","Nothing")
           call g:MyKeyMapper("nnoremap <leader><F3>  <Nop>","Nothing")
      endif
      if (a:1 == 0)
@@ -984,7 +884,7 @@ function! BiModeSet(...)
           call g:MyKeyMapper("nnoremap <F1> <C-W>w",     "Next Window")
           call g:MyKeyMapper("nnoremap <leader><F1>  :botright  new<CR>","Split Window Down")
 
-          call g:MyKeyMapper("nnoremap <F2> <C-W>w",     "Next Window")
+          call g:MyKeyMapper("nnoremap <F2> <C-W>W",     "Previous Window")
           call g:MyKeyMapper("nnoremap <leader><F2>  :botright  new<CR>","Split Window Down")
 
           call g:MyKeyMapper("nnoremap <F3> <C-W>w",     "Next Window")
@@ -1032,10 +932,17 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <leader>` ys$\`",               "surround till EOL")
           call g:MyKeyMapper("nnoremap <silent> <End>  :call PolyModeReset()<cr>","PolyMode Off")
           " Window
-          call g:MyKeyMapper("nnoremap <leader>sw<left>  :topleft  vnew<CR>","Split Window Left")
-          call g:MyKeyMapper("nnoremap <leader>sw<right> :botright vnew<CR>","Split Window Right")
-          call g:MyKeyMapper("nnoremap <leader>sw<up>    :topleft  new<CR>","Split Window Up")
-          call g:MyKeyMapper("nnoremap <leader>sw<down>  :botright new<CR>","Split Window Down")
+"           call g:MyKeyMapper("nnoremap <leader>sw<left>  :topleft  vnew<CR>","Split Window Left")
+"           call g:MyKeyMapper("nnoremap <leader>sw<right> :botright vnew<CR>","Split Window Right")
+"           call g:MyKeyMapper("nnoremap <leader>sw<up>    :topleft  new<CR>","Split Window Up")
+"           call g:MyKeyMapper("nnoremap <leader>sw<down>  :botright new<CR>","Split Window Down")
+"           call g:MyKeyMapper("nnoremap <leader>sw<left>  :topleft  vnew<CR>","Split Window Left")
+"           call g:MyKeyMapper("nnoremap <leader>sw<up>    :topleft  new<CR>","Split Window Up")
+
+          call g:MyKeyMapper("nnoremap <leader>sw<right> :vsplit<CR>","Split Window Right")
+          call g:MyKeyMapper("nnoremap <leader>sw<down>  :split<CR>","Split Window Down")
+          call g:MyKeyMapper("nnoremap <leader>mw<left>  :vertical resize +20<cr>","Resize Window") 
+          call g:MyKeyMapper("nnoremap <leader>mw<right> :vertical resize -20<cr>","Resize Window") 
           " Buffer  
           call g:MyKeyMapper("nnoremap <leader>sb<left>  :leftabove  vnew<CR>","Split Buffer Left")
           call g:MyKeyMapper("nnoremap <leader>sb<right> :rightbelow vnew<CR>","Split Buffer Right")
@@ -1081,6 +988,10 @@ function! PolyModeMapReset()
           nnoremap <silent> <PageUp>   <pageup>
           nnoremap <silent> <PageDown> <pagedown>
           nnoremap <silent> <Delete>   <delete>
+          call g:MyKeyMapper("nnoremap <silent> = :vertical resize +2<cr>","Vertical Resize +")
+          call g:MyKeyMapper("nnoremap <silent> + :vertical resize -2<cr>","Vertical Resize -")
+          call g:MyKeyMapper("nnoremap <silent> - :resize +2<cr>","Horozontal Resize +")
+          call g:MyKeyMapper("nnoremap <silent> _ :resize -2<cr>","Horozontal Resize -")
 endfunction
 call PolyModeMapReset()
 
@@ -1197,6 +1108,10 @@ endfunction
 function! RepoList()
         call LeftWindowBuffer("", "r !curl -s 'https://api.github.com/users/archernar/repos?per_page=100' | grep ssh_url")
 endfunction
+function! GetUrl()
+        exe "!curl -s 'https://api.github.com/users/archernar/repos?per_page=100' | grep ssh_url > /tmp/zed"
+        execute "redraw!"
+endfunction
 " *****************************************************************************************************
                                   " Commander Functions
                                   " *******************************************************************
@@ -1308,7 +1223,7 @@ function! EditInTempBuffer(...)
 endfunction
 function! MakeTempBuffer()
     let s:current_buffer_file_path = expand("%")
-    let s:output_buffer_name = RandomString()
+    let s:output_buffer_name = g:RandomString()
     let s:output_buffer_filetype = "output"
     if !exists("s:buf_nr") || !bufexists(s:buf_nr)
         silent execute 'botright new ' . s:output_buffer_name
@@ -1426,6 +1341,68 @@ function! Redir(cmd)
         call setline(1, split(output, "\n"))
 endfunction
 
+function! Redir2(...)
+        call g:NewWindow("Bottom",8)
+        redir => output
+        silent execute a:1
+        redir END
+        nnoremap <silent> <buffer> q :close<cr>
+        call setline(1, split(output, "\n"))
+        resize 8
+endfunction
+function! Redir2a(...)
+        call g:NewWindow("Bottom",8)
+        if a:1 =~ '^!'
+           execute "let output = system('" . substitute(a:1, '^!', '', '') . "')"
+        else
+            redir => output
+            silent execute a:1
+            redir END
+        endif
+        nnoremap <silent> <buffer> q :close<cr>
+        call setline(1, split(output, "\n"))
+        resize 8
+endfunction
+command! -nargs=1 B silent call Redir2a(<f-args>)
+
+
+function! Redir3(...)
+        call g:NewWindow("Right",18)
+        if a:1 =~ '^!'
+           execute "let output = system('" . substitute(a:1, '^!', '', '') . "')"
+        else
+            redir => output
+            silent execute a:1
+            redir END
+        endif
+        nnoremap <silent> <buffer> q :close<cr>
+        call setline(1, split(output, "\n"))
+        vertical resize 44 
+endfunction
+command! -nargs=1 BR silent call Redir3(<f-args>)
+function! Redir4()
+        let l:sz = "grep -n ^func " . @%  . " | grep Two"
+        " silent execute "let output = system('" . "grep -n ^func " . @%  . "')"
+        silent execute "let output = system('" . l:sz  . "')"
+        call g:NewWindow("Right",18)
+        nnoremap <silent> <buffer> q :close<cr>
+        call setline(1, split(output, "\n"))
+        vertical resize 44 
+endfunction
+command! BF silent call Redir4()
+
+
+function! RedirEchoRtp()
+        let output = ""
+        call g:NewWindow("Bottom",8)
+        redir => output
+        silent execute "echom &rtp"
+        redir END
+        nnoremap <silent> <buffer> q :close<cr>
+        call setline(1, split(output, ","))
+        resize 12 
+endfunction
+command! RTP silent call RedirEchoRtp()
 
 " https://stackoverflow.com/questions/11176159/how-to-jump-to-start-end-of-visual-selection
 "
@@ -1541,20 +1518,20 @@ let g:loaded_matchparen=1
 
 function! JSnip(t)
     let s:szIn = input('value >> ')
-    execute "e /home/mestes/scm/figg/templates/" . a:t
+    execute "e ~/scm/figg/templates/" . a:t
     execute "%s/NNAME/" . s:szIn . "/g"
     normal ggyG
     bdelete!
     normal p
 endfunction
 function! JSnipSimple(t)
-    execute "e /home/mestes/scm/figg/templates/" . a:t
+    execute "e ~/scm/figg/templates/" . a:t
     normal ggyG
     bdelete!
     normal p
 endfunction
 function! Snipper(t)
-    execute "e /home/mestes/scm/figg/templates/" . a:t
+    execute "e ~/scm/figg/templates/" . a:t
     normal ggyG
     bdelete!
     normal p
@@ -1615,14 +1592,13 @@ endfunction
 
 
 
-so ~/.vim/bundle/vimmap.vim/plugin/string.vim
 
 
 " *****************************************************************************************************
                                   " Command Mapper
                                   " *******************************************************************
 
-func! s:snipfileItem(...)
+func! s:SnipfileItem(...)
     let l:t = -1
     let l:l = -1
     let l:c = 0 
@@ -1642,57 +1618,59 @@ func! s:snipfileItem(...)
              let l:f1 = l:file
              let l:f2 = split(l:file,"/")[-1]
              let l:f2 = l:file
-             let l:f1 = g:strreplace(l:f1,'xxxxxxxxxwdd.','XX')
-             "call g:MyCommandItemMapper(Pad(a:1,6) . " " . Pad(toupper(split(l:f1,"/")[-1]),l:t) . " :e " . l:f2 )
-             call g:MyCommandItemMapper(Pad(a:1,6) . " :e " . l:f2 )
+             let l:f1 = g:Strreplace(l:f1,'xxxxxxxxxwdd.','XX')
+             "call g:MyCommandItemMapper(g:Pad(a:1,6) . " " . g:Pad(toupper(split(l:f1,"/")[-1]),l:t) . " :e " . l:f2 )
+                     let l:szKey = "ITEM" . g:MyCommandItemCT 
+                     let g:MyCommandItemDict[ l:szKey ] = g:Pad(a:1,6) . " :e " . l:f2 
+                     let g:MyCommandItemCT = g:MyCommandItemCT +1
         endfor
     endif
 endfunc
 
-func! g:setupsniplocal(...)
+func! g:Setupsniplocal(...)
     call  g:MyCommandItemMapperReset()
-    call  s:snipfileItem("FILE", a:1)
+    call  s:SnipfileItem("FILE", a:1)
 endfunc
-func! g:setupsnip()
+func! g:Setupsnip()
     call  g:MyCommandItemMapperReset()
-    call  s:snipfileItem("FILE", "./*.java")
-    call  s:snipfileItem("FILE", "~/.vim/Snips/*.java")
-    call  s:snipfileItem("FILE", "~/.vim/Snips/*.txt")
+    call  s:SnipfileItem("FILE", "./*.java")
+    call  s:SnipfileItem("FILE", "~/.vim/Snips/*.java")
+    call  s:SnipfileItem("FILE", "~/.vim/Snips/*.txt")
     call g:SetMyKeyMapperMode("SNIPTXT")
      for l:file in split(glob('~/.vim/Snips/*.txt'), '\n')
           let l:f1 = l:file
-          let l:f1 = g:strreplace(l:f1,'.','')
+          let l:f1 = g:Strreplace(l:f1,'.','')
           let l:f2 = split(l:file,"/")[-1]
           call g:MyCommandMapper("command! " . toupper(split(l:f1,"/")[-1]) . " :call Snp('" . l:f2 .    "','')")
      endfor
 endfunc
 
-func! s:setupsnip2()
+func! s:Setupsnip2()
     call g:SetMyKeyMapperMode("SNIP")
     for l:file in split(glob('~/.vim/Snips/*.java'), '\n')
          let l:f1 = l:file
-         let l:f1 = g:strreplace(l:f1,'.','')
+         let l:f1 = g:Strreplace(l:f1,'.','')
          let l:f2 = split(l:file,"/")[-1]
          call g:MyCommandMapper("command! " . toupper(split(l:f1,"/")[-1]) . " :call Snp('" . l:f2 .    "','')")
     endfor
     call g:SetMyKeyMapperMode("SNIPTXT")
     for l:file in split(glob('~/.vim/Snips/*.txt'), '\n')
          let l:f1 = l:file
-         let l:f1 = g:strreplace(l:f1,'.','')
+         let l:f1 = g:Strreplace(l:f1,'.','')
          let l:f2 = split(l:file,"/")[-1]
          call g:MyCommandMapper("command! " . toupper(split(l:f1,"/")[-1]) . " :call Snp('" . l:f2 .    "','')")
     endfor
     call g:SetMyKeyMapperMode("SNIPEJ")
     for l:file in split(glob('./*.java'), '\n')
          let l:f1 = l:file
-         let l:f1 = g:strreplace(l:f1,'.','')
+         let l:f1 = g:Strreplace(l:f1,'.','')
          let l:f2 = split(l:file,"/")[-1]
          call g:MyCommandMapper("command! " . toupper(split(l:f1,"/")[-1]) . " :e " . "./" . l:f2 )
     endfor
     call g:SetMyKeyMapperMode("SNIPET")
     for l:file in split(glob('./*.txt'), '\n')
          let l:f1 = l:file
-         let l:f1 = g:strreplace(l:f1,'.','')
+         let l:f1 = g:Strreplace(l:f1,'.','')
          let l:f2 = split(l:file,"/")[-1]
          call g:MyCommandMapper("command! " . toupper(split(l:f1,"/")[-1]) . " :e " . "./" . l:f2 )
     endfor
@@ -1700,12 +1678,12 @@ func! s:setupsnip2()
     for l:file in split(glob('~/.vim/Snips/*.java'), '\n')
          let l:f1 = l:file
          let l:f2 = l:file
-         let l:f1 = g:strreplace(l:f1,'.','XX')
+         let l:f1 = g:Strreplace(l:f1,'.','XX')
          call g:MyCommandNoMap("command! " . toupper(split(l:f1,"/")[-1]) . " :e " . l:f2 )
     endfor
 endfunc
 
-call g:setupsnip()
+call g:Setupsnip()
 call g:MyCommandMapper("command! PWD     :!pwd")
 " call g:MyCommandMapper("command! KSH     :call  SnipperStuff('KSH.txt','')")
 " call g:MyCommandMapper("command! PSETONE :call  SnipperStuff('PSetOne.txt','')")
@@ -1807,6 +1785,13 @@ set errorformat=%A%f:%l:\ %m,%-Z%p^,%-C%.%#
 " setl        efm=%A%f:%l:\ %m,%+Z%p^,%+C%.%#,%-G%.%#
 " set makeprg=javac\ %
 
+function! s:Max(...)
+        let l:n = a:1
+        if ( a:1 > a:2 )
+            let l:n = a:2
+        endif
+        return l:n
+endfunction
 function! IsQuickFixOpen()
         let l:n=0
         let l:bnum = winbufnr(winnr())
@@ -1818,18 +1803,70 @@ endfunction
 
 " cexpr system('javac -nowarn -cp ~/classes -d ~/classes ' . shellescape(expand('%:p')))
 " Set desired java options below
-" silent let l:cmd = "java -d64  " . "" . g:strreplace(expand("%:r"),"./","") . " " . arg
+" silent let l:cmd = "java -d64  " . "" . g:Strreplace(expand("%:r"),"./","") . " " . arg
 
-so ~/.vim/bundle/vimmap.vim/plugin/program.vim
+function! g:DD0(...)
+    let l:Dict = {} 
+    let l:DictCT = 1000 
+    let l:len = -1
+    let l:nn = 0
+    " Load Directory Part
+        call g:SetMyKeyMapperMode("FILE")
+        let l:list = split(glob(a:1),'\n')
+"         let l:list = split(globpath(".","**/*"),'\n')
+"         for l:file in split(glob(a:1),'\n')
+        for l:file in l:list
+            let l:Dict["ITEM" . l:DictCT] = l:file
+            let l:DictCT = l:DictCT+1
+            let l:nn = strlen(l:file)
+            if (l:nn > l:len)
+                let l:len = l:nn
+            endif
+        endfor
+            let l:Dict["ITEM" . l:DictCT] = l:len
+    " Create Window/Buffer Part
+        let l:cols = &columns / 3
+        let l:len = s:Max(l:len, l:cols)
+        let l:cols = 38
+        let g:thatwin = winnr()
+        call g:NewWindow("Left", l:cols, "<Enter> :call g:DD4('e')","s :call g:DD4('vnew')", "b :call g:DD4('split')")
+        echom "<enter> to edit, <s> to edit in Vert-Split, <b> to edit in Horz-Split"
+    " Display Part
+        setlocal cursorline
+        let l:nn=1
+	for key in sort(keys(l:Dict))
+          call setline(l:nn, l:Dict[key] . "")
+          let l:nn= l:nn + 1
+	endfor
+        set nowrap
+        resize 155
+endfunc
+function! g:DD4(...)
+     let l:sz   = getline(".")
+     if (strlen(l:sz) > 0)
+         silent execute "q"
+         exe g:thatwin . "wincmd w"
+         echom "execute " . a:1 . " " . "" . l:sz . ""
+         silent execute a:1 . " " . "" . l:sz . ""
+     endif
+endfunction
+
+
+function! g:DDD10()
+call g:NewWindow("Bottom",33)
+    exe "!ls .vimsession"
+endfunction
+"redir @">|silent call s:LS()|redir END|enew|put
 
 nnoremap <F5> :call ProgramCompile()<cr>
 nnoremap <F6> :call ProgramRun()<cr>
 nnoremap <leader><F6> <esc>:e out<cr>
 nnoremap <F7> :call g:setupsnip()<cr>:call MyDictionaryDump(g:MyCommandItemDict)<cr>
 nnoremap <leader><F7> :call g:setupsniplocal("./*.java")<cr>:call MyDictionaryDump(g:MyCommandItemDict)<cr>
+nnoremap <leader><F7> :call g:DD0("./*.*")<cr>
 call g:MyCommandMapper("command! GREP   :call Greppyon(1)")
 
-
+nnoremap <F3> :w<CR>:1<cr>i<cr><esc>k:r !gawk '/^function/{$1="";sub(/^ /,"", $0);print "\" " $0}' %<CR>:1<cr>dd
 
 
 " *****************************************************************************************************
@@ -1839,8 +1876,6 @@ if has("autocmd")
    au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
    \| exe "normal! g'\"" | endif
 endif
-
-
 
 
 
