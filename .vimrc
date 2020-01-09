@@ -15,6 +15,27 @@
 " |vim-variable|       v:	  Global, predefined by Vim.
 " nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
 " *****************************************************************************************************
+function! TestHeads(...)
+    call Heads("")
+    call Heads("Michael")
+    call Heads("")
+endfunction
+function! Heads(...)
+   let l:line="\"------------------------------------------"
+   let l:in=a:1
+   if (a:0 == 2)
+       let l:line="\"" . a:1
+       let l:in=a:2
+   endif
+   let l:linelen = strlen(l:line)
+   let l:len = strlen(l:in)
+   let l:sz = l:line
+   if (l:len > 0)
+       let l:sz = strpart( l:line, 0, l:linelen - (l:len) )
+   endif
+   let l:sz = l:sz . l:in 
+   echom l:sz
+endfunction
 function! Head()
    let l:one="\" ***************************************************************************************************"
    let l:two="\"               * "
@@ -221,44 +242,11 @@ function! XMan(...)
      execute l:pre . a:2
 endfunction
 
-function! ExeMan(...)
-     execute "" . a:1
-     execute "" . a:2
-endfunction
-function! ExeMan3(...)
-     execute "" . a:1
-     execute "" . a:2
-     execute "" . a:3
-endfunction
-
 
 function! VimKeyMap()
      redir! > ~/.vimkeymap.txt
      silent verbose map
      redir END
-endfunction
-
-function! Ls()
-    ls
-endfunction
-function! Two() 
-    vsplit 
-endfunction
-function! Tee() 
-    split | vsplit | exe "1" . "wincmd w"
-endfunction
-function! TeeLeft() 
-    vsplit | split | vertical resize 56 | exe "1" . "wincmd w"
-endfunction
-
-function! TwoTwo() 
-    split 
-endfunction
-function! Three() 
-    vsplit | vsplit
-endfunction
-function! Four() 
-    new | vnew | wincmd w | wincmd w | vnew 
 endfunction
                                   " *******************************************************************
                                   " END: Utility Functions
@@ -769,13 +757,6 @@ call g:MyCommandMapper("command! XXCSD   :call CallMan('LeftWindowBuffer()', 'My
 call g:MyCommandMapper("command! CSD     :call XMan('botright new', 'MyCommandsheetDump()')")
 call g:MyCommandMapper("command! SNIPS   :call g:DD0(\"~/.vim/Snips/*\")"          )
 call g:MyCommandMapper("command! REPOS   :call RepoList()")
-call g:MyCommandMapper("command! TEE     :call Tee()")
-call g:MyCommandMapper("command! TEELEFT :call TeeLeft()")
-call g:MyCommandMapper("command! TWO     :call Two()")
-call g:MyCommandMapper("command! TWOTWO  :call TwoTwo()")
-call g:MyCommandMapper("command! THREE   :call Three()")
-call g:MyCommandMapper("command! FOUR    :call Four()")
-call g:MyCommandMapper("command! LS      :call Ls()")
 call g:MyCommandMapper("command! GETVUNDLE     :!git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
 call g:MyCommandMapper("command! TIPS    :call Vimtips()")
 call g:MyCommandMapper("command! VT      :call Vimtips()")
@@ -820,26 +801,6 @@ call g:MyStaticMapper("u","Refresh MRU list")
 call g:MyStaticMapper("q","Close the MRU window")
 call g:MyStaticMapper("<Esc>","Close the MRU window")
 call g:SetMyKeyMapperMode("STD")
-function! Moe()
-    set splitbelow splitright
-    wincmd _ | wincmd |
-    vsplit
-    1wincmd h
-    wincmd w
-    wincmd _ | wincmd |
-    split
-    1wincmd k
-    wincmd w
-    set nosplitbelow
-    set nosplitright
-    wincmd t
-    set winheight=1 winwidth=1
-    exe 'vert 1resize ' . ((&columns * 79 + 79) / 159)
-    exe '2resize ' . ((&lines * 18 + 20) / 41)
-    exe 'vert 2resize ' . ((&columns * 79 + 79) / 159)
-    exe '3resize ' . ((&lines * 18 + 20) / 41)
-    exe 'vert 3resize ' . ((&columns * 79 + 79) / 159)
-endfunction
 " *****************************************************************************************************
                                   " Polymode Keys
                                   " *******************************************************************
@@ -994,7 +955,6 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <silent> _ :resize -2<cr>","Horozontal Resize -")
 endfunction
 call PolyModeMapReset()
-
 
 runtime plugin/polymode.vim
 if !exists('polymode_loaded')
@@ -1876,6 +1836,5 @@ if has("autocmd")
    au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
    \| exe "normal! g'\"" | endif
 endif
-
 
 
