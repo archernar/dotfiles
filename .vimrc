@@ -169,6 +169,7 @@ if !exists("NOVUNDLE")
                                   " Vundle            - see :h vundle for more details or wiki for FAQ
                                   " *******************************************************************
                                   " git clone  https://github.com/VundleVim/Vundle.vim.git  ~/.vim/bundle/Vundle.vim
+                                  " git clone  https://github.com/archernar/dotfiles.git    ~/tmp
                                   " :PluginList       - lists configured plugins
                                   " :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
                                   " :PluginUpdate     - <leader>p
