@@ -15,26 +15,43 @@
 " |vim-variable|       v:	  Global, predefined by Vim.
 " nnoremap <F4> :new<cr>:-1read $HOME/.vim/ksh.top<CR>
 " *****************************************************************************************************
-function! TestHeads(...)
-    call Heads("")
-    call Heads("Michael")
-    call Heads("")
+
+command! HEADS :call TestHeads()
+function! TestHeads()
+    let pu=strftime('%c')
+    call Heads("L", "")
+    call Heads("R", pu)
+    call Heads("L","  a1 - ")
+    call Heads("L","  a2 - ")
+    call Heads("L","  a3 - ")
+    call Heads("L", "")
+    call append(line("."), "")
+endfunction
+function! Headline(...)
+   let l:in=a:1
+   let l:sz = "\"" . l:in 
+   call append(line("."), l:sz . "|")
+   exe "normal j"
 endfunction
 function! Heads(...)
-   let l:line="\"------------------------------------------"
-   let l:in=a:1
-   if (a:0 == 2)
-       let l:line="\"" . a:1
-       let l:in=a:2
-   endif
+   let l:line="------------------------------------------"
+   let l:in=a:2
    let l:linelen = strlen(l:line)
    let l:len = strlen(l:in)
    let l:sz = l:line
+   let l:e = "-|"
    if (l:len > 0)
        let l:sz = strpart( l:line, 0, l:linelen - (l:len) )
+       let l:sz = substitute(l:sz, "-", " ", "g")
+       let l:e = " |"
    endif
-   let l:sz = l:sz . l:in 
-   echom l:sz
+   if (a:1 == "L")
+      let l:sz = l:in . l:sz 
+   else
+      let l:sz = l:sz . l:in 
+   endif
+   call append(line("."), "\"" . l:sz . l:e)
+   exe "normal j"
 endfunction
 function! Head()
    let l:one="\" ***************************************************************************************************"
@@ -47,6 +64,16 @@ function! Head()
    call setline(l:currentLine+2, l:two . l:szIn)
    call setline(l:currentLine+3, l:three)
 endfunction
+
+function! X100()
+    call inputsave()
+    let l:szIn = input("Snip ")
+    call inputrestore()
+    execute "e ~/.vim/Snips/" . l:szIn . ".txt"
+endfunction
+
+vnoremap v y:call X100()<cr>
+
 " *****************************************************************************************************
                 " External Environments Variables
                 " *************************************************************************************
@@ -114,6 +141,8 @@ set notimeout ttimeout ttimeoutlen=200         " Quickly time out on keycodes, b
 " *****************************************************************************************************
                                   " The 'External Command' Command Setup
                                   " *******************************************************************
+
+command! BB call g:FindBuffer()
 command! -nargs=* -complete=shellcmd H new  | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
 command! -nargs=* -complete=shellcmd BANG botright 60vnew | let w:scratch = 1 | setlocal buftype=nofile bufhidden=hide noswapfile | r !<args>
 command! -nargs=1 L silent call Redir(<f-args>)
@@ -127,6 +156,7 @@ command! -nargs=1 V new <args>
 " Usage:
 "       :Redir hi ............. show the full output of command ':hi' in a scratch window
 "       :Redir !ls -al ........ show the full output of command ':!ls -al' in a scratch window
+
 
 " *****************************************************************************************************
                                   " Pre Vundle Setup
@@ -150,6 +180,7 @@ set rtp+=~/.vim/bundle/Vundle.vim " Vundle BEGIN
 call vundle#begin()               " Vundle BEGIN
                                   " *******************************************************************
 Plugin 'VundleVim/Vundle.vim'
+Plugin 'tpope/vim-fugitive'
 Plugin 'archernar/vim-map'
 Plugin 'archernar/vim-utils'
 Plugin 'archernar/vim-session'
@@ -165,7 +196,6 @@ Plugin 'vim-scripts/grep.vim'      " https://github.com/vim-scripts/grep.vim
 Plugin 'tpope/vim-surround'
 Bundle 'Lokaltog/vim-monotone.git'
 Bundle 'owickstrom/vim-colors-paramount'
-
 "Plugin 'scrooloose/nerdtree.git'
 "let g:NERDTreeNodeDelimiter = "\u00a0"
 "call g:MyKeyMapper("nnoremap <Leader>nt :NERDTreeToggle<cr>","NERDTree Toggle")
@@ -351,10 +381,6 @@ function! MyTest()
      echom l:szKey
 endfunction
 
-" *****************************************************************************************************
-                                  " Fast Quit All
-                                  " *******************************************************************
-nnoremap <silent> zz :wqa<cr>
 " *****************************************************************************************************
                                   " Function Keys
                                   " *******************************************************************
@@ -621,6 +647,74 @@ call g:MyCheatsheet(g:CenterPad(""))
 call g:MyCheatsheet(g:CenterPad("My Cheat Sheet"))
 call g:MyCheatsheet(g:CenterPad(" "))
 call g:MyCheatsheet(s:barline)
+
+call g:MyCheatsheet(g:CenterPad("Plaintext Text Objects - Words"))
+call g:MyCheatsheet(g:CenterPad("<number><command><text object or motion>"))
+call g:CS("aw   a word (with white space)",           "iw   inner word")
+call g:CS("ab   a block from [( to ]) (with braces)", "ib   inner block")
+call g:CS("ap   a paragraph (with white space)",      "ip   inner paragraph")
+call g:CS("as   a sentence (with white space)",       "is   inner sentance")
+call g:CS("at   a tag block (with white space)",      "it   inner tag")
+
+call g:CS("a\"   double quoted string",               "i\"   double quoted string without the quotes")
+call g:CS("a\'   single quoted string",                "i\'   single quoted string without the quotes")
+
+
+call g:MyCheatsheet(s:barline)
+call g:MyCheatsheet("zt  puts current line to top of screen   ,,,    z. or zz puts current line to center of screen")
+call g:MyCheatsheet("zb  puts current line to bottom of screen        ,,,")
+call g:MyCheatsheet(s:barline)
+call g:MyCheatsheet("i   Enter insert mode at cursor                  ,,,    I   Enter insert mode at first non-blank char")
+call g:MyCheatsheet("s   Delete char under cursor enter i-mode        ,,,    S   Delete line & insert @ begin of same line")
+call g:MyCheatsheet("a   Enter insert mode _after_ cursor             ,,,    A   Enter insert mode at the end of the line")
+call g:MyCheatsheet("o   Enter insert mode on the next line           ,,,    O   rEenter insert mode on the above line")
+call g:MyCheatsheet("C   Delete from cursor to EOL & begin insert     ,,,")
+call g:MyCheatsheet(s:barline)
+call g:MyCheatsheet("dw  delete to the next word                      ,,,    dt  delete until next comma on the curline")
+call g:MyCheatsheet("de  delete to the end of the current word        ,,,    d2e delete to the end of next word")
+call g:MyCheatsheet("dj  delete down a line (current and one below    ,,,    dt) delete up until next closing parenthesis")
+call g:MyCheatsheet(s:barline)
+call g:MyCheatsheet("                     d/rails delete up until the first of 'rails'")
+call g:MyCheatsheet(s:barline)
+call g:MyCheatsheet(g:CenterPad("Motions"))
+call g:MyCheatsheet("h,l  move left/right by character                ,,,    w   move forward one (w)ord")
+call g:MyCheatsheet("b    move (b)ackward one word                    ,,,    e   move forward to the (e)nd of a word")
+call g:MyCheatsheet("aw   a word (surrounding white space)            ,,,    iw  inner word (not surrounding white space)")
+call g:MyCheatsheet(s:barline)
+call g:MyCheatsheet("()    Sentences (delimited words)                ,,, {}   Paragraphs (Next empty line)")
+call g:MyCheatsheet(";     Repeat last motion forward                 ,,, ,    Repeat last motion backward")
+call g:MyCheatsheet("<#>G  Go to Line #                               ,,, gg   Go to the top of the file")
+call g:MyCheatsheet("]]    Next section                               ,,, [[   Previous section")
+call g:MyCheatsheet("0     Front of line                              ,,, ^    Front of line (first non-blank)")
+call g:MyCheatsheet("%     Matching brace/bracket/paren/tag           ,,, $    End of line")
+
+call g:MyCheatsheet(g:CenterPad("Variable Scope"))
+call g:MyCheatsheet("nothing      In a function: local to a function; otherwise: global")
+call g:MyCheatsheet("buffer  b:   Local to the current buffer         ,,,window   w:   Local to the current window")
+call g:MyCheatsheet("vim     v:   Global, predefined by Vim           ,,,tabpage  t:   Local to the current tab page")
+call g:MyCheatsheet("global  g:   Global                              ,,,local    l:   Local to a function")
+call g:MyCheatsheet("script  s:   Local to |:src|'ed Vim script       ,,,fun-arg  a:   Function argument (inside a function)")
+call g:MyCheatsheet(s:barline)
+
+call g:MyCheatsheet(g:CenterPad("Commands"))
+call g:MyCheatsheet("COM", "call CommanderList()")
+call g:MyCheatsheet("COM", "call CommanderListEdit()")
+call g:MyCheatsheet(s:barline)
+call g:MyCheatsheet(g:CenterPad("Documents"))
+call g:MyCheatsheet("PDF","~/pdfs/vim-sq.pdf", "The Vim Tutorial and Reference")
+call g:MyCheatsheet("PDF","~/vimdocs/gnuplot4_6.pdf", "GnuPlot 4.6 Documentation")
+call g:MyCheatsheet("PDF","~/vimdocs/progit.pdf","Pro Git Book")
+call g:MyCheatsheet("PDF","~/vimdocs/SpringBootInAction.pdf")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/motion.txt","VIM Doc")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/pattern.txt")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_27.txt")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_40.txt")
+call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_41.txt","Write a VIM Script")
+call g:MyCheatsheet("URL","https://www.youtube.com/watch?v=XA2WjJbmmoM","How to Do 90% of What Plugins Do (With Just Vim)")
+call g:MyCheatsheet("URL","https://devhints.io/vimscript-functions","VimScript Functions")
+call g:MyCheatsheet("URL","https://technotales.wordpress.com/2010/04/29/vim-splits-a-guide-to-doing-exactly-what-you-want/","spliting the way you want")
+
+call g:MyCheatsheet(s:barline)
 call g:MyCheatsheet(g:CenterPad("i3wm"))
 call g:MyCheatsheet(g:CenterPad(" "))
 call g:MyCheatsheet("Controlling i3")
@@ -658,74 +752,6 @@ call g:MyCheatsheet("$mod+enter              Open new terminal window")
 call g:MyCheatsheet("$mod+d                  Open dmenu")
 
 call g:MyCheatsheet(s:barline)
-
-call g:MyCheatsheet(g:CenterPad("Plaintext Text Objects - Words"))
-call g:MyCheatsheet(g:CenterPad("<number><command><text object or motion>"))
-call g:CS("aw   a word (with white space)",           "iw   inner word")
-call g:CS("ab   a block from [( to ]) (with braces)", "ib   inner block")
-call g:CS("ap   a paragraph (with white space)",      "ip   inner paragraph")
-call g:CS("as   a sentence (with white space)",       "is   inner sentance")
-call g:CS("at   a tag block (with white space)",      "it   inner tag")
-
-call g:CS("a\"   double quoted string",               "i\"   double quoted string without the quotes")
-call g:CS("a\'   single quoted string",                "i\'   single quoted string without the quotes")
-
-
-call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet("zt  puts current line to top of screen             ,,,    z. or zz puts current line to center of screen")
-call g:MyCheatsheet("zb  puts current line to bottom of screen          ,,,")
-call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet("i   Enter insert mode at cursor                    ,,,    I   Enter insert mode at first non-blank char")
-call g:MyCheatsheet("s   Delete char under cursor enter i-mode          ,,,    S   Delete line & insert @ begin of same line")
-call g:MyCheatsheet("a   Enter insert mode _after_ cursor               ,,,    A   Enter insert mode at the end of the line")
-call g:MyCheatsheet("o   Enter insert mode on the next line             ,,,    O   rEenter insert mode on the above line")
-call g:MyCheatsheet("C   Delete from cursor to EOL & begin insert       ,,,")
-call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet("dw  delete to the next word                        ,,,    dt  delete until next comma on the curline")
-call g:MyCheatsheet("de  delete to the end of the current word          ,,,    d2e delete to the end of next word")
-call g:MyCheatsheet("dj  delete down a line (current and one below      ,,,    dt) delete up until next closing parenthesis")
-call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet("                     d/rails delete up until the first of 'rails'")
-call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet(g:CenterPad("Motions"))
-call g:MyCheatsheet("h,l  move left/right by character                  ,,,    w   move forward one (w)ord")
-call g:MyCheatsheet("b    move (b)ackward one word                      ,,,    e   move forward to the (e)nd of a word")
-call g:MyCheatsheet("aw   a word (surrounding white space)              ,,,    iw  inner word (not surrounding white space)")
-call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet("()    Sentences (delimited words)                  ,,, {}   Paragraphs (Next empty line)")
-call g:MyCheatsheet(";     Repeat last motion forward                   ,,, ,    Repeat last motion backward")
-call g:MyCheatsheet("<#>G  Go to Line #                                 ,,, gg   Go to the top of the file")
-call g:MyCheatsheet("]]    Next section                                 ,,, [[   Previous section")
-call g:MyCheatsheet("0     Front of line                                ,,, ^    Front of line (first non-blank)")
-call g:MyCheatsheet("%     Matching brace/bracket/paren/tag             ,,, $    End of line")
-
-call g:MyCheatsheet(g:CenterPad("Variable Scope"))
-call g:MyCheatsheet("nothing      In a function: local to a function; otherwise: global")
-call g:MyCheatsheet("buffer  b:   Local to the current buffer           ,,,window   w:   Local to the current window")
-call g:MyCheatsheet("vim     v:   Global, predefined by Vim             ,,,tabpage  t:   Local to the current tab page")
-call g:MyCheatsheet("global  g:   Global                                ,,,local    l:   Local to a function")
-call g:MyCheatsheet("script  s:   Local to |:src|'ed Vim script         ,,,fun-arg  a:   Function argument (inside a function)")
-call g:MyCheatsheet(s:barline)
-
-call g:MyCheatsheet(g:CenterPad("Commands"))
-call g:MyCheatsheet("COM", "call CommanderList()")
-call g:MyCheatsheet("COM", "call CommanderListEdit()")
-call g:MyCheatsheet(s:barline)
-call g:MyCheatsheet(g:CenterPad("Documents"))
-call g:MyCheatsheet("PDF","~/pdfs/vim-sq.pdf", "The Vim Tutorial and Reference")
-call g:MyCheatsheet("PDF","~/vimdocs/gnuplot4_6.pdf", "GnuPlot 4.6 Documentation")
-call g:MyCheatsheet("PDF","~/vimdocs/progit.pdf","Pro Git Book")
-call g:MyCheatsheet("PDF","~/vimdocs/SpringBootInAction.pdf")
-call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/motion.txt","VIM Doc")
-call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/pattern.txt")
-call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_27.txt")
-call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_40.txt")
-call g:MyCheatsheet("TXT","/usr/share/vim/vim74/doc/usr_41.txt","Write a VIM Script")
-call g:MyCheatsheet("URL","https://www.youtube.com/watch?v=XA2WjJbmmoM","How to Do 90% of What Plugins Do (With Just Vim)")
-call g:MyCheatsheet("URL","https://devhints.io/vimscript-functions","VimScript Functions")
-call g:MyCheatsheet("URL","https://technotales.wordpress.com/2010/04/29/vim-splits-a-guide-to-doing-exactly-what-you-want/","spliting the way you want")
-
-call g:MyCheatsheet(s:barline)
  
 
 " *****************************************************************************************************
@@ -755,7 +781,6 @@ call g:MyCommandMapper("command! CE      :call CommanderListEdit()")
 call g:MyCommandMapper("command! TEST    :call Test()")
 call g:MyCommandMapper("command! XXCSD   :call CallMan('LeftWindowBuffer()', 'MyCommandsheetDump()')")
 call g:MyCommandMapper("command! CSD     :call XMan('botright new', 'MyCommandsheetDump()')")
-call g:MyCommandMapper("command! SNIPS   :call g:DD0(\"~/.vim/Snips/*\")"          )
 call g:MyCommandMapper("command! REPOS   :call RepoList()")
 call g:MyCommandMapper("command! GETVUNDLE     :!git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
 call g:MyCommandMapper("command! TIPS    :call Vimtips()")
@@ -831,24 +856,26 @@ function! BiModeSet(...)
           echo "BiModeSet(1) to Buffer"
           let g:BiModeState = 1 
           call g:MyKeyMapper("nnoremap <F1> :bnext<cr>", "Next Buffer")
-          call g:MyKeyMapper("nnoremap <leader><F1>  <Nop>","Nothing")
+          call g:MyKeyMapper("nnoremap <leader><F1> <C-W>w",     "Next Window")
+"           call g:MyKeyMapper("nnoremap <leader><F1>  :call g:FindBuffer()<cr>","Find Buffer")
 
           call g:MyKeyMapper("nnoremap <F2> :bprev<cr>", "Previous Buffer")
           call g:MyKeyMapper("nnoremap <leader><F2>  <Nop>","Nothing")
 
-          call g:MyKeyMapper("nnoremap <F3> <Nop>","Nothing")
+          call g:MyKeyMapper("nnoremap <F3> :call g:EditNewBuffer()<cr>","Edit New Buffer")
           call g:MyKeyMapper("nnoremap <leader><F3>  <Nop>","Nothing")
      endif
      if (a:1 == 0)
           echom "BiModeSet(0) to Window"
           let g:BiModeState = 0 
           call g:MyKeyMapper("nnoremap <F1> <C-W>w",     "Next Window")
-          call g:MyKeyMapper("nnoremap <leader><F1>  :botright  new<CR>","Split Window Down")
+          call g:MyKeyMapper("nnoremap <leader><F1> :bnext<cr>", "Next Buffer")
+"           call g:MyKeyMapper("nnoremap <leader><F1>  :botright  new<CR>","Split Window Down")
 
           call g:MyKeyMapper("nnoremap <F2> <C-W>W",     "Previous Window")
           call g:MyKeyMapper("nnoremap <leader><F2>  :botright  new<CR>","Split Window Down")
 
-          call g:MyKeyMapper("nnoremap <F3> <C-W>w",     "Next Window")
+          call g:MyKeyMapper("nnoremap <F3> :call g:EditNewBuffer()<cr>","Edit New Buffer")
           call g:MyKeyMapper("nnoremap <leader><F3>  :vnew<CR>","Split Window Right")
 
 
@@ -885,7 +912,7 @@ function! PolyModeMapReset()
           call g:MyKeyMapper("nnoremap <F9> :set paste!<cr>",                     "Toggle Paste Setting")
           call g:MyKeyMapper("nnoremap <F10> :CHEAT<cr>",                         "My Cheat Sheet")
           call g:MyKeyMapper("nnoremap <leader><F10> :DOC<cr>",                   "Vim Doc")
-          call g:MyKeyMapper("nnoremap <leader><F1> :call MyTTLDump()<cr>",       "My Help",1)
+"         call g:MyKeyMapper("nnoremap <leader><F1> :call MyTTLDump()<cr>",       "My Help",1)
           call g:MyKeyMapper("nnoremap <leader><F8> :call MyCheatsheetDump()<cr>","My Cheatsheet")
           call g:MyKeyMapper("nnoremap <leader><F9> :call MyQuickListDump()<cr>", "My QuickList")
           " call g:MyKeyMapper("nnoremap <leader><F12> lmaj0d$`ahp`ah",             "grabandtuck")
@@ -1011,9 +1038,45 @@ endif
                                   " *******************************************************************
 " let NOPOWERLINE = 1
 if !exists("NOPOWERLINE")
-     set  rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim/
-     set laststatus=2
-     set t_Co=256
+    set  rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim/
+    set laststatus=2
+    set t_Co=256
+" else
+"     function! GitBranch()
+"       return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
+"     endfunction
+" 
+"     function! StatuslineGit()
+"       let l:branchname = GitBranch()
+"       return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
+"     endfunction
+"     set laststatus=2
+"     set t_Co=256
+"     set statusline=%{FugitiveStatusline()}
+"     set statusline=
+"     set statusline+=%#PmenuSel#
+"     set statusline+=%{StatuslineGit()}
+"     set statusline+=%#LineNr#
+"     set statusline+=\ %f
+"     set statusline+=%m\
+"     set statusline+=%=
+"     set statusline+=%#CursorColumn#
+"     set statusline+=\ %y
+"     set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
+"     set statusline+=\[%{&fileformat}\]
+"     set statusline+=\ %p%%
+"     set statusline+=\ %l:%c
+"     set statusline+=\
+"     set statusline=
+"     set statusline +=%1*\ %n\ %*            "buffer number
+"     set statusline +=%5*%{&ff}%*            "file format
+"     set statusline +=%3*%y%*                "file type
+"     set statusline +=%4*\ %<%F%*            "full path
+"     set statusline +=%2*%m%*                "modified flag
+"     set statusline +=%1*%=%5l%*             "current line
+"     set statusline +=%2*/%L%*               "total lines
+"     set statusline +=%1*%4v\ %*             "virtual column number
+"     set statusline +=%2*0x%04B\ %*          "character under cursor
 endif
 " *****************************************************************************************************
                                   " For Status Line
@@ -1525,6 +1588,9 @@ call g:MyCommandMapper("command! SNIPPEREDITOFF  :call SnipperEditOff()")
 call g:MyCommandMapper("command! SNIPPERNEW      :call SnipperPromptAndEdit()")
 call g:MyCommandMapper("command! SNIPNEW         :call SnipperPromptAndEdit()")
 call g:MyCommandMapper("command! SNIPLS          :call Snipperls()")
+function! Snp2(t,c)
+    echom "e " . g:SnipperHome . a:t
+endfunction
 function! Snp(t,c)
     execute "e " . g:SnipperHome . a:t
     if g:SnipperEdit == 0 
@@ -1645,64 +1711,6 @@ endfunc
 
 call g:Setupsnip()
 call g:MyCommandMapper("command! PWD     :!pwd")
-" call g:MyCommandMapper("command! KSH     :call  SnipperStuff('KSH.txt','')")
-" call g:MyCommandMapper("command! PSETONE :call  SnipperStuff('PSetOne.txt','')")
-" call g:MyCommandMapper("command! APPL    :call  SnipperStuff('Appl.txt','')")
-" call g:MyCommandMapper("command! GAWK    :call  SnipperStuff('Gawk.txt','')")
-" call g:MyCommandMapper("command! GSPLIT  :call  SnipperStuff('GSplit.txt','')")
-" call g:MyCommandMapper("command! SPLIT   :call  SnipperStuff('GSplit.txt','')")
-" call g:MyCommandMapper("command! QCLASS  :call  SnipperStuff('QuickClass.txt','')")
-" call g:MyCommandMapper("command! PCLASS  :call  SnipperStuff('PrivateClass.java','')")
-" call g:MyCommandMapper("command! CLASS   :call  SnipperStuff('Class.java','')")
-" call g:MyCommandMapper("command! RUNNER  :call  SnipperStuff('Runner.txt','')")
-" call g:MyCommandMapper("command! FOREX   :call  SnipperStuff('forexamples.java','')")
-" call g:MyCommandMapper("command! SB      :call  SnipperStuff('Sb.txt','')")
-" call g:MyCommandMapper("command! SCANNER :call  SnipperStuff('Scanner.txt','')")
-" call g:MyCommandMapper("command! SVM     :call  SnipperStuff('StaticVoidMain.txt','')")
-" call g:MyCommandMapper("command! SWITCH  :call  SnipperStuff('Switch.txt','')")
-" call g:MyCommandMapper("command! SYSOUT  :call  SnipperStuff('SysOut.txt','')")
-" call g:MyCommandMapper("command! STRING  :call  SnipperStuff('VarString.txt','')")
-" call g:MyCommandMapper("command! DOUBLE  :call  SnipperStuff('VarDouble.txt','')")
-" call g:MyCommandMapper("command! INT     :call  SnipperStuff('Varint.txt','')")
-" call g:MyCommandMapper("command! INTCIRCLE :call  SnipperStuff('IntCircle.txt','')")
-" call g:MyCommandMapper("command! SCORES  :call  SnipperStuff('Scores.txt','')")
-" call g:MyCommandMapper("command! FLOAT   :call  SnipperStuff('VarFloat.txt','')")
-" call g:MyCommandMapper("command! PRIM    :call  SnipperStuff('Prim.txt','')")
-" call g:MyCommandMapper("command! VAR     :call  SnipperStuff('Var.txt','')")
-" call g:MyCommandMapper("command! TRY     :call  SnipperStuff('Try.txt','')")
-" call g:MyCommandMapper("command! EX1     :call  SnipperStuff('ex1.java','')")
-" call g:MyCommandMapper("command! EX2     :call  SnipperStuff('ex2.java','')")
-" call g:MyCommandMapper("command! EX3     :call  SnipperStuff('ex3.java','')")
-" call g:MyCommandMapper("command! EX4     :call  SnipperStuff('ex4.java','')")
-" call g:MyCommandMapper("command! EX5     :call  SnipperStuff('ex5.java','')")
-" call g:MyCommandMapper("command! EX5A    :call  SnipperStuff('ex5a.java','')")
-" call g:MyCommandMapper("command! EX5B    :call  SnipperStuff('ex5b.java','')")
-" call g:MyCommandMapper("command! EX5C    :call  SnipperStuff('ex5c.java','')")
-" call g:MyCommandMapper("command! EX5D    :call  SnipperStuff('ex5d.java','')")
-" call g:MyCommandMapper("command! EX6     :call  SnipperStuff('ex6.java','')")
-" call g:MyCommandMapper("command! EX8     :call  SnipperStuff('ex8.java','')")
-" call g:MyCommandMapper("command! EX9     :call  SnipperStuff('ex9.java','')")
-" call g:MyCommandMapper("command! EX10    :call  SnipperStuff('ex10.java','')")
-" call g:MyCommandMapper("command! EX11    :call  SnipperStuff('ex11.java','')")
-" call g:MyCommandMapper("command! EX12A   :call  SnipperStuff('ex12a.java','')")
-" call g:MyCommandMapper("command! EX12B   :call  SnipperStuff('ex12b.java','')")
-
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('IntCircle.java','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('ex5bnew.java','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('ex6b.java','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('FileTest2.java','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('FileTest.java','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('PlayList.java','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('PlayListTest.java','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('Scores.java','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('Song.java','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('songs.txt','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('Template.txt','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('Uni.txt','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('VarChar.txt','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('VarDouble.txt','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('VarFloat.txt','')")
-" call g:MyCommandMapper("command! XXX  :call      SnipperStuff('Varint.txt','')")
 
 
 call g:SetMyKeyMapperMode("JAVA")
@@ -1826,8 +1834,60 @@ nnoremap <leader><F7> :call g:setupsniplocal("./*.java")<cr>:call MyDictionaryDu
 nnoremap <leader><F7> :call g:DD0("./*.*")<cr>
 call g:MyCommandMapper("command! GREP   :call Greppyon(1)")
 
-nnoremap <F3> :w<CR>:1<cr>i<cr><esc>k:r !gawk '/^function/{$1="";sub(/^ /,"", $0);print "\" " $0}' %<CR>:1<cr>dd
+" nnoremap <F3> :w<CR>:1<cr>i<cr><esc>k:r !gawk '/^function/{$1="";sub(/^ /,"", $0);print "\" " $0}' %<CR>:1<cr>dd
 
+" *****************************************************************************************************
+                                  " Git and Scratch Stuff
+                                  " *******************************************************************
+" git log --pretty=format:"%h : %an %ar : %s"
+" git log --pretty=format:'%h : %s' --graph > log.log
+" git log --pretty=format:'%h was %an, %ar, message: %s'
+" git log --pretty=format:'%h was %an, %ar, message: %s' > log.log
+" git config --list
+" git reset HEAD <FILENAME>    ; Unstage a file previously staged
+" git --no-pager log > log.txt
+" git config --global core.pager cat
+" git config --global man.viewer catman
+" git config --global man.catman.cmd 'man -P "col -b"'
+
+" call g:MyCommandMapper("command! KSTD     :call MyKeyMapperDump(g:MyKeyDict,'STD')")
+
+call g:SetMyKeyMapperMode("GIT")
+call g:MyCommandMapper("command! GITIGNORE e .gitignore")
+call g:MyCommandMapper("command! GITIG     e .gitignore")
+call g:MyCommandMapper("command! GITLOG      call Scratch('git log --pretty=format:\"%h : %an %ar : %s\" -4')")
+call g:MyCommandMapper("command! GITLOGLAST  call Scratch('git log --pretty=format:\"%h : %an %ar : %s\" -1')")
+call g:MyCommandMapper("command! GITLOGALL   call Scratch('git log --pretty=format:\"%h : %an %ar : %s\"')")
+call g:MyCommandMapper("command! GITLOG2     call Scratch('git log -p -1')")
+call g:MyCommandMapper("command! GITSTATUS   call Scratch('git status')")
+call g:MyCommandMapper("command! GITREMOTE   call Scratch('git remote -v')")
+
+command! GITLOG2X      call Scratch("git log -p -1")
+command! GITLOGA       call Scratch("git log --pretty=format:\"%h : %an %ar : %s\" -4")
+command! GITDIFF       call Scratch("git diff " . expand("%") )
+command! GITBLAME      call Scratch("git blame " . expand("%") )
+command! GITNOTSTAGED  call Scratch("git blame -s " . expand("%") . " | grep 00000000")
+command! GITDIFFSTAGED call Scratch("git diff --staged " )
+command! DF            call Scratch("df " )
+command! GITRESETHEAD  call Scratch("git reset HEAD " . expand("%") )
+
+command! TREE   call Scratch("tree -L 3", 40)
+
+function! Scratch(...)
+        for win in range(1, winnr('$'))
+            if getwinvar(win, 'scratch')
+                execute win . 'windo close'
+            endif
+        endfor
+        echom a:1
+        let  output = system(a:1)"
+        if (a:0 > 1)
+            call g:NewWindow("Right",a:2)
+        else
+            call g:NewWindow("Right",88)
+        endif
+        call setline(1, split(output, "\n"))
+endfunction
 
 " *****************************************************************************************************
                                   " Jump to Last Position When Reopening a File
@@ -1836,5 +1896,4 @@ if has("autocmd")
    au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
    \| exe "normal! g'\"" | endif
 endif
-
 
